@@ -1,0 +1,37 @@
+<resources>
+    <string name="serverUrl">http://10.0.2.2/LpsServer</string>
+    <string name="getToken">/token</string>
+    <string name="images">/FileUploads/</string>
+    <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
+    <string name="RegisterDevice">/api/Account/RegisterDevice</string>
+    <string name="PostBeaconData">/api/AltBeaconsData</string>
+    <string name="GetRegions">/api/AltBeaconsData</string>
+    <string name="PostMeasurement">/api/AltBeaconsData/SubmitMeasurement</string>
+    <string name="GetLocaleMap">/api/Rooms</string>
+    <string name="GetCities">/api/Rooms/cities</string>
+    <string name="GetLocaleNames">/api/Rooms/names</string>
+    <string name="GetLocaleTypes">/api/Rooms/types</string>
+    <string name="GetLocaleSpecializing">/api/Rooms/specializings</string>
+    <string name="GetFavorits">/api/Favorits</string>
+    <string name="GetFavoritNames">/api/Favorits/names</string>
+    <string name="InsertFavorit">/api/Favorits/insert</string>
+    <string name="DeleteFavorit">/api/Favorits/delete</string>
+    <string name="GetActorsInLocale">/api/Chat/Actors</string>
+    <string name="GetBeaconsInLocale">/api/Chat/Beacons</string>
+    <string name="SetPosition">/api/Chat/SetPosition</string>
+    <string name="RemovePosition">/api/Chat/RemovePosition</string>
+    <string name="GetActorByDevice">/api/Chat/ActorByDevice</string>
+    <string name="PostChatMessage">/api/Chat/SendMessage</string>
+    <string name="CreateConversation">/api/Chat/CreateConversation</string>
+    <string name="GetConversation">/api/Chat/GetConversation</string>
+    <string name="GetRoomConversations">/api/Chat/Conversations</string>
+    <string name="GetBookings">/api/Booking/Model</string>
+    <string name="GetTableReservation">/api/Booking/TableReservationModel</string>
+    <string name="GetBookingHistory">/api/Booking/GetBookingHistoryByUser</string>
+    <string name="SendBookingRequest">/api/Booking/Request</string>
+    <string name="SendBookingResponse">/api/Booking/Response</string>
+    <string name="modelDistanceDalculationsUrl">http://10.0.2.2/LpsServer/model-distance-calculations.map</string>
+    <integer name="SendBeaconDataPeriode">2000</integer>
+
+
+</resources>

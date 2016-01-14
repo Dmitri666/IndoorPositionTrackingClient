@@ -1,0 +1,85 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MenuActivity">
+
+    <include layout="@xml/app_bar" />
+
+    <TableLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="55dp"
+            android:layout_marginRight="55dp"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnSearch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:maxHeight="100dp"
+                android:maxWidth="100dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:nestedScrollingEnabled="false"
+                android:onClick="onSearchButtonClicked"
+                android:text="@string/search_room" />
+
+            <Button
+                android:id="@+id/btnNews"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:maxHeight="100dp"
+                android:maxWidth="100dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:onClick="onNewsClicked"
+                android:text="News" />
+
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="55dp"
+            android:layout_marginRight="55dp"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnChat"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:maxHeight="100dp"
+                android:maxWidth="100dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:onClick="onChatClicked"
+                android:text="@string/chat"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/btnFavorit"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:maxHeight="100dp"
+                android:maxWidth="100dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:onClick="onFavoritButtonClicked"
+                android:text="@string/favorit" />
+        </TableRow>
+
+    </TableLayout>
+</LinearLayout>

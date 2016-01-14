@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:touchscreenBlocksFocus="true"
+    tools:context="com.lps.lpsapp.activities.SearchLocaleResultActivity$PlaceholderFragment">
+
+    <ListView
+        android:id="@+id/lvLocales"
+        style="@style/AppTheme.ListView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:choiceMode="none"
+        android:clickable="false"
+        android:fastScrollAlwaysVisible="true" />
+
+</RelativeLayout>

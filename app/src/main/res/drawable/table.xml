@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+     >
+    <item  android:id="@+id/chearTop" android:width="25dp" android:height="180dp" android:top="90dp" android:left="0dp">
+        <shape  android:shape="rectangle"
+            android:tint="@color/table" >
+        </shape>
+    </item>
+    <item android:width="25dp" android:height="180dp" android:top="90dp"  android:left="335dp" >
+        <shape  android:shape="rectangle"  android:tint="@color/table">
+
+
+        </shape>
+    </item>
+    <item android:width="180dp" android:height="25dp"  android:top="335dp" android:left="90dp">
+        <shape  android:shape="rectangle"  android:tint="@color/table">
+
+
+        </shape>
+    </item>
+    <item android:width="180dp" android:height="25dp"  android:top="0dp" android:left="90dp" >
+        <shape  android:shape="rectangle"  android:tint="@color/table">
+
+
+        </shape>
+    </item>
+    <item android:width="300dp" android:height="300dp"  android:top="30dp" android:left="30dp" >
+        <shape  android:shape="rectangle"  android:tint="@color/table">
+        </shape>
+    </item>
+</layer-list>

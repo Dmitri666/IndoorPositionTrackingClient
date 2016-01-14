@@ -1,0 +1,9 @@
+<resources>
+    <declare-styleable name="CustomerMapView">
+        <attr name="mapViewDimension" format="dimension" />
+        <attr name="wandColor" format="color" />
+        <attr name="wandWidth" format="float" />
+        <attr name="mapViewDrawable" format="color|reference" />
+    </declare-styleable>
+
+</resources>

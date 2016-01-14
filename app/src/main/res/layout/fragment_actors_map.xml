@@ -1,0 +1,30 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lps.lpsapp.activities.ActorsActivity$PlaceholderFragment">
+
+    <com.lps.lpsapp.map.CustomerMapView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingLeft="0dp"
+        android:paddingBottom="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp"
+        android:clipChildren="false"
+        android:scaleType="fitCenter"
+        android:id="@+id/CustomerMapView"
+        app:mapViewDimension="24sp"
+        app:wandColor="#33b5e5"
+        app:wandWidth="10"
+        android:theme="@style/Base.AlertDialog.AppCompat.Light"
+        android:background="@drawable/map_bg"
+        />
+</RelativeLayout>
+
+
+
+

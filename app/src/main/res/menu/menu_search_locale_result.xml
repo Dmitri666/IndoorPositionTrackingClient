@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lps.lpsapp.activities.SearchLocaleResultActivity">
+    <item android:id="@+id/action_favorit" android:title="@string/favorit"
+        android:icon="@drawable/ic_favorite_black_24dp"
+        android:orderInCategory="100" app:showAsAction="ifRoom" />
+</menu>
