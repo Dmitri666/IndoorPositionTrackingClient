@@ -15,7 +15,7 @@
         android:left="160dp"
         android:bottom="25dp"
         android:gravity="center"
-        android:drawable="@drawable/chear">
+        android:drawable="@drawable/chearV">
     </item>
     <item
         android:right="25dp"
@@ -23,7 +23,7 @@
         android:left="25dp"
         android:bottom="0dp"
         android:gravity="center"
-        android:drawable="@drawable/chear1">
+        android:drawable="@drawable/chearH">
     </item>
 
 </layer-list>
