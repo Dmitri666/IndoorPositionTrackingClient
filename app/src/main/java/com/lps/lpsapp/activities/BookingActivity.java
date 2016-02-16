@@ -10,14 +10,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
 import android.widget.EditText;
 
 import com.lps.core.webapi.IWebApiResultListener;
@@ -31,7 +27,6 @@ import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.services.WebApiService;
 import com.lps.lpsapp.viewModel.booking.BookingRequest;
-import com.lps.lpsapp.viewModel.booking.BookingResponse;
 import com.lps.lpsapp.viewModel.booking.TableReservationModelRequest;
 import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
@@ -69,7 +64,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                String path = WebApiActions.GetRooms() + "/" + roomId.toString();
+                String path = WebApiActions.GetTableModel() + "/" + roomId.toString();
                 WebApiService service = new WebApiService(RoomModel.class, true);
                 service.performGet(path, new IWebApiResultListener<RoomModel>() {
                     @Override

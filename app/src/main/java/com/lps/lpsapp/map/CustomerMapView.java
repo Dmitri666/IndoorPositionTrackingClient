@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -29,7 +27,6 @@ import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
-import com.lps.lpsapp.viewModel.rooms.Point;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
 import com.lps.lpsapp.viewModel.rooms.Table;
 import com.squareup.picasso.Picasso;
@@ -154,24 +151,24 @@ public class CustomerMapView extends ScalableView  {
         }
 
         canvas.save();
-        float width = this.getDrawX(0.1f) - this.getDrawX(0f);
-        mPaint.setStrokeWidth(width);
-        Path path = new Path();
-        for(int i = 0; i < mRoomModel.border.size();i++)
-        {
-            Point point = this.mRoomModel.border.get(i);
-            if(i == 0)
-            {
-                path.moveTo(this.getDrawX( point.x),this.getDrawY(point.y));
-            }
-            else
-            {
-                path.lineTo(this.getDrawX(point.x), this.getDrawY(point.y));
-            }
-        }
-        path.close();
-        canvas.clipPath(path, Region.Op.DIFFERENCE);
-        canvas.drawColor(Color.BLACK);
+//        float width = this.getDrawX(0.1f) - this.getDrawX(0f);
+//        mPaint.setStrokeWidth(width);
+//        Path path = new Path();
+//        for(int i = 0; i < mRoomModel.border.size();i++)
+//        {
+//            Point point = this.mRoomModel.border.get(i);
+//            if(i == 0)
+//            {
+//                path.moveTo(this.getDrawX( point.x),this.getDrawY(point.y));
+//            }
+//            else
+//            {
+//                path.lineTo(this.getDrawX(point.x), this.getDrawY(point.y));
+//            }
+//        }
+//        path.close();
+//        canvas.clipPath(path, Region.Op.DIFFERENCE);
+//        canvas.drawColor(Color.BLACK);
 
 
         //mBackground.draw(canvas);
@@ -321,12 +318,24 @@ public class CustomerMapView extends ScalableView  {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for(Table table: mRoomModel.tables) {
-            ImageView view =  (ImageView)inflater.inflate(R.layout.layout_table,null);
+            ImageView view = null;
+            if(table.type.equals("Table1")) {
+                view = (ImageView) inflater.inflate(R.layout.layout_table1, null);
+            } else if(table.type.equals("Table2")) {
+                view = (ImageView) inflater.inflate(R.layout.layout_table2, null);
+            } else if(table.type.equals("Table3")) {
+                view = (ImageView) inflater.inflate(R.layout.layout_table3, null);
+            } else if(table.type.equals("Table4")) {
+                view = (ImageView) inflater.inflate(R.layout.layout_table4, null);
+            } else {
+                view = (ImageView) inflater.inflate(R.layout.layout_table4, null);
+            }
+
             view.setLayoutParams(this.getTableLayoutParams(table));
 
             view.setPivotY(0);
             view.setPivotX(0);
-            view.setRotation((float) table.angle);
+            view.setRotation( -(float) table.angle);
 
             table.guiElement = view;
             this.map.put(table, view);

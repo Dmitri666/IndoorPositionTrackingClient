@@ -43,6 +43,10 @@ public class WebApiActions {
     {
         return LpsApplication.getContext().getResources().getString(R.string.serverUrl) + LpsApplication.getContext().getResources().getString(R.string.GetLocaleMap);
     }
+    public static String GetTableModel()
+    {
+        return LpsApplication.getContext().getResources().getString(R.string.serverUrl) + LpsApplication.getContext().getResources().getString(R.string.GetTableModel);
+    }
 
     public static String GetLocaleNames()
     {

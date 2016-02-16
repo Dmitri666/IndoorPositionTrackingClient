@@ -1,5 +1,5 @@
 <resources>
-    <string name="serverUrl">http://10.0.2.2/LpsServer</string>
+    <string name="serverUrl">@string/urlEmulator</string>
     <string name="getToken">/token</string>
     <string name="images">/FileUploads/</string>
     <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
@@ -25,6 +25,8 @@
     <string name="CreateConversation">/api/Chat/CreateConversation</string>
     <string name="GetConversation">/api/Chat/GetConversation</string>
     <string name="GetRoomConversations">/api/Chat/Conversations</string>
+
+    <string name="GetTableModel">/api/Booking/GetTableModel</string>
     <string name="GetBookings">/api/Booking/Model</string>
     <string name="GetTableReservation">/api/Booking/TableReservationModel</string>
     <string name="GetBookingHistory">/api/Booking/GetBookingHistoryByUser</string>
@@ -33,5 +35,7 @@
     <string name="modelDistanceDalculationsUrl">http://10.0.2.2/LpsServer/model-distance-calculations.map</string>
     <integer name="SendBeaconDataPeriode">2000</integer>
 
-
+    <string name="urlEmulator">http://10.0.2.2/LpsServer</string>
+    <string name="urlLocal">http://192.168.19.102/LpsServer</string>
+    <string name="urlGloobar">http://gloobar.de/api</string>
 </resources>

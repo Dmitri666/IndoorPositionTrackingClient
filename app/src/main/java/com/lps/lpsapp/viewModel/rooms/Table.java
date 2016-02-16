@@ -34,6 +34,7 @@ public class Table  {
     public double wight;
     public double height;
     public double angle;
+    public String type;
 
     public Table()
     {
