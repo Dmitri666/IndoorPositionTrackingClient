@@ -1,5 +1,5 @@
 <resources>
-    <string name="serverUrl">@string/urlLocal</string>
+    <string name="serverUrl">@string/urlEmulator</string>
     <string name="getToken">/token</string>
     <string name="images">/FileUploads/</string>
     <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
@@ -32,7 +32,6 @@
     <string name="GetBookingHistory">/api/Booking/GetBookingHistoryByUser</string>
     <string name="SendBookingRequest">/api/Booking/Request</string>
     <string name="SendBookingResponse">/api/Booking/Response</string>
-    <string name="modelDistanceDalculationsUrl">http://10.0.2.2/LpsServer/model-distance-calculations.map</string>
     <integer name="SendBeaconDataPeriode">2000</integer>
 
     <string name="urlEmulator">http://10.0.2.2/LpsServer</string>

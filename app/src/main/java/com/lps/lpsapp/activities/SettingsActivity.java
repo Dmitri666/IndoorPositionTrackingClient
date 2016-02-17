@@ -15,7 +15,6 @@ import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import org.altbeacon.beacon.BeaconManager;
 
 public class SettingsActivity extends AppCompatActivity {
-    public static int BeaconCount = 0;
     public static Boolean SendToServer = false;
 
     private TextWatcher mTextWatcher;
@@ -29,7 +28,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         EditText tbBeaconCount =  (EditText)this.findViewById(R.id.tbBeaconCount);
         tbBeaconCount.getText().clear();
-        tbBeaconCount.getText().append(Integer.toString(BeaconCount));
         mTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -42,10 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() > 0) {
-                    BeaconCount = Integer.parseInt(s.toString());
-                    ((LpsApplication) getApplicationContext()).saveBaeconCountSetting(BeaconCount);
-                }
+
             }
         };
         tbBeaconCount.addTextChangedListener(mTextWatcher);

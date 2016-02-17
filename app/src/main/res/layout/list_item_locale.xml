@@ -60,22 +60,12 @@
         android:orientation="horizontal"
         android:layout_below="@+id/title"
         android:layout_toRightOf="@+id/favorit">
-    <ImageView
-        android:id="@+id/rating"
-        style="@style/RatingHalf" />
+        <ImageView
+            android:id="@+id/rating"
+            style="@style/RatingHalf" />
         <ImageView
             android:id="@+id/rating1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-
-
-            android:adjustViewBounds="true"
-            android:backgroundTintMode="src_in"
-            android:contentDescription="image"
-            android:src="@drawable/ic_star_white_24dp"
-            android:tint="#e61616"
-            android:tintMode="src_atop"
-            android:layout_alignParentRight="false" />
+            style="@style/RatingHalf" />
     </LinearLayout>
 
     <TextView

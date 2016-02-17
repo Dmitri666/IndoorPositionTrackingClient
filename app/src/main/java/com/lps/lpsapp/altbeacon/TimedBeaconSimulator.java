@@ -27,7 +27,6 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
     private int i = 0;
 	private Timer timer;
     private boolean isRunning;
-	private DistanceRssiConverter converter;
 	/*
 	 * You may simulate detection of beacons by creating a class like this in your project.
 	 * This is especially useful for when you are testing in an Emulator or on a device without BluetoothLE capability.
@@ -100,8 +99,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 			//int rndInt = rnd.nextInt(10);
 			//double factor = ( 1.0 + (5.0 - rndInt)/ 100d);
 			//distance = distance * factor;
-			int rssi = -(int)Math.round( new DistanceRssiConverter(0.420929998159409,6.9,0.54992002248764).ConvertDistanceToRssi(distance,55));
-			b.setRssi(rssi);
+			b.setRssi((int)(-55/distance));
 		}
 
 

@@ -58,7 +58,6 @@ public class LpsApplication extends MultiDexApplication {
         }
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
-        SettingsActivity.BeaconCount = settings.getInt("beaconCount", 0);
         SettingsActivity.SendToServer = settings.getBoolean("sendToServer", false);
 
     }

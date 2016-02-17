@@ -15,18 +15,14 @@ import android.widget.Toast;
 import com.lps.core.webapi.IWebApiResultListener;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.altbeacon.DistanceRssiConverter;
-import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
+import com.lps.lpsapp.altbeacon.AvarageDistanceCalculator;
 import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
-import com.lps.lpsapp.positions.PositionCalculator1;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.RangingData;
-import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
 
@@ -60,7 +56,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     private RegionBootstrap regionBootstrap;
     private BackgroundPowerSaver backgroundPowerSaver;
     private boolean haveDetectedBeaconsSinceBoot = false;
-    private PositionCalculator1 mPositionCalculator;
+    private PositionCalculator mPositionCalculator;
     public IDevicePositionListener devicePositionListener;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
@@ -88,7 +84,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             //LogManager.setLogger(Loggers.verboseLogger());
         }
 
-        BeaconManager.setDistanceModelUpdateUrl(getResources().getString(R.string.modelDistanceDalculationsUrl));
+//        BeaconManager.setDistanceModelUpdateUrl(getResources().getString(R.string.modelDistanceDalculationsUrl));
 
         boolean avalable = true;
         try
@@ -189,7 +185,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             service.performGet(path, new IWebApiResultListener<BeaconModel>() {
                 @Override
                 public void onResult(BeaconModel objResult) {
-                    mPositionCalculator = new PositionCalculator1(objResult);
+                    mPositionCalculator = new PositionCalculator(objResult);
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {
@@ -277,6 +273,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     @Override
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
+        Beacon.setDistanceCalculator(new AvarageDistanceCalculator());
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
@@ -284,12 +281,6 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     for (IBeaconServiceListener consumer : consumers) {
                         consumer.beaconsInRange(beacons);
                     }
-
-                    if (PositionCalculator1.mConverter == null) {
-                        PositionCalculator1.mConverter = new BeaconAccessor(beacons.iterator().next()).getDistanceRssiConverter();
-                        Log.d(TAG, "calculator p1=" + PositionCalculator1.mConverter.mCoefficient1 + "p2=" + PositionCalculator1.mConverter.mCoefficient2 + "p3=" + PositionCalculator1.mConverter.mCoefficient3);
-                    }
-
 
                     PointD position = mPositionCalculator.calculatePosition(beacons);
                     if (position != null) {
@@ -334,9 +325,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             data.id2 = beacon.getId2().toInt();
             data.id3 = beacon.getId3().toInt();
             data.bluetothAddress = beacon.getBluetoothAddress();
-            data.averageDistance = beacon.getDistance();
+            data.averageRssiLevel = beacon.getDistance();
             data.txPower = beacon.getTxPower();
-            data.averageRssiLevel = PositionCalculator1.mConverter.ConvertDistanceToRssi(data.averageDistance,data.txPower);
 
             if(data.averageRssiLevel != Double.NaN) {
                 list.add(data);

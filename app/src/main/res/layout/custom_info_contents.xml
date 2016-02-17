@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
 
     <ImageView
@@ -17,7 +16,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_toRightOf="@+id/imageView">
 
         <TextView
             android:id="@+id/title"
@@ -34,6 +34,19 @@
             android:text="nnn"
             android:textSize="10sp" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ratings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/imageView"
+        >
+        <ImageView
+            android:id="@+id/rating"
+            style="@style/RatingHalf" />
+        <ImageView
+            android:id="@+id/rating1"
+            style="@style/RatingHalf" />
+    </LinearLayout>
 
-
-</LinearLayout>
+</RelativeLayout>

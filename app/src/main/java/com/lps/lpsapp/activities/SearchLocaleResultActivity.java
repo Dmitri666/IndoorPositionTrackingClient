@@ -436,17 +436,20 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
     }
 
     class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-
+        private LayoutInflater inflater = null;
         private final View myContentsView;
         final TextView tvTitle;
         final TextView tvSnippet;
         final ImageView imageView;
+        final LinearLayout ratings;
 
         MyInfoWindowAdapter() {
-            myContentsView = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+            inflater = getLayoutInflater();
+            myContentsView = inflater.inflate(R.layout.custom_info_contents, null);
             tvTitle = ((TextView) myContentsView.findViewById(R.id.title));
             tvSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
             imageView = (ImageView) myContentsView.findViewById(R.id.imageView);
+            ratings = (LinearLayout) myContentsView.findViewById(R.id.ratings);
         }
 
         @Override
@@ -460,6 +463,14 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
             }
             tvTitle.setText(info.name);
             tvSnippet.setText(info.name);
+
+
+            ratings.removeAllViews();
+            for(int i = 0; i < info.rating; i++)
+            {
+                ImageView iv = (ImageView)inflater.inflate(R.layout.imageview_rating_full,null);
+                ratings.addView(iv);
+            }
             return myContentsView;
         }
 

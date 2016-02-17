@@ -21,12 +21,12 @@ public class BeaconInRoom {
     /// <summary>
     ///     Gets or sets the x.
     /// </summary>
-    public double x;
+    public float x;
 
     /// <summary>
     ///     Gets or sets the y.
     /// </summary>
-    public double y;
+    public float y;
 
     public BeaconInRoom()
     {

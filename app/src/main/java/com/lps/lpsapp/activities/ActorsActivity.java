@@ -1,12 +1,9 @@
 package com.lps.lpsapp.activities;
 
-import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -47,7 +44,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class ActorsActivity extends BaseActivity implements View.OnLongClickListener{
@@ -439,7 +435,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                     public void onGlobalLayout() {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                        String path = WebApiActions.GetRooms() + "/" + activity.roomId.toString();
+                        String path = WebApiActions.GetTableModel() + "/" + activity.roomId.toString();
                         WebApiService service = new WebApiService(RoomModel.class, true);
                         service.performGet(path, new IWebApiResultListener<RoomModel>() {
                             @Override
@@ -447,6 +443,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                                 activity.setRoomModel(view,objResult);
                             }
                         });
+
+
                     }
                 });
                 return rootView;

@@ -7,14 +7,16 @@ public class BeaconData
 {
     private float distanceFactor;
     private double distance;
-    public Vector2D v;
+    public float x;
+    public float y;
 
 
-    public BeaconData(double distance,double x,double y)
+    public BeaconData(double distance,float x,float y)
     {
         this.distanceFactor = 1.0f;
         this.distance = distance;
-        this.v = new Vector2D(x,y);
+        this.x = x;
+        this.y = y;
     }
 
     public double getDistance()
@@ -27,8 +29,5 @@ public class BeaconData
         this.distanceFactor += 0.01f;
     }
 
-    public float getDistanceFactor()
-    {
-        return this.distanceFactor;
-    }
+
 }

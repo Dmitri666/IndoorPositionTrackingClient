@@ -16,7 +16,7 @@
         android:bottom="25dp"
 
         android:gravity="center"
-        android:drawable="@drawable/chearV">
+        android:drawable="@drawable/chear_v">
     </item>
     <item
         android:right="0dp"
@@ -24,7 +24,7 @@
         android:left="160dp"
         android:bottom="25dp"
         android:gravity="center"
-        android:drawable="@drawable/chearV">
+        android:drawable="@drawable/chear_v">
     </item>
     <item
         android:right="25dp"
@@ -32,7 +32,7 @@
         android:left="25dp"
         android:bottom="0dp"
         android:gravity="center"
-        android:drawable="@drawable/chearH">
+        android:drawable="@drawable/chear_h">
     </item>
     <item
         android:right="25dp"
@@ -40,6 +40,6 @@
         android:left="25dp"
         android:bottom="160dp"
         android:gravity="center"
-        android:drawable="@drawable/chearH">
+        android:drawable="@drawable/chear_h">
     </item>
 </layer-list>

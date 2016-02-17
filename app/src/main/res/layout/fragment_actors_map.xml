@@ -21,7 +21,7 @@
         app:wandColor="#33b5e5"
         app:wandWidth="10"
         android:theme="@style/Base.AlertDialog.AppCompat.Light"
-        android:background="@drawable/map_bg"
+        android:background="@android:color/black"
         />
 </RelativeLayout>
 
