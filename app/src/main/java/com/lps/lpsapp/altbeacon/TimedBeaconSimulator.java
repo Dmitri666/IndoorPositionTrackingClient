@@ -82,24 +82,24 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 		for (Beacon b:beacons) {
 			double distance = 0.0;
 			if(b.getId3().toString() == "1") {
-				distance = Math.sqrt(Math.pow(currentPoint.x - 2.0, 2.0) + Math.pow(currentPoint.y - 6.0, 2.0));
+				distance = Math.sqrt(Math.pow(currentPoint.x - 1.0, 2.0) + Math.pow(currentPoint.y - 7.0, 2.0));
 						}
 			else if(b.getId3().toString() == "2")
 			{
-				distance = Math.sqrt(Math.pow(currentPoint.x - 2.0,2.0) + Math.pow(currentPoint.y - 2.0,2.0));
+				distance = Math.sqrt(Math.pow(currentPoint.x - 1.0,2.0) + Math.pow(currentPoint.y - 1.0,2.0));
 			}
 			else if(b.getId3().toString() == "3")
 			{
-				distance = Math.sqrt(Math.pow(6.0 - currentPoint.x,2.0) + Math.pow(2.0 - currentPoint.y,2.0));
+				distance = Math.sqrt(Math.pow(7.0 - currentPoint.x,2.0) + Math.pow(1.0 - currentPoint.y,2.0));
 			}
 			else if(b.getId3().toString() == "4")
 			{
-				distance = Math.sqrt(Math.pow(6.0 - currentPoint.x,2.0) + Math.pow(currentPoint.y - 6.0,2.0));
+				distance = Math.sqrt(Math.pow(7.0 - currentPoint.x,2.0) + Math.pow(currentPoint.y - 7.0,2.0));
 			}
 			//int rndInt = rnd.nextInt(10);
 			//double factor = ( 1.0 + (5.0 - rndInt)/ 100d);
 			//distance = distance * factor;
-			b.setRssi((int)(-55/distance));
+			b.setRssi((int)(-55 * distance ));
 		}
 
 

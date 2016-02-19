@@ -9,6 +9,7 @@ public class BeaconData
     private double distance;
     public float x;
     public float y;
+    public String beaconId;
 
 
     public BeaconData(double distance,float x,float y)
@@ -26,8 +27,11 @@ public class BeaconData
 
     public void increaseDistanceFactor()
     {
-        this.distanceFactor += 0.01f;
+        this.distanceFactor += 1f;
     }
 
-
+    public void setDistanceFactor(float distanceFactor)
+    {
+        this.distanceFactor = distanceFactor;
+    }
 }

@@ -17,8 +17,8 @@ public class GuiDevice extends Button {
 
     public GuiDevice(Context context, DevicePosition actor) {
         super(context, null);
-        this.wight = 0.2f;
-        this.height = 0.2f;
+        this.wight = 10f;
+        this.height = 10f;
         this.devicePosition = actor;
         this.devicePosition.guiElement = this;
         if(actor.deviceId.equals("001")) {

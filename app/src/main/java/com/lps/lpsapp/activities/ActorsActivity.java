@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,8 @@ import com.lps.core.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
+import com.lps.lpsapp.positions.BeaconData;
+import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.IChatListener;
@@ -135,7 +138,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     @Override
     protected void onStop() {
-        Log.d(TAG,"onStop");
+        Log.d(TAG, "onStop");
         mPushService.removeActorPositionListener(actorPositionListener);
         mPushService.removeChatMessageListener(chatListener);
         mPushService.leavePositionConsumerGroup(roomId);
@@ -258,7 +261,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             case R.id.action_history:
                 Intent intent = new Intent(getApplicationContext(), ChatListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("roomId",roomId );
+                intent.putExtra("roomId", roomId);
                 startActivity(intent);
 
                 return true;
@@ -280,6 +283,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         });
 
     }
+
+
 
     private ServiceConnection mPushServiceConnection = new ServiceConnection() {
 
@@ -307,6 +312,18 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         }
     };
 
+    public void onCalculationResult(final List<BeaconData> beaconDatas,final Rect bounds) {
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
+                if(view.hasRoomModel()) {
+                    view.setCalculationResult(beaconDatas, bounds);
+                }
+            }
+        });
+
+    }
+
     private ServiceConnection mBeaconServiceConnection = new ServiceConnection() {
 
         @Override
@@ -318,7 +335,12 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconServiceBound = true;
 
             mBeaconService.devicePositionListener = actorPositionListener;
-
+            mBeaconService.positionCalculatorListener = new IPositionCalculatorListener() {
+                @Override
+                public void calculationResult(List<BeaconData> beaconDatas, Rect bounds) {
+                    onCalculationResult(beaconDatas,bounds);
+                }
+            };
 
         }
 

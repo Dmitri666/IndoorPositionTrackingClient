@@ -3,6 +3,7 @@ package com.lps.lpsapp.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,6 +19,7 @@ import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.altbeacon.AvarageDistanceCalculator;
+import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.viewModel.BeaconData;
@@ -58,6 +60,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     private boolean haveDetectedBeaconsSinceBoot = false;
     private PositionCalculator mPositionCalculator;
     public IDevicePositionListener devicePositionListener;
+    public IPositionCalculatorListener positionCalculatorListener;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
@@ -186,6 +189,15 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 @Override
                 public void onResult(BeaconModel objResult) {
                     mPositionCalculator = new PositionCalculator(objResult);
+                    mPositionCalculator.positionCalculatorListener = new IPositionCalculatorListener() {
+                        @Override
+                        public void calculationResult(List<com.lps.lpsapp.positions.BeaconData> beaconDatas, Rect bounds) {
+                            if(positionCalculatorListener != null)
+                            {
+                                positionCalculatorListener.calculationResult(beaconDatas,bounds);
+                            }
+                        }
+                    };
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {

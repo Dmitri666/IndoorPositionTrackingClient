@@ -6,6 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -22,6 +25,8 @@ import com.lps.core.gui.ScaleGestureDetectorCompat;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.BookingActivity;
+import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
@@ -52,6 +57,9 @@ public class CustomerMapView extends ScalableView  {
     private List<Actor> actors;
     private RoomModel mRoomModel;
     private Target mBgTarget;
+
+    private List<BeaconData> beaconDatas;
+    private Rect calculationResult;
 
     public HashMap<Table,ImageView> map;
 
@@ -150,7 +158,12 @@ public class CustomerMapView extends ScalableView  {
             return;
         }
 
-        canvas.save();
+        if(mBackground != null) {
+            mBackground.setBounds((int) this.getDrawX(0) , (int) this.getDrawY(0), (int) this.getDrawX(mRoomModel.wight), (int) this.getDrawY(mRoomModel.height));
+            mBackground.draw(canvas);
+        }
+
+
 //        float width = this.getDrawX(0.1f) - this.getDrawX(0f);
 //        mPaint.setStrokeWidth(width);
 //        Path path = new Path();
@@ -173,15 +186,38 @@ public class CustomerMapView extends ScalableView  {
 
         //mBackground.draw(canvas);
 
-        canvas.restore();
-        if(mBackground != null) {
-            mBackground.setBounds((int) this.getDrawX(0) , (int) this.getDrawY(0), (int) this.getDrawX(mRoomModel.wight), (int) this.getDrawY(mRoomModel.height));
-            mBackground.draw(canvas);
+        if(SettingsActivity.ShowCircles && this.beaconDatas != null && this.calculationResult != null)
+        {
+            for(int i = 0; i < 3; i++) {
+                BeaconData beaconData = this.beaconDatas.get(i);
+                Path path = new Path();
+                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getDistance()) - this.getDrawX(0), Path.Direction.CW);
+                path.close();
+                canvas.save();
+                canvas.clipPath(path, Region.Op.INTERSECT);
+                if(beaconData.beaconId == "1") {
+                    canvas.drawColor(Color.GREEN);
+                }
+                else if(beaconData.beaconId == "2") {
+                    canvas.drawColor(Color.YELLOW);
+                }
+                else if(beaconData.beaconId == "3") {
+                    canvas.drawColor(Color.BLUE);
+                }
+                else if(beaconData.beaconId == "4") {
+                    canvas.drawColor(Color.CYAN);
+                }
+                canvas.restore();
+            }
         }
+
+
+
         //canvas.clipPath(path);
         //canvas.drawColor(Color.MAGENTA);
 
         this.setLayoutForMapObjects();
+
 
         /*Point lastPoint = null;
         for(int i = 0; i < mRoomModel.border.size();i++)
@@ -296,22 +332,7 @@ public class CustomerMapView extends ScalableView  {
         }
     }
 
-    private FrameLayout.LayoutParams getTableLayoutParams(Table table)
-    {
-        float tSize = getResources().getDimension(R.dimen.tableSize);
-        float tPadding = getResources().getDimension(R.dimen.tablePadding);
-        float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
-        float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
-        float newHight = hight * (tSize + 2 * tPadding) / tSize;
-        float newWidth = width * (tSize + 2 * tPadding) / tSize;
-        int xOffset = (int)(newWidth - width)/2;
-        int yOffset = (int)(newHight - hight)/2;
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)newWidth,(int)newHight);
-        lp.leftMargin = (int)this.getDrawX((float) table.x) - xOffset;
-        lp.topMargin = (int) this.getDrawY((float) table.y) - yOffset;
 
-        return lp;
-    }
 
     private void CreateMapObjects()
     {
@@ -369,7 +390,9 @@ public class CustomerMapView extends ScalableView  {
     private void setLayoutForMapObjects()
     {
         for (Table table:this.mRoomModel.tables) {
-            map.get(table).setLayoutParams(this.getTableLayoutParams(table));
+            FrameLayout.LayoutParams lp = this.getTableLayoutParams(table);
+            map.get(table).setLayoutParams(lp);
+            //Log.d(TAG,"Table Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
 
         for (Actor actor:this.actors) {
@@ -379,7 +402,32 @@ public class CustomerMapView extends ScalableView  {
             lp.leftMargin = (int)this.getDrawX((float) actor.position.x);
             lp.topMargin = Math.round(this.getDrawY((float)actor.position.y) - hight);
             actor.position.guiElement.setLayoutParams(lp);
+            //Log.d(TAG, "Actor Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
+    }
+
+    public void setCalculationResult(List<BeaconData> beaconDatas, Rect bounds)
+    {
+        this.beaconDatas = beaconDatas;
+        this.calculationResult = bounds;
+        this.invalidate();
+    }
+
+    private FrameLayout.LayoutParams getTableLayoutParams(Table table)
+    {
+        float tSize = getResources().getDimension(R.dimen.tableSize);
+        float tPadding = getResources().getDimension(R.dimen.tablePadding);
+        float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
+        float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
+        float newHight = hight * (tSize + 2 * tPadding) / tSize;
+        float newWidth = width * (tSize + 2 * tPadding) / tSize;
+        int xOffset = (int)(newWidth - width)/2;
+        int yOffset = (int)(newHight - hight)/2;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)newWidth,(int)newHight);
+        lp.leftMargin = (int)this.getDrawX((float) table.x) - xOffset;
+        lp.topMargin = (int) this.getDrawY((float) table.y) - yOffset;
+
+        return lp;
     }
 
     private void init(AttributeSet attrs, int defStyle) {
