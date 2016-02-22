@@ -106,7 +106,7 @@ public class PositionCalculator {
         {
             String msg = "";
             for (BeaconData data:beaconDatas) {
-                msg += "x=" + data.x + " y=" + data.y + " distance=" + data.getDistance() + '\n';
+                msg += "Id=" + data.beaconId + " distance=" + data.getDistance() + '\n';
             }
             Log.d(TAG,msg + " Position x=" + region.exactCenterX() + " y=" + region.exactCenterY());
             return new PointD(region.exactCenterX() / scaleFactor, region.exactCenterY() / scaleFactor);

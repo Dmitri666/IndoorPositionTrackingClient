@@ -19,6 +19,7 @@ import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.altbeacon.AvarageDistanceCalculator;
+import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
@@ -285,7 +286,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     @Override
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
-        Beacon.setDistanceCalculator(new AvarageDistanceCalculator());
+        Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
