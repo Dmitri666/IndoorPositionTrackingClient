@@ -3,6 +3,7 @@ package com.lps.lpsapp.map;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -37,6 +39,8 @@ import com.lps.lpsapp.viewModel.rooms.Table;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,25 +75,6 @@ public class CustomerMapView extends ScalableView  {
         init(attrs, 0);
         ScaleGestureDetectorCompat.synchronizeScale = true;
         actors = new ArrayList<>();
-        this.mBgTarget = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mBackground = new BitmapDrawable(getResources(), bitmap);
-                invalidate();
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
-
-
     }
 
     @Override
@@ -101,6 +86,10 @@ public class CustomerMapView extends ScalableView  {
     public void setmRoomModel(RoomModel roomModel)
     {
         this.mRoomModel = roomModel;
+        String imageDataBytes = roomModel.backgroungImage.substring(roomModel.backgroungImage.indexOf(",")+1);
+        InputStream stream = new ByteArrayInputStream(Base64.decode(imageDataBytes.getBytes(), Base64.DEFAULT));
+        Bitmap bitmap = BitmapFactory.decodeStream(stream);
+        mBackground = new BitmapDrawable(getResources(), bitmap);
         this.CreateMapObjects();
         this.invalidate();
 

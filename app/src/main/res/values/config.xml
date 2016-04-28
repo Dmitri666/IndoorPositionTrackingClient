@@ -7,11 +7,12 @@
     <string name="PostBeaconData">/api/AltBeaconsData</string>
     <string name="GetRegions">/api/AltBeaconsData</string>
     <string name="PostMeasurement">/api/AltBeaconsData/SubmitMeasurement</string>
-    <string name="GetLocaleMap">/api/Rooms</string>
-    <string name="GetCities">/api/Rooms/cities</string>
-    <string name="GetLocaleNames">/api/Rooms/names</string>
-    <string name="GetLocaleTypes">/api/Rooms/types</string>
-    <string name="GetLocaleSpecializing">/api/Rooms/specializings</string>
+    <string name="GetLocaleMap">/api/RoomMobile</string>
+    <string name="GetCities">/api/RoomMobile/cities</string>
+    <string name="GetLocaleNames">/api/RoomMobile/names</string>
+    <string name="GetLocaleTypes">/api/RoomMobile/types</string>
+    <string name="GetLocaleSpecializing">/api/RoomMobile/specializings</string>
+    <string name="GetTableModel">/api/RoomMobile/GetTableModel</string>
     <string name="GetFavorits">/api/Favorits</string>
     <string name="GetFavoritNames">/api/Favorits/names</string>
     <string name="InsertFavorit">/api/Favorits/insert</string>
@@ -26,7 +27,7 @@
     <string name="GetConversation">/api/Chat/GetConversation</string>
     <string name="GetRoomConversations">/api/Chat/Conversations</string>
 
-    <string name="GetTableModel">/api/Booking/GetTableModel</string>
+
     <string name="GetBookings">/api/Booking/Model</string>
     <string name="GetTableReservation">/api/Booking/TableReservationModel</string>
     <string name="GetBookingHistory">/api/Booking/GetBookingHistoryByUser</string>

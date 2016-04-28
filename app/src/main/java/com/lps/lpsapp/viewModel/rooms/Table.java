@@ -28,11 +28,17 @@ public class Table  {
     @JsonIgnore
     public final Animation animation = new AlphaAnimation(1, 0);
 
+
+    public double wight;
+
+
+    public double height;
+
+
     public UUID id;
     public double x;
     public double y;
-    public double wight;
-    public double height;
+
     public double angle;
     public String type;
 

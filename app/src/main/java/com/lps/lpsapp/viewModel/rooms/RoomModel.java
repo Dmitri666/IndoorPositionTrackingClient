@@ -11,7 +11,8 @@ import java.util.List;
 public class RoomModel extends RoomInfo {
     public float wight;
     public float height;
-
+    public float zoom;
+    public String backgroungImage;
 
     public RoomModel() {
         this.tables = new ArrayList<Table>();
