@@ -96,6 +96,7 @@ public class MenuActivity extends BaseActivity {
 
 	public void onNewsClicked(View view) {
 		Intent myIntent = new Intent(this, LoginActivity.class);
+		//Intent myIntent = new Intent(this, BeaconListActivity.class);
 		myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		this.startActivity(myIntent);
 	}
