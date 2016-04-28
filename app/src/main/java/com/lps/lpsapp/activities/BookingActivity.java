@@ -35,7 +35,6 @@ import com.lps.lpsapp.viewModel.rooms.Table;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +45,6 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
     private IBookingStateChangedListener bookingStateListener;
     private GregorianCalendar mDate;
-    private GregorianCalendar mTime;
     private boolean mBound = false;
     protected PushService mPushService;
 
@@ -57,6 +55,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         setContentView(R.layout.activity_booking);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mDate = new GregorianCalendar();
         final CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
         ViewTreeObserver vto = view.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -69,7 +68,9 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                 service.performGet(path, new IWebApiResultListener<RoomModel>() {
                     @Override
                     public void onResult(RoomModel objResult) {
-                        setRoomModel(objResult);
+                        view.setmRoomModel(objResult);
+                        BookingActivity.this.setDate();
+                        BookingActivity.this.mProgressBar.setVisibility(View.GONE);
                     }
                 });
             }
@@ -82,33 +83,33 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             }
         };
 
-        EditText tv= (EditText) findViewById(R.id.txtDate);
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogFragment picker = new DatePickerFragment();
-                if(mDate != null) {
+        EditText tv = (EditText) findViewById(R.id.txtDate);
+        if(tv != null) {
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogFragment picker = new DatePickerFragment();
                     Bundle args = new Bundle();
                     args.putLong("date", mDate.getTime().getTime());
                     picker.setArguments(args);
+                    picker.show(getSupportFragmentManager(), "datePicker");
                 }
-                picker.show(getSupportFragmentManager(), "datePicker");
-            }
-        });
+            });
+        };
 
         EditText tvTime= (EditText) findViewById(R.id.txtTime);
-        tvTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogFragment timePicker = new TimePickerFragment();
-                if(mTime != null) {
+        if(tvTime != null) {
+            tvTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogFragment timePicker = new TimePickerFragment();
                     Bundle args = new Bundle();
-                    args.putLong("time", mTime.getTime().getTime());
+                    args.putLong("time", mDate.getTime().getTime());
                     timePicker.setArguments(args);
+                    timePicker.show(getSupportFragmentManager(), "timePicker");
                 }
-                timePicker.show(getSupportFragmentManager(), "timePicker");
-            }
-        });
+            });
+        };
 
         EditText tvCount= (EditText) findViewById(R.id.txtCount);
 
@@ -121,35 +122,34 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         });*/
 
         FloatingActionButton btn = (FloatingActionButton)this.findViewById(R.id.btnBooking);
-        btn.setVisibility(View.INVISIBLE);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBookingRequest();
-                Snackbar.make(view, "send booking ", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if(btn != null) {
+            btn.setVisibility(View.INVISIBLE);
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendBookingRequest();
+                    Snackbar.make(view, "send booking ", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        };
     }
 
     @Override
     public void returnDate(GregorianCalendar date) {
-        this.mDate = date;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = sdf.format(date.getTime());
-        EditText tv= (EditText) findViewById(R.id.txtDate);
-        tv.setText(formattedDate);
-        this.getReservationModel();
+        this.mDate.set(Calendar.YEAR, date.get(Calendar.YEAR));
+        this.mDate.set(Calendar.MONTH, date.get(Calendar.MONTH));
+        this.mDate.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+
+        setDate();
     }
 
     @Override
     public void returnTime(GregorianCalendar time) {
-        this.mTime = time;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        String formattedTime = sdf.format(time.getTime());
-        EditText tv= (EditText) findViewById(R.id.txtTime);
-        tv.setText(formattedTime);
-        this.getReservationModel();
+        this.mDate.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
+        this.mDate.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+
+        setDate();
     }
 
     @Override
@@ -159,28 +159,25 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
     }
 
-    private Date getBookingDate()
+    private void setDate()
     {
-        if(this.mDate == null || this.mTime == null)
-        {
-            return null;
-        }
-        Calendar c = new GregorianCalendar();
-        c.set(Calendar.YEAR, this.mDate.get(Calendar.YEAR));
-        c.set(Calendar.MONTH, this.mDate.get(Calendar.MONTH));
-        c.set(Calendar.DAY_OF_MONTH, this.mDate.get(Calendar.DAY_OF_MONTH));
-        c.set(Calendar.HOUR_OF_DAY, this.mTime.get(Calendar.HOUR_OF_DAY));
-        c.set(Calendar.MINUTE, this.mTime.get(Calendar.MINUTE));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = sdf.format(this.mDate.getTime());
+        EditText tv= (EditText) findViewById(R.id.txtDate);
+        tv.setText(formattedDate);
 
-        return c.getTime();
+        sdf = new SimpleDateFormat("HH:mm");
+        String formattedTime = sdf.format(this.mDate.getTime());
+        tv= (EditText) findViewById(R.id.txtTime);
+        tv.setText(formattedTime);
 
+        this.getReservationModel();
     }
-
     public void validateBooking()
     {
         CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
         FloatingActionButton btn = (FloatingActionButton)this.findViewById(R.id.btnBooking);
-        if(this.getBookingDate() != null && !view.getSelectedTables().isEmpty())
+        if(!view.getSelectedTables().isEmpty())
         {
             btn.setVisibility(View.VISIBLE);
         }
@@ -190,27 +187,13 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         }
     }
 
-    private void setRoomModel(RoomModel map)
-    {
-        CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
-        view.setmRoomModel(map);
-        this.getReservationModel();
-
-        this.mProgressBar.setVisibility(View.GONE);
-
-    }
 
     private void getReservationModel()
     {
-        Date bokingTime = this.getBookingDate();
-        if(bokingTime == null)
-        {
-            return;
-        }
         try {
             TableReservationModelRequest request = new TableReservationModelRequest();
             request.roomId = roomId;
-            request.time = bokingTime;
+            request.time = mDate.getTime();
 
             WebApiService service = new WebApiService(TableState.class,true);
             service.performPostList(WebApiActions.GetBookingState(), request, new IWebApiResultListener<List>() {
@@ -220,7 +203,6 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                     view.setBooking(objResult);
                 }
             });
-
         }
         catch (Exception ex)
         {
@@ -257,8 +239,6 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             bookingStateListener = null;
         }
     }
-
-
 
     public void onBookingStateChanged() {
         this.getReservationModel();
@@ -309,7 +289,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         String path =  WebApiActions.SendBookingRequest();
         BookingRequest request = new BookingRequest();
         request.tableId = table.id;
-        request.time = getBookingDate();
+        request.time = this.mDate.getTime();
         WebApiService service = new WebApiService(BookingRequest.class,true);
         service.performPost(path, request);
 

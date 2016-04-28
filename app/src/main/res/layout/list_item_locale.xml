@@ -2,8 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-
     <CheckBox
         android:id="@+id/localecheck"
         android:layout_width="wrap_content"
@@ -93,14 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="5dp"
         android:adjustViewBounds="true"
-        android:backgroundTintMode="src_in"
         android:contentDescription="image"
         android:src="@drawable/ic_launcher"
-        android:tint="#e61616"
-        android:tintMode="add"
         android:layout_alignParentRight="true" />
-
-
-
-
 </RelativeLayout>
