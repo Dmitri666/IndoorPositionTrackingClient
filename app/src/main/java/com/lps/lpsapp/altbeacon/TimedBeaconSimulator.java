@@ -111,13 +111,13 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	 */
 	public void createBasicSimulatedBeacons(){
 		if (USE_SIMULATED_BEACONS) {
-            Beacon beacon1 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon1 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("1").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon2 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon2 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("2").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon3 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon3 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("3").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon4 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon4 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("4").setRssi(-55).setTxPower(-55).build();
 			beacons.add(beacon1);
 			beacons.add(beacon2);
@@ -141,13 +141,13 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 
 
 			beacons = new ArrayList<Beacon>();
-            Beacon beacon1 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon1 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("1").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon2 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon2 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("2").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon3 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon3 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("3").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon4 = new AltBeacon.Builder().setId1("699ebc80-e1f3-11e3-9a0f-0cf3ee3bc012")
+            Beacon beacon4 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("4").setRssi(-55).setTxPower(-55).build();
 			beacons.add(beacon1);
 			beacons.add(beacon2);
