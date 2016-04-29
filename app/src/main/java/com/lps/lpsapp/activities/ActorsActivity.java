@@ -14,6 +14,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +61,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private AltBeaconService mBeaconService;
     private MyArrayAdapter mActorListAdapter;
     private IChatListener chatListener;
+    private ActionMode mActionMode;
 
         @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,12 +205,6 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     {
         return R.menu.menu_actors;
     }
-
-
-    public Integer getContextMenuId() {
-        return R.menu.menu_context_actors;
-    }
-
 
     public boolean contextMenuItemClicked(ActionMode mode, MenuItem item)
     {
@@ -354,18 +351,78 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                 return false;
             }
         }
-//        if (mActionMode != null) {
-//            return false;
-//        }
-//
-//        // Start the CAB using the ActionMode.Callback defined above
-//        mActionMode = startActionMode(mActionModeCallback);
-//        mActionMode.setTag(view);
+        if (mActionMode != null) {
+            return false;
+        }
+
+        // Start the CAB using the ActionMode.Callback defined above
+        mActionMode = startActionMode(mActionModeCallback);
+        mActionMode.setTag(view);
         view.setSelected(true);
         return true;
 
     }
 
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.menu_context_actors, menu);
+            mActionMode = mode;
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_chat:
+                    GuiDevice actor = (GuiDevice)mode.getTag();
+                    mode.finish();
+                    String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
+                    WebApiService service = new WebApiService(Actor.class,true);
+                    service.performGet(path, new IWebApiResultListener() {
+                        @Override
+                        public void onResult(Object objResult) {
+                            try {
+                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                String serActor = JsonSerializer.serialize(objResult);
+                                intent.putExtra("actor", serActor);
+                                startActivity(intent);
+                            } catch (JsonProcessingException ex) {
+                                Log.e(TAG, ex.getMessage(), ex);
+                            }
+                        }
+                    });
+
+                    return true;
+                case R.id.action_showProfile:
+
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode.setTag(null);
+            mActionMode = null;
+        }
+    };
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

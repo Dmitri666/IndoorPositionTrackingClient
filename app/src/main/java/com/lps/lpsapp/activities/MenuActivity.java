@@ -61,6 +61,8 @@ public class MenuActivity extends BaseActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		View btn =  MenuActivity.this.findViewById(R.id.btnChat);
+		btn.setEnabled(SettingsActivity.UseBeaconSimulator);
 		Log.d(TAG, "onStart");
 
 	}

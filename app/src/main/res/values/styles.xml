@@ -7,7 +7,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="android:dialogTheme">@style/MyDialogTheme</item>
         <item name="android:timePickerStyle">@style/MyTimePicker</item>
-
+        <item name="actionModeStyle">@style/LStyled.ActionMode</item>
     </style>
     <style name="AppTheme.ListView" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">@color/light_white</item>
@@ -21,6 +21,16 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
 
+    </style>
+    <style name="LStyled.ActionMode" parent="@style/Widget.AppCompat.Light.ActionMode.Inverse">
+        <item name="titleTextStyle">@style/LStyled.ActionMode.Title</item>
+        <item name="subtitleTextStyle">@style/LStyled.ActionMode.Subtitle</item>
+    </style>
+    <style name="LStyled.ActionMode.Title" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+    <style name="LStyled.ActionMode.Subtitle" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle">
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="ListView" parent="@android:style/Widget.ListView"/>
