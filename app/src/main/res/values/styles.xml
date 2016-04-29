@@ -22,7 +22,8 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
 
     </style>
-    <style name="LStyled.ActionMode" parent="@style/Widget.AppCompat.Light.ActionMode.Inverse">
+
+    <style name="LStyled.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="titleTextStyle">@style/LStyled.ActionMode.Title</item>
         <item name="subtitleTextStyle">@style/LStyled.ActionMode.Subtitle</item>
     </style>

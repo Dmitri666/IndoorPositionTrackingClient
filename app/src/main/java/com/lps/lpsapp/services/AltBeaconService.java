@@ -87,7 +87,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             //LogManager.setLogger(Loggers.verboseLogger());
         }
 
-//        BeaconManager.setDistanceModelUpdateUrl(getResources().getString(R.string.modelDistanceDalculationsUrl));
+        //BeaconManager.setDistanceModelUpdateUrl(getResources().getString(R.string.modelDistanceDalculationsUrl));
 
         boolean avalable = true;
         try
