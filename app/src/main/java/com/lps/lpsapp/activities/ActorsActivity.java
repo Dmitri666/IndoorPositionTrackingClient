@@ -60,22 +60,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private MyArrayAdapter mActorListAdapter;
     private IChatListener chatListener;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-
-    @Override
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_actors);
@@ -111,11 +96,13 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         };
         // Create the mActorListAdapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections mActorListAdapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
+        if(mViewPager != null) {
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+        }
     }
 
     @Override
@@ -316,7 +303,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         this.runOnUiThread(new Runnable() {
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
-                if(view.hasRoomModel()) {
+                if(view != null && view.hasRoomModel()) {
                     view.setCalculationResult(beaconDatas, bounds);
                 }
             }
@@ -501,7 +488,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         }
     }
 
-    private static class MyArrayAdapter extends ArrayAdapter
+    private static class MyArrayAdapter extends ArrayAdapter<Actor>
     {
         private Context context;
         private LayoutInflater inflater = null;
@@ -520,7 +507,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
             ImageView iv = (ImageView) convertView.findViewById(R.id.imageView);
 
-            Actor actor =  (Actor)this.getItem(position);
+            Actor actor =  this.getItem(position);
             tvText.setText(actor.userName);
             tvTitle.setText(actor.userName);
             String iPath = actor.photoPath;

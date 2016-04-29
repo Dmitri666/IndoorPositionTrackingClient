@@ -17,6 +17,7 @@ import org.altbeacon.beacon.BeaconManager;
 public class SettingsActivity extends AppCompatActivity {
     public static Boolean SendToServer = false;
     public static Boolean ShowCircles = false;
+    public static Boolean UseBeaconSimulator = false;
 
     private TextWatcher mTextWatcher;
     private CompoundButton.OnCheckedChangeListener mSendToServerChangeListener;
@@ -62,17 +63,18 @@ public class SettingsActivity extends AppCompatActivity {
         mUseBeaconSimulatorChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if(isChecked)
-            {
-                BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
-                ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
-            } else {
-                BeaconManager.setBeaconSimulator(null);
-            }
+                UseBeaconSimulator = isChecked;
+                if (isChecked) {
+                    BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
+                    ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
+                } else {
+                    BeaconManager.setBeaconSimulator(null);
+                }
 
             }
         };
         Switch swUseSimulator =  (Switch)this.findViewById(R.id.switch_use_beacon_simulator);
+        swUseSimulator.setChecked(UseBeaconSimulator);
         swUseSimulator.setOnCheckedChangeListener(mUseBeaconSimulatorChangeListener);
 
         mShowCirclesChangeListener = new CompoundButton.OnCheckedChangeListener() {

@@ -19,7 +19,7 @@ public class ChatMessage {
     public UUID conversationId;
     public String message;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm", timezone="GMT")
     public Date time;
 
     public boolean isMe;

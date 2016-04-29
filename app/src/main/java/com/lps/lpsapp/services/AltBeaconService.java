@@ -18,7 +18,6 @@ import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.altbeacon.AvarageDistanceCalculator;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.positions.PointD;
@@ -66,7 +65,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
         for (com.lps.lpsapp.viewModel.Region r :regions) {
-            this.mRegions.add(new Region(r.mapId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null));
+            this.mRegions.add(new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null));
         }
 
         this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
@@ -118,6 +117,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             @Override
             public void onResult(List objResult) {
                 setRegions(objResult);
+                for(int i = 0; i < objResult.size(); i++)
+                {
+                    Log.i(TAG, "setRegion:"  + objResult.get(i).toString());
+                }
+
             }
         });
 
@@ -180,7 +184,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public void didEnterRegion(final Region region) {
         if (!region.getUniqueId().equals("backgroundRegion")) {
 
-            Log.d(TAG, "did enter region." + region.getUniqueId());
+            Log.i(TAG, "did enter region." + region.getUniqueId());
             final Context ctx = this;
             LpsApplication app = (LpsApplication) this.getApplicationContext();
 
@@ -272,6 +276,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
+                if(mPositionCalculator != null)
+                {
+                    mPositionCalculator.positionCalculatorListener = null;
+                    mPositionCalculator = null;
+                }
             } catch (RemoteException ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }
@@ -295,17 +304,19 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                         consumer.beaconsInRange(beacons);
                     }
 
-                    PointD position = mPositionCalculator.calculatePosition(beacons);
-                    if (position != null) {
-                        LpsApplication app = (LpsApplication) getApplicationContext();
-                        String path = WebApiActions.SetPosition();
-                        DevicePosition param = new DevicePosition();
-                        param.deviceId = app.getAndroidId();
-                        param.roomId = UUID.fromString(region.getUniqueId());
-                        param.x = position.x;
-                        param.y = position.y;
-                        WebApiService service = new WebApiService(DevicePosition.class, true);
-                        service.performPost(path, param);
+                    if(mPositionCalculator != null) {
+                        PointD position = mPositionCalculator.calculatePosition(beacons);
+                        if (position != null) {
+                            LpsApplication app = (LpsApplication) getApplicationContext();
+                            String path = WebApiActions.SetPosition();
+                            DevicePosition param = new DevicePosition();
+                            param.deviceId = app.getAndroidId();
+                            param.roomId = UUID.fromString(region.getUniqueId());
+                            param.x = position.x;
+                            param.y = position.y;
+                            WebApiService service = new WebApiService(DevicePosition.class, true);
+                            service.performPost(path, param);
+                        }
                     }
 
                     if (SettingsActivity.SendToServer) {

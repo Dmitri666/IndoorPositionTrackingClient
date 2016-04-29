@@ -17,7 +17,7 @@ public class BookingData {
 
     public UUID bookingId;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm", timezone="GMT")
     public Date time;
 
     public UUID tableId;

@@ -17,6 +17,6 @@ public class TableReservationModelRequest {
 
     public UUID roomId;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm':'ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm", timezone="GMT")
     public Date time;
 }

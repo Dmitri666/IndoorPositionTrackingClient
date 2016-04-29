@@ -1,6 +1,5 @@
 package com.lps.lpsapp.activities;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -124,21 +123,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showMessage(String title,String message)
-    {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(android.R.string.ok, null);
-        //builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-        //    @Override
-        //    public void onDismiss(DialogInterface dialog) {
-        //        finish();
-                //System.exit(0);
-        //    }
-        //});
-        builder.show();
-    }
+
 
 
 

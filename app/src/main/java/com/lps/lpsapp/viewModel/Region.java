@@ -8,7 +8,7 @@ import java.util.UUID;
 public class Region {
     private Region() { }
 
-    public UUID mapId;
+    public UUID roomId;
 
     public UUID identifirer1;
 

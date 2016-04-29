@@ -21,6 +21,7 @@ import com.lps.lpsapp.R;
 import com.lps.lpsapp.dialogs.DatePickerFragment;
 import com.lps.lpsapp.dialogs.NumberPickerFragment;
 import com.lps.lpsapp.dialogs.TimePickerFragment;
+import com.lps.lpsapp.helper.DataTimeUtil;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.services.IBookingStateChangedListener;
 import com.lps.lpsapp.services.PushService;
@@ -193,7 +194,8 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         try {
             TableReservationModelRequest request = new TableReservationModelRequest();
             request.roomId = roomId;
-            request.time = mDate.getTime();
+            Calendar bookingTime = DataTimeUtil.convertToGTM(mDate);
+            request.time = bookingTime.getTime();
 
             WebApiService service = new WebApiService(TableState.class,true);
             service.performPostList(WebApiActions.GetBookingState(), request, new IWebApiResultListener<List>() {
@@ -289,7 +291,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         String path =  WebApiActions.SendBookingRequest();
         BookingRequest request = new BookingRequest();
         request.tableId = table.id;
-        request.time = this.mDate.getTime();
+        request.time = DataTimeUtil.convertToGTM(this.mDate).getTime();
         WebApiService service = new WebApiService(BookingRequest.class,true);
         service.performPost(path, request);
 
