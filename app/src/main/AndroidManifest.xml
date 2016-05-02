@@ -71,6 +71,7 @@
         <activity
             android:name=".activities.BeaconListActivity"
             android:label="@string/title_activity_beacon_list"
+            android:parentActivityName=".activities.MenuActivity"
             />
         <activity
             android:name=".activities.ChatActivity"

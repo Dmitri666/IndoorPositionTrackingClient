@@ -25,6 +25,11 @@ public class WebApiActions {
         return LpsApplication.getContext().getResources().getString(R.string.serverUrl) + LpsApplication.getContext().getResources().getString(R.string.GetRegions);
     }
 
+    public static String SaveBackgroundBeacons()
+    {
+        return LpsApplication.getContext().getResources().getString(R.string.serverUrl) + LpsApplication.getContext().getResources().getString(R.string.SaveBackgroundBeacons);
+    }
+
     public static String RegisterUserCurrentDevice()
     {
         return LpsApplication.getContext().getResources().getString(R.string.serverUrl) + LpsApplication.getContext().getResources().getString(R.string.RegisterUserCurrentDevice);

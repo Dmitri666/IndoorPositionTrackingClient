@@ -15,6 +15,7 @@ import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 
 import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class MeasurementActivity extends BaseActivity {
         mProgressBar.setVisibility(View.GONE);
         listener = new IBeaconServiceListener() {
             @Override
-            public void beaconsInRange(Collection<Beacon> beacons) {
+            public void beaconsInRange(Collection<Beacon> beacons,Region region) {
                 lock.lock();
                 try
                 {

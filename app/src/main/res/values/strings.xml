@@ -9,6 +9,7 @@
     <string name="action_chat">Chat</string>
     <string name="action_show_profile">Show Profile</string>
     <string name="action_show_my_conversations">My conversations</string>
+    <string name="action_save">Save</string>
     <string name="booking_data">Date</string>
     <string name="menu">Menu</string>
     <string name="home">Home</string>

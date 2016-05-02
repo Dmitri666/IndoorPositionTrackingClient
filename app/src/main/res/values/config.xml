@@ -5,6 +5,8 @@
     <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
     <string name="RegisterDevice">/api/Account/RegisterDevice</string>
     <string name="PostBeaconData">/api/AltBeaconsData</string>
+    <string name="SaveBackgroundBeacons">/api/AltBeaconsData/SaveBackgroundBeacons</string>
+
     <string name="GetRegions">/api/AltBeaconsData</string>
     <string name="PostMeasurement">/api/AltBeaconsData/SubmitMeasurement</string>
     <string name="GetLocaleMap">/api/RoomMobile</string>

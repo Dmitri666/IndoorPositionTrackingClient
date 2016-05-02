@@ -61,11 +61,16 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     private PositionCalculator mPositionCalculator;
     public IDevicePositionListener devicePositionListener;
     public IPositionCalculatorListener positionCalculatorListener;
+    public Region backgroundRegion;
+    public UUID currentLocaleId;
+
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
         for (com.lps.lpsapp.viewModel.Region r :regions) {
-            this.mRegions.add(new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null));
+            Region roomRegion = new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null);
+            this.mRegions.add(roomRegion);
+
         }
 
         this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
@@ -77,7 +82,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         super.onCreate();
 
         this.mRegions = new ArrayList<>();
-        this.mRegions.add(new Region("backgroundRegion", null, null, null));
+        backgroundRegion = new Region("backgroundRegion", null, null, null);
         this.consumers = new ArrayList<IBeaconServiceListener>();
 
         LpsApplication app = (LpsApplication) this.getApplicationContext();
@@ -182,9 +187,15 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
     @Override
     public void didEnterRegion(final Region region) {
-        if (!region.getUniqueId().equals("backgroundRegion")) {
+        Log.i(TAG, "did enter region." + region.getUniqueId());
+        if (region.getUniqueId().equals(this.backgroundRegion.getUniqueId())) {
+            try {
+                beaconManager.startRangingBeaconsInRegion(region);
+            } catch (RemoteException ex) {
+                Log.e(TAG, ex.getMessage(), ex);
+            }
+        } else {
 
-            Log.i(TAG, "did enter region." + region.getUniqueId());
             final Context ctx = this;
             LpsApplication app = (LpsApplication) this.getApplicationContext();
 
@@ -231,6 +242,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     toast1.show();
                 }
             });
+
+            currentLocaleId = param.roomId;
             // The very first time since boot that we detect an beacon, we launch the
             // MainActivity
             Intent intent = new Intent(this, ActorsActivity.class);
@@ -248,10 +261,14 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
     @Override
     public void didExitRegion(final Region region) {
-        if(!region.getUniqueId().equals("backgroundRegion")) {
-
-            Log.d(TAG, "did exit region." + region.getUniqueId());
-
+        Log.d(TAG, "did exit region." + region.getUniqueId());
+        if (region.getUniqueId().equals(this.backgroundRegion.getUniqueId())) {
+            try {
+                beaconManager.stopRangingBeaconsInRegion(region);
+            } catch (RemoteException ex) {
+                Log.e(TAG, ex.getMessage(), ex);
+            }
+        } else {
             LpsApplication app = (LpsApplication) this.getApplicationContext();
             String path =  WebApiActions.RemovePosition();
             DevicePosition param = new DevicePosition();
@@ -273,7 +290,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     toast1.show();
                 }
             });
-
+            currentLocaleId = null;
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
                 if(mPositionCalculator != null)
@@ -301,10 +318,10 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     for (IBeaconServiceListener consumer : consumers) {
-                        consumer.beaconsInRange(beacons);
+                        consumer.beaconsInRange(beacons,region);
                     }
 
-                    if(mPositionCalculator != null) {
+                    if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
                         PointD position = mPositionCalculator.calculatePosition(beacons);
                         if (position != null) {
                             LpsApplication app = (LpsApplication) getApplicationContext();
@@ -328,6 +345,18 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         });
 
 
+    }
+
+    public void monitoreBackgroundRegion(boolean mode) {
+        try {
+            if (mode) {
+                beaconManager.startMonitoringBeaconsInRegion(this.backgroundRegion);
+            } else {
+                beaconManager.stopMonitoringBeaconsInRegion(this.backgroundRegion);
+            }
+        } catch (RemoteException ex) {
+            Log.e(TAG, ex.getMessage(), ex);
+        }
     }
 
     public void setBeaconServiceListener(IBeaconServiceListener consumer)

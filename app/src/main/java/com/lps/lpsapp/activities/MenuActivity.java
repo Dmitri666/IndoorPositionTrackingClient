@@ -14,6 +14,7 @@ import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 
 import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.Region;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -28,7 +29,6 @@ public class MenuActivity extends BaseActivity {
 	AltBeaconService mService;
 	boolean mBound = false;
 	IBeaconServiceListener listener;
-	private UUID mLocaleId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class MenuActivity extends BaseActivity {
 
 		this.listener = new IBeaconServiceListener() {
 			@Override
-			public void beaconsInRange(Collection<Beacon> beacon) {
+			public void beaconsInRange(Collection<Beacon> beacon,Region region) {
 
 			}
 
@@ -48,8 +48,7 @@ public class MenuActivity extends BaseActivity {
 					public void run() {
 						View btn =  MenuActivity.this.findViewById(R.id.btnChat);
 						btn.setEnabled(isInLocale);
-						MenuActivity.this.mLocaleId = localeId;
-					}
+							}
 				});
 
 			}
@@ -106,7 +105,7 @@ public class MenuActivity extends BaseActivity {
 	public void onChatClicked(View view) {
 		Intent myIntent = new Intent(this, ActorsActivity.class);
 		myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		myIntent.putExtra("id", this.mLocaleId);
+		myIntent.putExtra("id", mService.currentLocaleId);
 		this.startActivity(myIntent);
 	}
 
@@ -117,7 +116,7 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	public void onFavoritButtonClicked(View view) {
-		Intent myIntent = new Intent(this, FavoritsActivity.class);
+		Intent myIntent = new Intent(this, BeaconListActivity.class);
 		myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		this.startActivity(myIntent);
 	}
@@ -134,6 +133,9 @@ public class MenuActivity extends BaseActivity {
 			mService = binder.getService();
 			mBound = true;
 			mService.setBeaconServiceListener(listener);
+			View btn =  MenuActivity.this.findViewById(R.id.btnChat);
+			btn.setEnabled(mService.currentLocaleId != null);
+
 			Log.d(TAG, "onServiceConnected");
 		}
 

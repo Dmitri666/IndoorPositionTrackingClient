@@ -2,6 +2,7 @@ package com.lps.lpsapp.altbeacon;
 
 import android.util.Log;
 
+import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.viewModel.rooms.Point;
 
 import org.altbeacon.beacon.AltBeacon;
@@ -70,6 +71,10 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	 * Any beacons returned by this method will appear within your test environment immediately.
 	 */
 	public List<Beacon> getBeacons(){
+		if(!SettingsActivity.UseBeaconSimulator) {
+			beacons.clear();
+			return new ArrayList<>();
+		}
 		Random rnd = new Random(new Date().getTime());
         i++;
         if(i%5 == 0) {
@@ -141,13 +146,13 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 
 
 			beacons = new ArrayList<Beacon>();
-            Beacon beacon1 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
+            Beacon beacon1 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("1").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon2 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
+            Beacon beacon2 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("2").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon3 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
+            Beacon beacon3 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("3").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon4 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
+            Beacon beacon4 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
                     .setId2("1").setId3("4").setRssi(-55).setTxPower(-55).build();
 			beacons.add(beacon1);
 			beacons.add(beacon2);
