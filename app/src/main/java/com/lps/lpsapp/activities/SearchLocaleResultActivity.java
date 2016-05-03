@@ -2,6 +2,7 @@ package com.lps.lpsapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -80,19 +81,32 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_locale_result);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mRoomsMap = new HashMap<>();
         String params = getIntent().getStringExtra("parameters");
-        try {
-            this.mParameters = JsonSerializer.deserialize(params, RequestLocationData.class);
+        if(params != null) {
+            try {
+                this.mParameters = JsonSerializer.deserialize(params, RequestLocationData.class);
+                SharedPreferences settings = getSharedPreferences("parameters", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("search", params);
+                editor.commit();
+            } catch (IOException ex) {
+                Log.e(TAG, ex.getMessage(), ex);
+            }
+        } else {
+            SharedPreferences settings = getSharedPreferences("parameters", 0);
+            String search = settings.getString("search", null);
+            if(search != null)
+            {
+                try {
+                    this.mParameters = JsonSerializer.deserialize(search, RequestLocationData.class);
+                } catch (IOException ex) {
+                    Log.e(TAG, ex.getMessage(), ex);
+                }
+            }
         }
-        catch (IOException ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
-        }
-
         this.loadLocales();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

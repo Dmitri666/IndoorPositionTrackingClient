@@ -52,9 +52,9 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.roomId = (UUID) getIntent().getExtras().get("id");
         setContentView(R.layout.activity_booking);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.roomId = (UUID) getIntent().getExtras().get("id");
 
         mDate = new GregorianCalendar();
         final CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
@@ -137,6 +137,36 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
+        if(view.hasRoomModel()) {
+            this.getReservationModel();
+        }
+        bindService(new Intent(this, PushService.class), mConnection, Context.BIND_AUTO_CREATE);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mBound) {
+            mPushService.removeBookingStateListener(bookingStateListener);
+            mPushService.leaveReservationModelGroup(this.roomId);
+            unbindService(mConnection);
+            mBound = false;
+            mPushService = null;
+            bookingStateListener = null;
+        }
+    }
+
+    @Override
     public void returnDate(GregorianCalendar date) {
         this.mDate.set(Calendar.YEAR, date.get(Calendar.YEAR));
         this.mDate.set(Calendar.MONTH, date.get(Calendar.MONTH));
@@ -212,35 +242,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
-        if(view.hasRoomModel()) {
-            this.getReservationModel();
-        }
-        bindService(new Intent(this, PushService.class), mConnection, Context.BIND_AUTO_CREATE);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mBound) {
-            mPushService.removeBookingStateListener(bookingStateListener);
-            mPushService.leaveReservationModelGroup(this.roomId);
-            unbindService(mConnection);
-            mBound = false;
-            mPushService = null;
-            bookingStateListener = null;
-        }
-    }
 
     public void onBookingStateChanged() {
         this.getReservationModel();
@@ -272,14 +274,22 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_booking, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu:
+                return true;
+            case R.id.home:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
-        return true;
     }
 
     private void sendBookingRequest()

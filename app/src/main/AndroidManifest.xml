@@ -84,7 +84,6 @@
         <activity
             android:name=".activities.SearchLocaleResultActivity"
             android:label="@string/title_activity_search_locale_result"
-            android:launchMode="singleTop"
             android:parentActivityName=".activities.SearchLocaleActivity"/>
         <activity
             android:name=".activities.SearchLocaleActivity"
