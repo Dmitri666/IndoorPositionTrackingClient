@@ -15,4 +15,9 @@ public class AvarageDistanceCalculator implements DistanceCalculator {
         Log.d(TAG, "avg mRssi: " + rssi + " distance: " + distance);
         return distance;
     }
+
+    public int calculateRssi(int txPower, double distance) {
+        int rssi = (int)distance * txPower;
+        return rssi;
+    }
 }

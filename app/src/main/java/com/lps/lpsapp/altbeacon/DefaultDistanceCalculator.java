@@ -29,4 +29,9 @@ public class DefaultDistanceCalculator implements DistanceCalculator {
         Log.d(TAG, "avg mRssi: " + rssi + " distance: " + distance);
         return distance;
     }
+
+    public int calculateRssi(int txPower, double distance) {
+        int rssi = Math.round(Math.round(Math.pow(((distance - 0.54992) / 0.42093),1.0 / 6.9476) * txPower));
+        return rssi;
+    }
 }

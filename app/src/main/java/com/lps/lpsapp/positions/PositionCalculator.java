@@ -22,9 +22,9 @@ import java.util.List;
  */
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
-    private static float scaleFactor = 1.0f;
     private static double mRoomWigth;
     private static double mRoomHeight;
+    private static float realScaleFactor;
     public IPositionCalculatorListener positionCalculatorListener;
 
 
@@ -50,6 +50,7 @@ public class PositionCalculator {
         }
         mRoomHeight = model.height;
         mRoomWigth = model.wight;
+        realScaleFactor = model.realScaleFactor;
     }
 
 
@@ -76,7 +77,7 @@ public class PositionCalculator {
                 Log.d(TAG,"Beacon " + list.get(i).getId1() + ":" + list.get(i).getId2() + ":" + list.get(i).getId3() + " not found");
                 continue;
             }
-            BeaconData data = new BeaconData(list.get(i).getDistance(),beaconInRoom.x,beaconInRoom.y);
+            BeaconData data = new BeaconData(list.get(i).getDistance() * realScaleFactor,beaconInRoom.x,beaconInRoom.y);
             data.beaconId = list.get(i).getId3().toString();
             beaconDatas.add(data);
         }
@@ -106,10 +107,12 @@ public class PositionCalculator {
         {
             String msg = "";
             for (BeaconData data:beaconDatas) {
-                msg += "Id=" + data.beaconId + " distance=" + data.getDistance() + '\n';
+                //msg += "Id=" + data.beaconId + " distance=" + data.getDistance() + '\n';
             }
-            Log.d(TAG,msg + " Position x=" + region.exactCenterX() + " y=" + region.exactCenterY());
-            return new PointD(region.exactCenterX() / scaleFactor, region.exactCenterY() / scaleFactor);
+
+            PointD result = new PointD(region.exactCenterX(), region.exactCenterY());
+            Log.d(TAG,"Position x=" + result.x / realScaleFactor  + " y=" + result.y / realScaleFactor);
+            return result;
         }
     }
 
@@ -133,14 +136,14 @@ public class PositionCalculator {
     {
         try
         {
-            Region clip = new Region(0, 0, (int) (mRoomWigth * scaleFactor), (int) (mRoomHeight * scaleFactor));
+            Region clip = new Region(0, 0, (int) (mRoomWigth ), (int) (mRoomHeight));
 
             for(int i = 0;i < 1000;i++) {
 
                 Region firstRegion = null;
                 for(BeaconData beaconData:beaconDatas) {
                     Path path = new Path();
-                    path.addCircle(beaconData.x * scaleFactor, beaconData.y * scaleFactor, (float) beaconData.getDistance() * scaleFactor, Path.Direction.CW);
+                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getDistance(), Path.Direction.CW);
                     path.close();
                     Region region = new Region();
                     region.setPath(path, clip);

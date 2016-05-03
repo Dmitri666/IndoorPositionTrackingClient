@@ -12,7 +12,7 @@ import java.util.List;
 public class BeaconModel {
     public float wight;
     public float height;
-
+    public float realScaleFactor;
 
     public BeaconModel()
     {

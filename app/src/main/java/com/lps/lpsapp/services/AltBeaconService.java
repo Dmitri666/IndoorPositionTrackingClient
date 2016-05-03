@@ -324,6 +324,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
                         PointD position = mPositionCalculator.calculatePosition(beacons);
                         if (position != null) {
+
                             LpsApplication app = (LpsApplication) getApplicationContext();
                             String path = WebApiActions.SetPosition();
                             DevicePosition param = new DevicePosition();

@@ -3,6 +3,8 @@ package com.lps.lpsapp.altbeacon;
 import android.util.Log;
 
 import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
+import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.rooms.Point;
 
 import org.altbeacon.beacon.AltBeacon;
@@ -28,6 +30,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
     private int i = 0;
 	private Timer timer;
     private boolean isRunning;
+	private BeaconModel mBeaconmodel;
 	/*
 	 * You may simulate detection of beacons by creating a class like this in your project.
 	 * This is especially useful for when you are testing in an Emulator or on a device without BluetoothLE capability.
@@ -75,6 +78,8 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 			beacons.clear();
 			return new ArrayList<>();
 		}
+		Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f,this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
+		float radius = center.x;
 		Random rnd = new Random(new Date().getTime());
         i++;
         if(i%5 == 0) {
@@ -82,29 +87,24 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
             angle = angle % 360.0;
             //angle = 180.0;
             double radian = Math.toRadians(angle);
-            currentPoint = new Point(4.0f + 3.0f * (float) Math.cos(radian), 4.0f + 3.0f * (float) Math.sin(radian));
+            currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
+			Log.d(TAG,"currentPoint " + currentPoint.x + " " + currentPoint.y);
         }
 		for (Beacon b:beacons) {
-			double distance = 0.0;
-			if(b.getId3().toString() == "1") {
-				distance = Math.sqrt(Math.pow(currentPoint.x - 1.0, 2.0) + Math.pow(currentPoint.y - 7.0, 2.0));
-						}
-			else if(b.getId3().toString() == "2")
+			BeaconInRoom beacon = null;
+			for(BeaconInRoom beaconInRoom:mBeaconmodel.beacons)
 			{
-				distance = Math.sqrt(Math.pow(currentPoint.x - 1.0,2.0) + Math.pow(currentPoint.y - 1.0,2.0));
+				if(beaconInRoom.id3 == b.getId3().toInt())
+				{
+					beacon = beaconInRoom;
+					break;
+				}
 			}
-			else if(b.getId3().toString() == "3")
-			{
-				distance = Math.sqrt(Math.pow(7.0 - currentPoint.x,2.0) + Math.pow(1.0 - currentPoint.y,2.0));
-			}
-			else if(b.getId3().toString() == "4")
-			{
-				distance = Math.sqrt(Math.pow(7.0 - currentPoint.x,2.0) + Math.pow(currentPoint.y - 7.0,2.0));
-			}
-			//int rndInt = rnd.nextInt(10);
-			//double factor = ( 1.0 + (5.0 - rndInt)/ 100d);
-			//distance = distance * factor;
-			b.setRssi((int)(-55 * distance ));
+
+			double distance = Math.sqrt(Math.pow(currentPoint.x - beacon.x / this.mBeaconmodel.realScaleFactor, 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
+			DefaultDistanceCalculator calc = new DefaultDistanceCalculator();
+			int rssi = calc.calculateRssi(-55,distance);
+			b.setRssi(rssi);
 		}
 
 
@@ -140,25 +140,18 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	/**
 	 * Simulates a new beacon every 10 seconds until it runs out of new ones to add.
 	 */
-	public void createTimedSimulatedBeacons(){
+	public void createTimedSimulatedBeacons(BeaconModel model){
 		if (USE_SIMULATED_BEACONS){
-
-
-
+			this.mBeaconmodel = model;
 			beacons = new ArrayList<Beacon>();
-            Beacon beacon1 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
-                    .setId2("1").setId3("1").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon2 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
-                    .setId2("1").setId3("2").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon3 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
-                    .setId2("1").setId3("3").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon4 = new AltBeacon.Builder().setId1("00900000-0000-0000-0000-000000000000")
-                    .setId2("1").setId3("4").setRssi(-55).setTxPower(-55).build();
-			beacons.add(beacon1);
-			beacons.add(beacon2);
-			beacons.add(beacon3);
-			beacons.add(beacon4);
-			
+
+			for(BeaconInRoom beaconInRoom:model.beacons)
+			{
+				Beacon beacon = new AltBeacon.Builder().setId1(beaconInRoom.id1.toString())
+						.setId2(String.valueOf(beaconInRoom.id2)).setId3(String.valueOf(beaconInRoom.id3)).setRssi(-55).setTxPower(-55).build();
+				beacons.add(beacon);
+			}
+
 			final List<Beacon> finalBeacons = new ArrayList<Beacon>(beacons);
 
 			//Clearing beacons list to prevent all beacons from appearing immediately.

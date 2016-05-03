@@ -8,11 +8,18 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import com.lps.core.webapi.IWebApiResultListener;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
+import com.lps.lpsapp.services.WebApiActions;
+import com.lps.lpsapp.services.WebApiService;
+import com.lps.lpsapp.viewModel.chat.BeaconModel;
+import com.lps.lpsapp.viewModel.rooms.RoomInfo;
 
 import org.altbeacon.beacon.BeaconManager;
+
+import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
     public static Boolean SendToServer = false;
@@ -65,8 +72,26 @@ public class SettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 UseBeaconSimulator = isChecked;
                 if (isChecked) {
-                    BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
-                    ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
+                    String path = WebApiActions.GetRooms();
+                    WebApiService service = new WebApiService(RoomInfo.class,true);
+                    service.performGetList(path, new IWebApiResultListener<List<RoomInfo>>() {
+                        @Override
+                        public void onResult(List<RoomInfo> objResult) {
+                            if(!objResult.isEmpty())
+                            {
+                                String path = WebApiActions.GetBeaconsInLocale() + "/" + objResult.get(0).id;
+                                WebApiService service = new WebApiService(BeaconModel.class,true);
+                                service.performGet(path, new IWebApiResultListener<BeaconModel>() {
+                                    @Override
+                                    public void onResult(BeaconModel objResult) {
+                                        BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
+                                        ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons(objResult);
+                                    }
+                                });
+                            }
+                        }
+                    });
+
                 } else {
                     BeaconManager.setBeaconSimulator(null);
                 }
