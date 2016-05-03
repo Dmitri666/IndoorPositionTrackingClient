@@ -459,6 +459,10 @@ public class PushService extends Service {
                     if(bookingStateConsumers.size() == 0)
                     {
                         notifyBookingStateChanged(model);
+                    } else {
+                        for (IBookingStateChangedListener consumer : bookingStateConsumers) {
+                            consumer.bookingStateChanged();
+                        }
                     }
 
                 }

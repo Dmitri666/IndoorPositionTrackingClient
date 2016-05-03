@@ -137,7 +137,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     private void StartResultActivity()
     {
         Intent intent = new Intent(getApplicationContext(), SearchLocaleResultActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             intent.putExtra("parameters", JsonSerializer.serialize(this.mSearchParameters));
             startActivity(intent);

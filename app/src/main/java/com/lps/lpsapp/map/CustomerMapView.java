@@ -344,16 +344,11 @@ public class CustomerMapView extends ScalableView  {
             view.setLayoutParams(this.getTableLayoutParams(table));
 
             if(table.angle != 0.0) {
-                float tSize = getResources().getDimension(R.dimen.tableSize);
-                float tPadding = getResources().getDimension(R.dimen.tablePadding);
                 float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
                 float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
-                float newHight = hight * (tSize + 2 * tPadding) / tSize;
-                float newWidth = width * (tSize + 2 * tPadding) / tSize;
-
-                view.setPivotY((int) ((newHight - hight) / 2.0));
-                view.setPivotX((int) ((newWidth - width) / 2.0));
-                view.setRotation(-(float) table.angle);
+                view.setPivotY(Math.round(hight / 2.0));
+                view.setPivotX(Math.round(width / 2.0));
+                view.setRotation(Math.round(table.angle));
             }
 
             table.guiElement = view;
