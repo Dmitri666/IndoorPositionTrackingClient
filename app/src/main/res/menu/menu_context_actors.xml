@@ -1,10 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.lps.lpsapp.activities.ActorsActivity">
-    <item android:id="@+id/action_chat" android:title="@string/action_chat"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lps.lpsapp.activities.ActorsActivity">
+    <item
+        android:id="@+id/action_chat"
         android:icon="@drawable/ic_chat_white_24dp"
-        android:orderInCategory="1" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_showProfile" android:title="@string/action_show_profile"
-        android:orderInCategory="10" app:showAsAction="ifRoom" />
+        android:orderInCategory="1"
+        android:title="@string/action_chat"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_showProfile"
+        android:icon="@drawable/ic_person_white_24dp"
+        android:orderInCategory="10"
+        android:title="@string/action_show_profile"
+        app:showAsAction="ifRoom" />
 
 </menu>

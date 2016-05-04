@@ -9,17 +9,20 @@
         <item name="android:timePickerStyle">@style/MyTimePicker</item>
         <item name="actionModeStyle">@style/LStyled.ActionMode</item>
     </style>
+
     <style name="AppTheme.ListView" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">@color/light_white</item>
         <item name="android:cacheColorHint">@android:color/transparent</item>
         <item name="android:divider">@color/colorPrimary</item>
         <item name="android:dividerHeight">1dp</item>
     </style>
+
     <style name="AppTheme.TextView" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">@color/light_white</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
 
     </style>
 
@@ -27,21 +30,29 @@
         <item name="titleTextStyle">@style/LStyled.ActionMode.Title</item>
         <item name="subtitleTextStyle">@style/LStyled.ActionMode.Subtitle</item>
     </style>
+
     <style name="LStyled.ActionMode.Title" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
+
     <style name="LStyled.ActionMode.Subtitle" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle">
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="ListView" parent="@android:style/Widget.ListView"/>
-    <style name="TextView" parent="@style/AppTheme.TextView"/>
+
+    <style name="ListView" parent="@android:style/Widget.ListView" />
+
+    <style name="TextView" parent="@style/AppTheme.TextView" />
+
     <style name="MyDialogTheme" parent="android:Theme.Material.Dialog">
-         <item name="android:timePickerStyle">@style/MyTimePicker</item>
+        <item name="android:timePickerStyle">@style/MyTimePicker</item>
     </style>
+
     <style name="MyTimePicker" parent="android:Widget.Material.TimePicker">
         <item name="android:timePickerMode">spinner</item>
     </style>
+
     <style name="RatingFull">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -49,6 +60,7 @@
         <item name="android:tint">@color/rating</item>
         <item name="android:tintMode">src_atop</item>
     </style>
+
     <style name="RatingHalf">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -56,6 +68,7 @@
         <item name="android:tint">@color/rating</item>
         <item name="android:tintMode">src_atop</item>
     </style>
+
     <style name="Table1">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -64,6 +77,7 @@
 
 
     </style>
+
     <style name="Table2">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -72,6 +86,7 @@
 
 
     </style>
+
     <style name="Table3">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -80,6 +95,7 @@
 
 
     </style>
+
     <style name="Table4">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

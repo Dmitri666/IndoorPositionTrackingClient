@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ActorsActivity extends BaseActivity implements View.OnLongClickListener{
+public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
     private static String TAG = "ActorsActivity";
     private UUID roomId;
     private IDevicePositionListener actorPositionListener;
@@ -63,7 +63,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private IChatListener chatListener;
     private ActionMode mActionMode;
 
-        @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_actors);
@@ -86,14 +86,12 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             }
 
             @Override
-            public void joinChat(Actor actor)
-            {
+            public void joinChat(Actor actor) {
                 actorJoined(actor);
             }
 
             @Override
-            public void leaveChat(Actor actor)
-            {
+            public void leaveChat(Actor actor) {
                 actorLeaved(actor);
             }
         };
@@ -103,7 +101,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
         // Set up the ViewPager with the sections mActorListAdapter.
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
-        if(mViewPager != null) {
+        if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
         }
     }
@@ -147,11 +145,10 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     }
 
-    public void setRoomModel(final CustomerMapView view,RoomModel map)
-    {
+    public void setRoomModel(final CustomerMapView view, RoomModel map) {
         view.setmRoomModel(map);
-        String path =  WebApiActions.GetActorsInLocale() + "/" + this.roomId.toString();
-        WebApiService service = new WebApiService(Actor.class,true);
+        String path = WebApiActions.GetActorsInLocale() + "/" + this.roomId.toString();
+        WebApiService service = new WebApiService(Actor.class, true);
         service.performGetList(path, new IWebApiResultListener<List>() {
             @Override
             public void onResult(List objResult) {
@@ -160,39 +157,32 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         });
     }
 
-    private void setActors(CustomerMapView view,List<Actor> model)
-    {
-        for(Actor actor:model) {
+    private void setActors(CustomerMapView view, List<Actor> model) {
+        for (Actor actor : model) {
             view.addActor(actor);
         }
         this.mActorListAdapter.clear();
         this.mActorListAdapter.addAll(model);
     }
 
-    private void actorJoined(Actor actor)
-    {
-        boolean notExist  = true;
-        for(int i = 0;i < this.mActorListAdapter.getCount();i++)
-        {
-            if(((Actor)this.mActorListAdapter.getItem(i)).userId == actor.userId)
-            {
+    private void actorJoined(Actor actor) {
+        boolean notExist = true;
+        for (int i = 0; i < this.mActorListAdapter.getCount(); i++) {
+            if (((Actor) this.mActorListAdapter.getItem(i)).userId == actor.userId) {
                 notExist = false;
                 break;
             }
         }
 
-        if(notExist) {
+        if (notExist) {
             mActorListAdapter.add(actor);
             mActorListAdapter.notifyDataSetInvalidated();
         }
     }
 
-    private void actorLeaved(Actor actor)
-    {
-        for(int i = 0;i < this.mActorListAdapter.getCount();i++)
-        {
-            if(((Actor)this.mActorListAdapter.getItem(i)).userId == actor.userId)
-            {
+    private void actorLeaved(Actor actor) {
+        for (int i = 0; i < this.mActorListAdapter.getCount(); i++) {
+            if (((Actor) this.mActorListAdapter.getItem(i)).userId == actor.userId) {
                 this.mActorListAdapter.remove(this.mActorListAdapter.getItem(i));
                 this.mActorListAdapter.notifyDataSetInvalidated();
                 break;
@@ -201,73 +191,18 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     }
 
-    public Integer getOptionsMenuId()
-    {
-        return R.menu.menu_actors;
-    }
-
-    public boolean contextMenuItemClicked(ActionMode mode, MenuItem item)
-    {
-        switch (item.getItemId()) {
-            case R.id.action_chat:
-                GuiDevice actor = (GuiDevice)mode.getTag();
-                String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
-                WebApiService service = new WebApiService(Actor.class,true);
-                service.performGet(path, new IWebApiResultListener() {
-                    @Override
-                    public void onResult(Object objResult) {
-                        try {
-                            Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                            String serActor = JsonSerializer.serialize(objResult);
-                            intent.putExtra("actor", serActor);
-                            startActivity(intent);
-                        } catch (JsonProcessingException ex) {
-                            Log.e(TAG, ex.getMessage(), ex);
-                        }
-                    }
-                });
-                mode.finish();
-                return true;
-            case R.id.action_showProfile:
-
-                mode.finish(); // Action picked, so close the CAB
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
-    public boolean optionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId()) {
-            case R.id.action_history:
-                Intent intent = new Intent(getApplicationContext(), ChatListActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("roomId", roomId);
-                startActivity(intent);
-
-                return true;
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
 
     public void actorPositionChanged(final DevicePosition position) {
         this.runOnUiThread(new Runnable() {
             public void run() {
-               CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
-               if(view.hasRoomModel()) {
-                   view.positionChanged(position);
-               }
+                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
+                if (view.hasRoomModel()) {
+                    view.positionChanged(position);
+                }
             }
         });
 
     }
-
 
 
     private ServiceConnection mPushServiceConnection = new ServiceConnection() {
@@ -283,24 +218,24 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mPushService.setActorPositionListener(actorPositionListener);
             mPushService.setChatListener(chatListener);
             mPushService.joinPositionConsumerGroup(roomId);
-            Log.d(TAG,"onServiceConnected");
+            Log.d(TAG, "onServiceConnected");
 
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mPushServiceBound = false;
-            Log.d(TAG,"onServiceDisconnected");
+            Log.d(TAG, "onServiceDisconnected");
 
 
         }
     };
 
-    public void onCalculationResult(final List<BeaconData> beaconDatas,final Rect bounds) {
+    public void onCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
         this.runOnUiThread(new Runnable() {
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
-                if(view != null && view.hasRoomModel()) {
+                if (view != null && view.hasRoomModel()) {
                     view.setCalculationResult(beaconDatas, bounds);
                 }
             }
@@ -322,7 +257,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconService.positionCalculatorListener = new IPositionCalculatorListener() {
                 @Override
                 public void calculationResult(List<BeaconData> beaconDatas, Rect bounds) {
-                    onCalculationResult(beaconDatas,bounds);
+                    onCalculationResult(beaconDatas, bounds);
                 }
             };
 
@@ -338,15 +273,13 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     @Override
     public boolean onLongClick(View view) {
-        GuiDevice gDevice = (GuiDevice)view;
+        GuiDevice gDevice = (GuiDevice) view;
         //todo nur für test
-        if(AuthenticationService.authenticationData.userName == "admin")
-        {
+        if (AuthenticationService.authenticationData.userName == "admin") {
             if (gDevice.devicePosition.deviceId.equals("000")) {
                 return false;
             }
-        }
-        else {
+        } else {
             if (gDevice.devicePosition.deviceId.equals(mMyApp.getAndroidId())) {
                 return false;
             }
@@ -387,10 +320,10 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_chat:
-                    GuiDevice actor = (GuiDevice)mode.getTag();
+                    GuiDevice actor = (GuiDevice) mode.getTag();
                     mode.finish();
                     String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
-                    WebApiService service = new WebApiService(Actor.class,true);
+                    WebApiService service = new WebApiService(Actor.class, true);
                     service.performGet(path, new IWebApiResultListener() {
                         @Override
                         public void onResult(Object objResult) {
@@ -405,10 +338,12 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                             }
                         }
                     });
-
+                    mode.finish();
                     return true;
                 case R.id.action_showProfile:
-
+                    Intent intent = new Intent(getApplicationContext(), ActorProfileActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     mode.finish(); // Action picked, so close the CAB
                     return true;
                 default:
@@ -488,10 +423,9 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            final ActorsActivity activity = (ActorsActivity)getActivity();
+            final ActorsActivity activity = (ActorsActivity) getActivity();
             int tabNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-            if(tabNumber == 2)
-            {
+            if (tabNumber == 2) {
                 View rootView = inflater.inflate(R.layout.fragment_actors_map, container, false);
 
                 final CustomerMapView view = (CustomerMapView) rootView.findViewById(R.id.CustomerMapView);
@@ -506,7 +440,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                         service.performGet(path, new IWebApiResultListener<RoomModel>() {
                             @Override
                             public void onResult(RoomModel objResult) {
-                                activity.setRoomModel(view,objResult);
+                                activity.setRoomModel(view, objResult);
                             }
                         });
 
@@ -514,13 +448,11 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                     }
                 });
                 return rootView;
-            }
-            else
-            {
+            } else {
                 View rootView = inflater.inflate(R.layout.fragment_actors_list, container, false);
-                ListView listView = (ListView)rootView.findViewById(R.id.lvActors);
+                ListView listView = (ListView) rootView.findViewById(R.id.lvActors);
 
-                activity.mActorListAdapter = new MyArrayAdapter(getContext().getApplicationContext(),R.layout.list_item_chat,new ArrayList<Actor>());
+                activity.mActorListAdapter = new MyArrayAdapter(getContext().getApplicationContext(), R.layout.list_item_chat, new ArrayList<Actor>());
                 listView.setAdapter(activity.mActorListAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -545,12 +477,12 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         }
     }
 
-    private static class MyArrayAdapter extends ArrayAdapter<Actor>
-    {
+    private static class MyArrayAdapter extends ArrayAdapter<Actor> {
         private Context context;
         private LayoutInflater inflater = null;
+
         public MyArrayAdapter(Context context, int resource, List<Actor> objects) {
-            super(context, resource,objects);
+            super(context, resource, objects);
             this.context = context;
             inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -564,14 +496,13 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
             ImageView iv = (ImageView) convertView.findViewById(R.id.imageView);
 
-            Actor actor =  this.getItem(position);
+            Actor actor = this.getItem(position);
             tvText.setText(actor.userName);
             tvTitle.setText(actor.userName);
             String iPath = actor.photoPath;
-            if(iPath != null && !iPath.isEmpty())
-            {
+            if (iPath != null && !iPath.isEmpty()) {
                 String path = WebApiActions.GetImage() + "/" + iPath;
-                Picasso.with(context).load(path).resize(200,200).into(iv);
+                Picasso.with(context).load(path).resize(200, 200).into(iv);
             }
             return convertView;
         }
