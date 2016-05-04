@@ -22,14 +22,12 @@ import java.util.List;
  */
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
-    private static double mRoomWigth;
-    private static double mRoomHeight;
-    private static float realScaleFactor;
+    private BeaconModel beaconModel;
     public IPositionCalculatorListener positionCalculatorListener;
 
 
-    private static HashMap<Integer,BeaconInRoom> beaconsInRoom = new HashMap<>();
-    private static Comparator<Beacon> comparator  = new Comparator<Beacon>() {
+    private HashMap<Integer,BeaconData> beaconsInRoom;
+    private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
         @Override
         public int compare(Beacon lhs, Beacon rhs) {
             if (lhs.getDistance() < rhs.getDistance()) {
@@ -43,14 +41,13 @@ public class PositionCalculator {
 
     public PositionCalculator(BeaconModel model)
     {
-        beaconsInRoom.clear();
+        beaconModel = model;
+        beaconsInRoom = new HashMap<>();
         for(BeaconInRoom beacon:model.beacons)
         {
-            beaconsInRoom.put(beacon.id3,beacon);
+            BeaconData data = new BeaconData(beacon.id3,beacon.x,beacon.y);
+            beaconsInRoom.put(beacon.id3,data);
         }
-        mRoomHeight = model.height;
-        mRoomWigth = model.wight;
-        realScaleFactor = model.realScaleFactor;
     }
 
 
@@ -71,15 +68,14 @@ public class PositionCalculator {
         List<BeaconData> beaconDatas = new ArrayList<>();
         for(int i = 0;i < list.size();i++)
         {
-            BeaconInRoom beaconInRoom = beaconsInRoom.get(list.get(i).getId3().toInt());
+            BeaconData beaconInRoom = beaconsInRoom.get(list.get(i).getId3().toInt());
             if(beaconInRoom == null)
             {
-                Log.d(TAG,"Beacon " + list.get(i).getId1() + ":" + list.get(i).getId2() + ":" + list.get(i).getId3() + " not found");
+                Log.e(TAG,"Beacon " + list.get(i).getId1() + ":" + list.get(i).getId2() + ":" + list.get(i).getId3() + " not found");
                 continue;
             }
-            BeaconData data = new BeaconData(list.get(i).getDistance() * realScaleFactor,beaconInRoom.x,beaconInRoom.y);
-            data.beaconId = list.get(i).getId3().toString();
-            beaconDatas.add(data);
+            beaconInRoom.setDistance(list.get(i).getDistance() * beaconModel.realScaleFactor);
+            beaconDatas.add(beaconInRoom);
         }
 
         if(beaconDatas.size() == 0)
@@ -95,12 +91,12 @@ public class PositionCalculator {
             return new PointD(beaconDatas.get(0).x,beaconDatas.get(0).y);
         }
 
-        calculateDistanceFactor(beaconDatas);
+        //calculateDistanceFactor(beaconDatas);
 
         Rect region = calculateRegion(beaconDatas);
         if(region == null)
         {
-            Log.d(TAG,"position not found");
+            Log.e(TAG,"position not found");
             return null;
         }
         else
@@ -111,7 +107,7 @@ public class PositionCalculator {
             }
 
             PointD result = new PointD(region.exactCenterX(), region.exactCenterY());
-            Log.d(TAG,"Position x=" + result.x / realScaleFactor  + " y=" + result.y / realScaleFactor);
+            Log.d(TAG,"Position (" + result.x / beaconModel.realScaleFactor  + "," + result.y / beaconModel.realScaleFactor + ")");
             return result;
         }
     }
@@ -119,9 +115,9 @@ public class PositionCalculator {
     private void calculateDistanceFactor(List<BeaconData> beaconDatas)
     {
         List<Double> factors = new ArrayList<>();
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x,2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y,2.0)) / (beaconDatas.get(0).getDistance() + beaconDatas.get(1).getDistance()));
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(0).getDistance() + beaconDatas.get(2).getDistance()));
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(1).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(1).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(1).getDistance() + beaconDatas.get(2).getDistance()));
+        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x,2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y,2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(1).getFactoredDistance()));
+        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
+        factors.add(Math.sqrt(Math.pow(beaconDatas.get(1).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(1).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(1).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
 
         double factor = Collections.max(factors);
         Log.d(TAG," factor=" + factor);
@@ -136,14 +132,14 @@ public class PositionCalculator {
     {
         try
         {
-            Region clip = new Region(0, 0, (int) (mRoomWigth ), (int) (mRoomHeight));
+            Region clip = new Region(0, 0, Math.round(beaconModel.wight), Math.round(beaconModel.height));
 
             for(int i = 0;i < 1000;i++) {
 
                 Region firstRegion = null;
                 for(BeaconData beaconData:beaconDatas) {
                     Path path = new Path();
-                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getDistance(), Path.Direction.CW);
+                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getFactoredDistance(), Path.Direction.CW);
                     path.close();
                     Region region = new Region();
                     region.setPath(path, clip);
@@ -174,7 +170,7 @@ public class PositionCalculator {
                     {
                         this.positionCalculatorListener.calculationResult(beaconDatas,bounds);
                     }
-                    Log.d(TAG,"Position calculated. Iteration count:" + i);
+                    Log.d(TAG,"Iteration count:" + i);
                     return bounds;
                 }
             }

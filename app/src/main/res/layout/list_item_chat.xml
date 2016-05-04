@@ -26,14 +26,16 @@
             android:layout_height="wrap_content"
             android:text="title"
             android:textSize="12sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
 
         <TextView
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nnn"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:textColor="@android:color/black"/>
     </LinearLayout>
 
 

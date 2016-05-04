@@ -11,10 +11,7 @@ import org.altbeacon.beacon.AltBeacon;
 import org.altbeacon.beacon.Beacon;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
-import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,9 +25,8 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	private Point currentPoint;
 	private double angle = 0;
     private int i = 0;
-	private Timer timer;
-    private boolean isRunning;
 	private BeaconModel mBeaconmodel;
+	DefaultDistanceCalculator calc = new DefaultDistanceCalculator();
 	/*
 	 * You may simulate detection of beacons by creating a class like this in your project.
 	 * This is especially useful for when you are testing in an Emulator or on a device without BluetoothLE capability.
@@ -50,7 +46,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	 */
 	public TimedBeaconSimulator(){
 		beacons = new ArrayList<Beacon>();
-        currentPoint = new Point(2,2);
+
 
 		ScheduledExecutorService distancesSimulator= Executors.newScheduledThreadPool(5);
 
@@ -74,21 +70,21 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	 * Any beacons returned by this method will appear within your test environment immediately.
 	 */
 	public List<Beacon> getBeacons(){
+		//Log.d(TAG,"getBeacon");
 		if(!SettingsActivity.UseBeaconSimulator) {
 			beacons.clear();
 			return new ArrayList<>();
 		}
 		Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f,this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
-		float radius = center.x;
-		Random rnd = new Random(new Date().getTime());
-        i++;
+		float radius = center.x / 1.5f;
+		i++;
         if(i%5 == 0) {
             angle += 20.0;
             angle = angle % 360.0;
             //angle = 180.0;
             double radian = Math.toRadians(angle);
-            currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
-			Log.d(TAG,"currentPoint " + currentPoint.x + " " + currentPoint.y);
+			currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
+			Log.d(TAG,"TestPoint (" + currentPoint.x + "," + currentPoint.y + ")");
         }
 		for (Beacon b:beacons) {
 			BeaconInRoom beacon = null;
@@ -101,10 +97,11 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 				}
 			}
 
-			double distance = Math.sqrt(Math.pow(currentPoint.x - beacon.x / this.mBeaconmodel.realScaleFactor, 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
-			DefaultDistanceCalculator calc = new DefaultDistanceCalculator();
-			int rssi = calc.calculateRssi(-55,distance);
-			b.setRssi(rssi);
+			double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
+			double rssi = calc.calculateRssi(-55,distance);
+			double d = calc.calculateDistance(-55,rssi);
+			b.setRssi(Math.round(Math.round(rssi)));
+			//Log.d(TAG,"distance " + distance);
 		}
 
 

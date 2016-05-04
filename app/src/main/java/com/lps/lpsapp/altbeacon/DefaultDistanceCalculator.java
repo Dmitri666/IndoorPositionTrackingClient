@@ -9,6 +9,7 @@ import org.altbeacon.beacon.distance.DistanceCalculator;
  */
 public class DefaultDistanceCalculator implements DistanceCalculator {
     private static String TAG = "DefaultDistanceCalculator";
+
     @Override
     public double calculateDistance(int txPower, double rssi) {
         if (rssi == 0) {
@@ -18,20 +19,24 @@ public class DefaultDistanceCalculator implements DistanceCalculator {
         Log.d(TAG, "calculating distance based on mRssi of" + rssi + " and txPower of " + txPower);
 
 
-        double ratio = rssi*1.0/txPower;
+        double ratio = rssi * 1.0 / txPower;
         double distance;
         if (ratio < 1.0) {
-            distance =  Math.pow(ratio,10);
-        }
-        else {
-            distance =  (0.42093)*Math.pow(ratio,6.9476) + 0.54992;
+            distance = Math.pow(ratio, 10);
+        } else {
+            distance = (0.42093) * Math.pow(ratio, 6.9476) + 0.54992;
         }
         Log.d(TAG, "avg mRssi: " + rssi + " distance: " + distance);
         return distance;
     }
 
-    public int calculateRssi(int txPower, double distance) {
-        int rssi = Math.round(Math.round(Math.pow(((distance - 0.54992) / 0.42093),1.0 / 6.9476) * txPower));
+    public double calculateRssi(int txPower, double distance) {
+        double rssi;
+        if (distance < 1.0) {
+            rssi = Math.pow(distance, 0.1) * txPower;
+        } else {
+            rssi = Math.round(Math.pow(((distance - 0.54992) / 0.42093), 1.0 / 6.9476) * txPower);
+        }
         return rssi;
     }
 }

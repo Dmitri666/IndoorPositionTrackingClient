@@ -177,27 +177,19 @@ public class CustomerMapView extends ScalableView  {
 
         if(SettingsActivity.ShowCircles && this.beaconDatas != null && this.calculationResult != null)
         {
+            canvas.save();
             for(int i = 0; i < 3; i++) {
                 BeaconData beaconData = this.beaconDatas.get(i);
                 Path path = new Path();
-                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getDistance()) - this.getDrawX(0), Path.Direction.CW);
+                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getFactoredDistance()) - this.getDrawX(0), Path.Direction.CW);
                 path.close();
-                canvas.save();
+
                 canvas.clipPath(path, Region.Op.INTERSECT);
-                if(beaconData.beaconId == "1") {
-                    canvas.drawColor(Color.GREEN);
-                }
-                else if(beaconData.beaconId == "2") {
-                    canvas.drawColor(Color.YELLOW);
-                }
-                else if(beaconData.beaconId == "3") {
-                    canvas.drawColor(Color.BLUE);
-                }
-                else if(beaconData.beaconId == "4") {
-                    canvas.drawColor(Color.CYAN);
-                }
-                canvas.restore();
+
+
             }
+            canvas.drawColor(Color.GREEN);
+            canvas.restore();
         }
 
 
