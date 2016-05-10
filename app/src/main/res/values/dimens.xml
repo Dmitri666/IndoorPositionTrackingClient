@@ -11,5 +11,5 @@
     <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="list_padding">16dp</dimen>
     <dimen name="tableSize">140dp</dimen>
-    <dimen name="tablePadding">15dp</dimen>
+    <dimen name="tablePadding">23.3dp</dimen>
 </resources>

@@ -322,6 +322,7 @@ public class CustomerMapView extends ScalableView  {
         for(Table table: mRoomModel.tables) {
             ImageView view = null;
             if(table.type.equals("Table1")) {
+                table.height = table.height * (1 + 1f / 6);
                 view = (ImageView) inflater.inflate(R.layout.layout_table1, null);
             } else if(table.type.equals("Table2")) {
                 view = (ImageView) inflater.inflate(R.layout.layout_table2, null);
@@ -336,10 +337,16 @@ public class CustomerMapView extends ScalableView  {
             view.setLayoutParams(this.getTableLayoutParams(table));
 
             if(table.angle != 0.0) {
+                float tSize = getResources().getDimension(R.dimen.tableSize);
+                float tPadding = getResources().getDimension(R.dimen.tablePadding);
                 float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
                 float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
-                view.setPivotY(Math.round(hight / 2.0));
-                view.setPivotX(Math.round(width / 2.0));
+                float newHight = hight * (tSize + 2 * tPadding) / tSize;
+                float newWidth = width * (tSize + 2 * tPadding) / tSize;
+                int xOffset = (int)(newWidth - width)/2;
+                int yOffset = (int)(newHight - hight)/2;
+                view.setPivotY(xOffset);
+                view.setPivotX(yOffset);
                 view.setRotation(Math.round(table.angle));
             }
 
@@ -376,7 +383,7 @@ public class CustomerMapView extends ScalableView  {
             float hight = this.getDrawY((float)(actor.position.y + actor.position.guiElement.height)) - this.getDrawY((float)actor.position.y);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)width,(int)hight);
             lp.leftMargin = (int)this.getDrawX((float) actor.position.x);
-            lp.topMargin = Math.round(this.getDrawY((float)actor.position.y) - hight);
+            lp.topMargin = Math.round(this.getDrawY((float)actor.position.y));
             actor.position.guiElement.setLayoutParams(lp);
             //Log.d(TAG, "Actor Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
@@ -393,15 +400,15 @@ public class CustomerMapView extends ScalableView  {
     {
         float tSize = getResources().getDimension(R.dimen.tableSize);
         float tPadding = getResources().getDimension(R.dimen.tablePadding);
-        float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
-        float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
+        float width = this.getDrawX(Math.round(table.wight)) - this.getDrawX(0);
+        float hight = this.getDrawY(Math.round(table.height)) - this.getDrawY(0);
         float newHight = hight * (tSize + 2 * tPadding) / tSize;
         float newWidth = width * (tSize + 2 * tPadding) / tSize;
         int xOffset = (int)(newWidth - width)/2;
         int yOffset = (int)(newHight - hight)/2;
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)newWidth,(int)newHight);
-        lp.leftMargin = (int)this.getDrawX((float) table.x) - xOffset;
-        lp.topMargin = (int) this.getDrawY((float) table.y) - yOffset;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Math.round(newWidth),Math.round(newHight));
+        lp.leftMargin = Math.round(this.getDrawX((float) table.x));
+        lp.topMargin = Math.round(this.getDrawY((float) table.y));
 
         return lp;
     }
