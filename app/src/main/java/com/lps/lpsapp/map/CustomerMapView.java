@@ -20,7 +20,7 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.ImageSwitcher;
 
 import com.lps.core.gui.ScalableView;
 import com.lps.core.gui.ScaleGestureDetectorCompat;
@@ -65,7 +65,7 @@ public class CustomerMapView extends ScalableView  {
     private List<BeaconData> beaconDatas;
     private Rect calculationResult;
 
-    public HashMap<Table,ImageView> map;
+    public HashMap<Table,View> map;
 
     public CustomerMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -320,33 +320,36 @@ public class CustomerMapView extends ScalableView  {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for(Table table: mRoomModel.tables) {
-            ImageView view = null;
+            View view = null;
             if(table.type.equals("Table1")) {
-                table.height = table.height * (1 + 1f / 6);
-                view = (ImageView) inflater.inflate(R.layout.layout_table1, null);
+                view = (View) inflater.inflate(R.layout.layout_table1, null);
             } else if(table.type.equals("Table2")) {
-                view = (ImageView) inflater.inflate(R.layout.layout_table2, null);
+                view = (View) inflater.inflate(R.layout.layout_table2, null);
             } else if(table.type.equals("Table3")) {
-                view = (ImageView) inflater.inflate(R.layout.layout_table3, null);
+                view = (View) inflater.inflate(R.layout.layout_table3, null);
             } else if(table.type.equals("Table4")) {
-                view = (ImageView) inflater.inflate(R.layout.layout_table4, null);
+                view = (View) inflater.inflate(R.layout.layout_table4, null);
             } else {
-                view = (ImageView) inflater.inflate(R.layout.layout_table4, null);
+                view = (View) inflater.inflate(R.layout.layout_table4, null);
             }
 
             view.setLayoutParams(this.getTableLayoutParams(table));
 
             if(table.angle != 0.0) {
-                float tSize = getResources().getDimension(R.dimen.tableSize);
-                float tPadding = getResources().getDimension(R.dimen.tablePadding);
-                float width = this.getDrawX((float) (table.x + table.wight)) - this.getDrawX((float) table.x);
-                float hight = this.getDrawY((float) (table.y + table.height)) - this.getDrawY((float) table.y);
-                float newHight = hight * (tSize + 2 * tPadding) / tSize;
-                float newWidth = width * (tSize + 2 * tPadding) / tSize;
-                int xOffset = (int)(newWidth - width)/2;
-                int yOffset = (int)(newHight - hight)/2;
-                view.setPivotY(xOffset);
-                view.setPivotX(yOffset);
+                if(table.type.equals("Table1")) {
+                    view.setPivotY(0);
+                    view.setPivotX(0);
+                } else if(table.type.equals("Table2")) {
+                    view.setPivotY(0);
+                    view.setPivotX(0);
+                } else if(table.type.equals("Table3")) {
+                    view.setPivotY(0);
+                    view.setPivotX(0);
+                } else if(table.type.equals("Table4")) {
+                    view.setPivotY(0);
+                    view.setPivotX(0);
+                }
+
                 view.setRotation(Math.round(table.angle));
             }
 
@@ -396,19 +399,13 @@ public class CustomerMapView extends ScalableView  {
         this.invalidate();
     }
 
-    private FrameLayout.LayoutParams getTableLayoutParams(Table table)
+    private ImageSwitcher.LayoutParams getTableLayoutParams(Table table)
     {
-        float tSize = getResources().getDimension(R.dimen.tableSize);
-        float tPadding = getResources().getDimension(R.dimen.tablePadding);
-        float width = this.getDrawX(Math.round(table.wight)) - this.getDrawX(0);
-        float hight = this.getDrawY(Math.round(table.height)) - this.getDrawY(0);
-        float newHight = hight * (tSize + 2 * tPadding) / tSize;
-        float newWidth = width * (tSize + 2 * tPadding) / tSize;
-        int xOffset = (int)(newWidth - width)/2;
-        int yOffset = (int)(newHight - hight)/2;
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Math.round(newWidth),Math.round(newHight));
-        lp.leftMargin = Math.round(this.getDrawX((float) table.x));
-        lp.topMargin = Math.round(this.getDrawY((float) table.y));
+        float width = this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x));
+        float hight = this.getDrawY(Math.round(table.y + table.height)) - this.getDrawY(Math.round(table.y));
+        ImageSwitcher.LayoutParams lp = new ImageSwitcher.LayoutParams(Math.round(width),Math.round(hight));
+        lp.leftMargin = Math.round(this.getDrawX(Math.round(table.x)));
+        lp.topMargin = Math.round(this.getDrawY(Math.round(table.y)));
 
         return lp;
     }

@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list android:paddingMode="nest" xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="transparent" >
+<layer-list
+    android:paddingMode="nest"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="transparent" >
     <item
-        android:right="@dimen/tablePadding"
-        android:top="@dimen/tablePadding"
-        android:left="@dimen/tablePadding"
-        android:bottom="@dimen/tablePadding"
-        android:gravity="center"
+        android:top="18dp"
+        android:gravity="bottom"
         android:drawable="@drawable/tbl">
     </item>
    <item
-        android:right="25dp"
-        android:top="0dp"
-        android:left="25dp"
-        android:bottom="163.3dp"
-        android:gravity="center"
+        android:right="5dp"
+        android:left="5dp"
+        android:gravity="top"
         android:drawable="@drawable/chear_h">
     </item>
 
