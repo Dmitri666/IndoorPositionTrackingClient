@@ -1,18 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list
-    android:paddingMode="nest"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:opacity="transparent" >
-    <item
-        android:top="18dp"
-        android:gravity="bottom"
-        android:drawable="@drawable/tbl">
-    </item>
-   <item
-        android:right="5dp"
-        android:left="5dp"
-        android:gravity="top"
-        android:drawable="@drawable/chear_h">
-    </item>
-
-</layer-list>
+<vector android:height="256dp"
+    android:viewportHeight="70"
+    android:viewportWidth="60"
+    android:width="256dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="@color/table"
+        android:pathData="M0,10h60v60h-60z"
+        android:strokeColor="#55ccdd" android:strokeWidth="1"/>
+    <path android:fillColor="@color/table"
+        android:pathData="M6,0h48v6h-48z"
+        android:strokeColor="#55ccdd"
+        android:strokeWidth="1"/>
+</vector>

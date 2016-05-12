@@ -17,7 +17,6 @@ import com.lps.core.webapi.IWebApiResultListener;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
-import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.positions.PointD;
@@ -337,9 +336,6 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                         }
                     }
 
-                    if (SettingsActivity.SendToServer) {
-                        postDeviceCoordinate(beacons);
-                    }
                 }
             }
 

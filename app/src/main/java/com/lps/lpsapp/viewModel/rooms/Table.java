@@ -1,12 +1,14 @@
 package com.lps.lpsapp.viewModel.rooms;
 
-import android.view.View;
+import android.graphics.Color;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lps.lpsapp.viewModel.booking.TableState;
+import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 
 import java.util.UUID;
 
@@ -21,7 +23,7 @@ public class Table  {
     private Boolean selected;
 
     @JsonIgnore
-    public View guiElement;
+    public ImageView guiElement;
 
     @JsonIgnore
     public final Animation animation = new AlphaAnimation(1, 0);
@@ -36,7 +38,7 @@ public class Table  {
     public UUID id;
     public double x;
     public double y;
-
+    public String description;
     public double angle;
     public String type;
 
@@ -55,7 +57,7 @@ public class Table  {
 
     public void setBookingState(TableState state)
     {
-       /* bookingState = state;
+        bookingState = state;
         if(state.getTableState() == TableStateEnum.Waiting) {
             this.guiElement.startAnimation(this.animation);
             this.guiElement.setColorFilter(Color.BLUE);
@@ -71,7 +73,7 @@ public class Table  {
             } else if (state.getTableState() == TableStateEnum.Rejected) {
                 this.guiElement.setColorFilter(Color.RED);
             }
-        }*/
+        }
     }
 
     public TableState getBookingState()
@@ -88,7 +90,7 @@ public class Table  {
     {
         this.selected = selected;
         if(selected) {
-            //this.guiElement.setColorFilter(Color.YELLOW);
+            this.guiElement.setColorFilter(Color.YELLOW);
         }
         else
         {

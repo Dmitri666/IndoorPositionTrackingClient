@@ -69,39 +69,7 @@
         <item name="android:tintMode">src_atop</item>
     </style>
 
-    <style name="Table1">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:opacity">translucent</item>
-        <item name="android:src">@drawable/table1</item>
 
 
-    </style>
 
-    <style name="Table2">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:opacity">translucent</item>
-        <item name="android:src">@drawable/table2</item>
-
-
-    </style>
-
-    <style name="Table3">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:opacity">translucent</item>
-        <item name="android:src">@drawable/table3</item>
-
-
-    </style>
-
-    <style name="Table4">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:opacity">translucent</item>
-        <item name="android:src">@drawable/table4</item>
-
-
-    </style>
 </resources>

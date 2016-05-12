@@ -20,7 +20,7 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 
 import com.lps.core.gui.ScalableView;
 import com.lps.core.gui.ScaleGestureDetectorCompat;
@@ -29,20 +29,16 @@ import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.BookingActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.positions.BeaconData;
-import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
 import com.lps.lpsapp.viewModel.rooms.Table;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -60,17 +56,13 @@ public class CustomerMapView extends ScalableView  {
     private Paint mCPaint;
     private List<Actor> actors;
     private RoomModel mRoomModel;
-    private Target mBgTarget;
 
     private List<BeaconData> beaconDatas;
     private Rect calculationResult;
 
-    public HashMap<Table,View> map;
-
     public CustomerMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        this.map = new HashMap<>();
         setWillNotDraw(false);
         init(attrs, 0);
         ScaleGestureDetectorCompat.synchronizeScale = true;
@@ -92,21 +84,6 @@ public class CustomerMapView extends ScalableView  {
         mBackground = new BitmapDrawable(getResources(), bitmap);
         this.CreateMapObjects();
         this.invalidate();
-
-        String iPath = roomModel.imageFileName;
-        if(iPath != null && !iPath.isEmpty())
-        {
-            String path = WebApiActions.GetImage() + "/" + iPath;
-            try {
-                Picasso.with(getContext()).load(path).into(this.mBgTarget);
-            }
-            catch (Exception ex)
-            {
-                Log.e(TAG,ex.getMessage(),ex);
-            }
-
-        }
-        Log.d(TAG, "setmRoomModel");
     }
 
     public boolean hasRoomModel()
@@ -277,7 +254,7 @@ public class CustomerMapView extends ScalableView  {
                     table.setBookingState(state);
                     if(state.getTableState() == TableStateEnum.Free || state.getTableState() == TableStateEnum.BookedForMe || state.getTableState() == TableStateEnum.Waiting)
                     {
-                        map.get(table).setOnClickListener(new OnClickListener() {
+                        table.guiElement.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Boolean selected = table.getSelected();
@@ -322,18 +299,19 @@ public class CustomerMapView extends ScalableView  {
         for(Table table: mRoomModel.tables) {
             View view = null;
             if(table.type.equals("Table1")) {
-                view = (View) inflater.inflate(R.layout.layout_table1, null);
+                view = inflater.inflate(R.layout.layout_table1, null);
             } else if(table.type.equals("Table2")) {
-                view = (View) inflater.inflate(R.layout.layout_table2, null);
+                view = inflater.inflate(R.layout.layout_table2, null);
             } else if(table.type.equals("Table3")) {
-                view = (View) inflater.inflate(R.layout.layout_table3, null);
+                view = inflater.inflate(R.layout.layout_table3, null);
             } else if(table.type.equals("Table4")) {
-                view = (View) inflater.inflate(R.layout.layout_table4, null);
+                view = inflater.inflate(R.layout.layout_table4, null);
             } else {
-                view = (View) inflater.inflate(R.layout.layout_table4, null);
+                view = inflater.inflate(R.layout.layout_table4, null);
             }
 
-            view.setLayoutParams(this.getTableLayoutParams(table));
+            table.guiElement = (ImageView)view;
+            this.addView(view);
 
             if(table.angle != 0.0) {
                 if(table.type.equals("Table1")) {
@@ -353,10 +331,11 @@ public class CustomerMapView extends ScalableView  {
                 view.setRotation(Math.round(table.angle));
             }
 
-            table.guiElement = view;
-            this.map.put(table, view);
+            view.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams)view.getLayoutParams(),table));
 
-            this.addView(view);
+            //TextView text = new TextView(getContext());
+            //text.setText(table.description);
+
         }
     }
 
@@ -376,9 +355,7 @@ public class CustomerMapView extends ScalableView  {
     private void setLayoutForMapObjects()
     {
         for (Table table:this.mRoomModel.tables) {
-            FrameLayout.LayoutParams lp = this.getTableLayoutParams(table);
-            map.get(table).setLayoutParams(lp);
-            //Log.d(TAG,"Table Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
+            table.guiElement.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams)table.guiElement.getLayoutParams(),table));
         }
 
         for (Actor actor:this.actors) {
@@ -399,22 +376,19 @@ public class CustomerMapView extends ScalableView  {
         this.invalidate();
     }
 
-    private ImageSwitcher.LayoutParams getTableLayoutParams(Table table)
+    private FrameLayout.LayoutParams applayTableLayoutParams(FrameLayout.LayoutParams param,Table table)
     {
-        float width = this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x));
-        float hight = this.getDrawY(Math.round(table.y + table.height)) - this.getDrawY(Math.round(table.y));
-        ImageSwitcher.LayoutParams lp = new ImageSwitcher.LayoutParams(Math.round(width),Math.round(hight));
-        lp.leftMargin = Math.round(this.getDrawX(Math.round(table.x)));
-        lp.topMargin = Math.round(this.getDrawY(Math.round(table.y)));
-
-        return lp;
+        param.width = Math.round(this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x)));
+        param.height = Math.round(this.getDrawY(Math.round(table.y + table.height)) - this.getDrawY(Math.round(table.y)));
+        param.leftMargin = Math.round(this.getDrawX(Math.round(table.x)));
+        param.topMargin = Math.round(this.getDrawY(Math.round(table.y)));
+        return param;
     }
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.CustomerMapView, defStyle, 0);
-
 
         mWandColor = a.getColor(
                 R.styleable.CustomerMapView_wandColor,

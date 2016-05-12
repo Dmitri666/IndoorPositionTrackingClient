@@ -10,7 +10,6 @@ import android.util.Log;
 import com.lps.core.webapi.AccessToken;
 import com.lps.core.webapi.JsonSerializer;
 import com.lps.lpsapp.activities.LoginActivity;
-import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.PushService;
@@ -57,8 +56,6 @@ public class LpsApplication extends MultiDexApplication {
             startService(puchService);
         }
 
-        SharedPreferences settings = getSharedPreferences("settings", 0);
-        SettingsActivity.SendToServer = settings.getBoolean("sendToServer", false);
 
     }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="130dp"
+        android:scaleType="fitXY"
+        android:background="@color/common_action_bar_splitter"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:srcCompat="@drawable/table4"
+        xmlns:android="http://schemas.android.com/apk/res/android" />
+</FrameLayout>

@@ -9,38 +9,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lps.lpsapp.activities.SettingsActivity">
 
-    <EditText
-        android:id="@+id/tbBeaconCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="36dp"
-        android:ems="10"
-        android:inputType="number" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="BeaconCount" />
-
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="send to server"
-        android:id="@+id/switch_send_to_server"
-        android:layout_below="@+id/tbBeaconCount"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="68dp" />
-
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="use beacon simulator"
         android:id="@+id/switch_use_beacon_simulator"
-        android:layout_below="@+id/switch_send_to_server"
         android:layout_alignParentStart="true"
         android:layout_marginTop="68dp" />
 
