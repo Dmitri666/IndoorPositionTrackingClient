@@ -48,6 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
                                     public void onResult(BeaconModel objResult) {
                                         BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
                                         ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons(objResult);
+
                                     }
                                 });
                             }

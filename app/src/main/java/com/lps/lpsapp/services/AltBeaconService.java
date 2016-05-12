@@ -3,7 +3,6 @@ package com.lps.lpsapp.services;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,7 +17,6 @@ import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
-import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.viewModel.BeaconData;
@@ -57,9 +55,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     private RegionBootstrap regionBootstrap;
     private BackgroundPowerSaver backgroundPowerSaver;
     private boolean haveDetectedBeaconsSinceBoot = false;
-    private PositionCalculator mPositionCalculator;
+    public PositionCalculator mPositionCalculator;
     public IDevicePositionListener devicePositionListener;
-    public IPositionCalculatorListener positionCalculatorListener;
     public Region backgroundRegion;
     public UUID currentLocaleId;
 
@@ -117,13 +114,13 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         }
         WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
-        service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List>() {
+        service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
             @Override
-            public void onResult(List objResult) {
+            public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
                 setRegions(objResult);
                 for(int i = 0; i < objResult.size(); i++)
                 {
-                    Log.i(TAG, "setRegion:"  + objResult.get(i).toString());
+                    Log.i(TAG, "setRegion:"  + objResult.get(i).roomId.toString());
                 }
 
             }
@@ -204,15 +201,6 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 @Override
                 public void onResult(BeaconModel objResult) {
                     mPositionCalculator = new PositionCalculator(objResult);
-                    mPositionCalculator.positionCalculatorListener = new IPositionCalculatorListener() {
-                        @Override
-                        public void calculationResult(List<com.lps.lpsapp.positions.BeaconData> beaconDatas, Rect bounds) {
-                            if(positionCalculatorListener != null)
-                            {
-                                positionCalculatorListener.calculationResult(beaconDatas,bounds);
-                            }
-                        }
-                    };
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {
@@ -343,6 +331,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
 
     }
+
 
     public void monitoreBackgroundRegion(boolean mode) {
         try {

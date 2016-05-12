@@ -74,37 +74,37 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 		if(!SettingsActivity.UseBeaconSimulator) {
 			beacons.clear();
 			return new ArrayList<>();
-		}
-		Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f,this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
-		float radius = center.x / 1.5f;
-		i++;
-        if(i%5 == 0) {
-            angle += 20.0;
-            angle = angle % 360.0;
-            //angle = 180.0;
-            double radian = Math.toRadians(angle);
-			currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
-			Log.d(TAG,"TestPoint (" + currentPoint.x + "," + currentPoint.y + ")");
-        }
-		for (Beacon b:beacons) {
-			BeaconInRoom beacon = null;
-			for(BeaconInRoom beaconInRoom:mBeaconmodel.beacons)
-			{
-				if(beaconInRoom.id3 == b.getId3().toInt())
-				{
-					beacon = beaconInRoom;
-					break;
+		} else if (this.mBeaconmodel != null) {
+			Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f, this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
+			float radius = center.x / 1.5f;
+			i++;
+			if (i % 5 == 0) {
+				angle += 20.0;
+				angle = angle % 360.0;
+				//angle = 180.0;
+				double radian = Math.toRadians(angle);
+				currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
+				Log.d(TAG, "TestPoint (" + currentPoint.x + "," + currentPoint.y + ")");
+			}
+			for (Beacon b : beacons) {
+				BeaconInRoom beacon = null;
+				for (BeaconInRoom beaconInRoom : mBeaconmodel.beacons) {
+					if (beaconInRoom.id3 == b.getId3().toInt()) {
+						beacon = beaconInRoom;
+						break;
+					}
+				}
+
+				if (beacon != null && currentPoint != null) {
+					double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
+					double rssi = calc.calculateRssi(-55, distance);
+					double d = calc.calculateDistance(-55, rssi);
+					b.setRssi(Math.round(Math.round(rssi)));
+					//Log.d(TAG,"distance " + distance);
 				}
 			}
 
-			double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
-			double rssi = calc.calculateRssi(-55,distance);
-			double d = calc.calculateDistance(-55,rssi);
-			b.setRssi(Math.round(Math.round(rssi)));
-			//Log.d(TAG,"distance " + distance);
 		}
-
-
 		return beacons;
 	}
 	
@@ -113,14 +113,14 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 	 */
 	public void createBasicSimulatedBeacons(){
 		if (USE_SIMULATED_BEACONS) {
-            Beacon beacon1 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
-                    .setId2("0").setId3("1").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon2 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
-                    .setId2("0").setId3("2").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon3 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
-                    .setId2("0").setId3("3").setRssi(-55).setTxPower(-55).build();
-            Beacon beacon4 = new AltBeacon.Builder().setId1("00000000-0000-0000-0000-000000000000")
-                    .setId2("0").setId3("4").setRssi(-55).setTxPower(-55).build();
+            Beacon beacon1 = new AltBeacon.Builder().setId1("B0000000-0000-0000-0000-000000000000")
+                    .setId2("10").setId3("1").setRssi(-55).setTxPower(-55).build();
+            Beacon beacon2 = new AltBeacon.Builder().setId1("C0000000-0000-0000-0000-000000000000")
+                    .setId2("2").setId3("2").setRssi(-55).setTxPower(-55).build();
+            Beacon beacon3 = new AltBeacon.Builder().setId1("D0000000-0000-0000-0000-000000000000")
+                    .setId2("5").setId3("3").setRssi(-55).setTxPower(-55).build();
+            Beacon beacon4 = new AltBeacon.Builder().setId1("A0000000-0000-0000-0000-000000000000")
+                    .setId2("64").setId3("4").setRssi(-55).setTxPower(-55).build();
 			beacons.add(beacon1);
 			beacons.add(beacon2);
 			beacons.add(beacon3);
@@ -164,8 +164,10 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 						//putting a single beacon back into the beacons list.
 						if (finalBeacons.size() > beacons.size())
 							beacons.add(finalBeacons.get(beacons.size()));
-						else 
+						else {
 							scheduleTaskExecutor.shutdown();
+							createBasicSimulatedBeacons();
+						}
 						
 					}catch(Exception e){
 						e.printStackTrace();

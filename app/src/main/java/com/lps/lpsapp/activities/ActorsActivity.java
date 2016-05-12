@@ -36,6 +36,7 @@ import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.AuthenticationService;
+import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.IDevicePositionListener;
 import com.lps.lpsapp.services.PushService;
@@ -47,7 +48,11 @@ import com.lps.lpsapp.viewModel.chat.DevicePosition;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
 import com.squareup.picasso.Picasso;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.Region;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +60,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private static String TAG = "ActorsActivity";
     private UUID roomId;
     private IDevicePositionListener actorPositionListener;
+    private IBeaconServiceListener beaconServiceListener;
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mBeaconServiceBound = false;
@@ -104,6 +110,20 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
         }
+
+        beaconServiceListener = new IBeaconServiceListener() {
+            @Override
+            public void beaconsInRange(Collection<Beacon> beacon, Region region) {
+
+            }
+
+            @Override
+            public void deviceInLocale(UUID localeId, boolean isInLocale) {
+                if(!isInLocale) {
+                    ActorsActivity.this.finish();
+                }
+            }
+        };
     }
 
     @Override
@@ -135,7 +155,13 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mPushServiceBound = false;
             mPushService = null;
         }
+        mBeaconService.removeBeaconServiceListener(beaconServiceListener);
         mBeaconService.devicePositionListener = null;
+        if(mBeaconService.mPositionCalculator != null)
+        {
+            mBeaconService.mPositionCalculator.positionCalculatorListener = null;
+        }
+
         if (mBeaconServiceBound) {
             unbindService(mBeaconServiceConnection);
             mBeaconServiceBound = false;
@@ -254,12 +280,17 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconServiceBound = true;
 
             mBeaconService.devicePositionListener = actorPositionListener;
-            mBeaconService.positionCalculatorListener = new IPositionCalculatorListener() {
-                @Override
-                public void calculationResult(List<BeaconData> beaconDatas, Rect bounds) {
-                    onCalculationResult(beaconDatas, bounds);
-                }
-            };
+            mBeaconService.setBeaconServiceListener(beaconServiceListener);
+            if(mBeaconService.mPositionCalculator != null)
+            {
+                mBeaconService.mPositionCalculator.positionCalculatorListener = new IPositionCalculatorListener() {
+                    @Override
+                    public void calculationResult(List<BeaconData> beaconDatas, Rect bounds) {
+                        onCalculationResult(beaconDatas, bounds);
+                    }
+                };
+            }
+
 
         }
 
