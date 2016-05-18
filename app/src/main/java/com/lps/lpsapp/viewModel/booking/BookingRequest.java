@@ -1,8 +1,11 @@
 package com.lps.lpsapp.viewModel.booking;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -14,10 +17,11 @@ public class BookingRequest {
 
     public int peopleCount;
 
-    public UUID tableId;
+    @JsonDeserialize(as=ArrayList.class, contentAs= UUID.class)
+    public List<UUID> tables;
 
     public BookingRequest()
     {
-
+        this.tables = new ArrayList<>();
     }
 }

@@ -35,6 +35,7 @@ import com.lps.lpsapp.viewModel.rooms.RoomModel;
 import com.lps.lpsapp.viewModel.rooms.Table;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -296,19 +297,24 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
     {
         CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
 
-        Table table = view.getSelectedTables().get(0);//((GuiTable)mode.getTag()).mTable;
-
+        List<Table> selected = new ArrayList<>(view.getSelectedTables());
         String path =  WebApiActions.SendBookingRequest();
         BookingRequest request = new BookingRequest();
-        request.tableId = table.id;
+        for(Table table:selected) {
+            request.tables.add(table.id);
+        }
+
         request.time = DataTimeUtil.convertToGTM(this.mDate).getTime();
         WebApiService service = new WebApiService(BookingRequest.class,true);
         service.performPost(path, request);
 
         view.clearSelectedTables();
-        TableState state = table.getBookingState();
-        state.setTableState(TableStateEnum.Waiting);
-        table.setBookingState(state);
+        for(Table table:selected) {
+            TableState state = table.getBookingState();
+            state.setTableState(TableStateEnum.Waiting);
+            table.setBookingState(state);
+        }
+
 
         view.invalidate();
 

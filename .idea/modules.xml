@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LpsApp.iml" filepath="$PROJECT_DIR$/LpsApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/android-beacon-library/android-beacon-library.iml" filepath="$PROJECT_DIR$/libs/android-beacon-library/android-beacon-library.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/libs.iml" filepath="$PROJECT_DIR$/libs/libs.iml" />
     </modules>

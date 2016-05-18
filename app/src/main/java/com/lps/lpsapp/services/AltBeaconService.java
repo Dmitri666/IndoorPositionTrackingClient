@@ -33,6 +33,8 @@ import org.altbeacon.beacon.BleNotAvailableException;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.logging.LogManager;
+import org.altbeacon.beacon.logging.Loggers;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
@@ -68,8 +70,12 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             this.mRegions.add(roomRegion);
 
         }
+        if(this.mRegions.size() > 0) {
+            this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
+        } else {
+            this.beaconManager.setMonitorNotifier(this);
+        }
 
-        this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
 
     }
 
@@ -84,8 +90,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         LpsApplication app = (LpsApplication) this.getApplicationContext();
         beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(app);
         if(BuildConfig.DEBUG) {
-            //LogManager.setVerboseLoggingEnabled(true);
-            //LogManager.setLogger(Loggers.verboseLogger());
+            LogManager.setVerboseLoggingEnabled(true);
+            LogManager.setLogger(Loggers.verboseLogger());
         }
 
         //BeaconManager.setDistanceModelUpdateUrl(getResources().getString(R.string.modelDistanceDalculationsUrl));
@@ -111,7 +117,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         //
         if(avalable) {
             beaconManager.getBeaconParsers().clear();
-            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+            beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); // Estimotes
+            beaconManager.getBeaconParsers().add(new BeaconParser().
+                    setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));  // iBeacons
+            beaconManager.getBeaconParsers().add(new BeaconParser().
+                    setBeaconLayout("m:0-3=a7ae2eb7,i:4-19,i:20-21,i:22-23,p:24-24"));  // easiBeacons
         }
         WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
         service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
@@ -137,6 +147,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 //            BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
 //            ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
 //        }
+
         Log.d(TAG,"Created");
     }
 
@@ -300,6 +311,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
         Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
+        beaconManager.setMonitorNotifier(this);
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
