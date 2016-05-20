@@ -1,4 +1,10 @@
 <resources>
+    <string name="google_maps_key_b" translatable="false" templateMergeStrategy="preserve">
+        AIzaSyBhK7f_n_9sqJ3rbqJlFiyqKu_9P0VJQ6o
+    </string>
+    <string name="google_maps_key_h" translatable="false" templateMergeStrategy="preserve">
+        AIzaSyA5b0gHo3-ZgrWKYFlF9XZTmrs4h86BYRU
+    </string>
     <string name="google_app_id">964696897480</string>
 
     <string name="app_name">Gloobar App</string>

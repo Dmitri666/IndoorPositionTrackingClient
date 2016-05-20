@@ -2,8 +2,11 @@ package com.lps.lpsapp.viewModel.booking;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -20,11 +23,10 @@ public class BookingData {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm", timezone="GMT")
     public Date time;
 
-    public UUID tableId;
+    @JsonDeserialize(as=ArrayList.class, contentAs= RoomTableData.class)
+    public List<RoomTableData> roomTableDataList;
 
     public int peopleCount;
-
-    public String tableClientName;
 
     public int state;
 
