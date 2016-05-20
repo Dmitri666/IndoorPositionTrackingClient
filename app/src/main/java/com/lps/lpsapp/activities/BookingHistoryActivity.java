@@ -52,8 +52,10 @@ public class BookingHistoryActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mRoomId = (UUID) getIntent().getExtras().get("id");
         setContentView(R.layout.activity_booking_history);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        this.mRoomId = (UUID) getIntent().getExtras().get("id");
         listView = (ListView)this.findViewById(R.id.bookingListView);
 
         adapter=new MyArrayAdapter(this,

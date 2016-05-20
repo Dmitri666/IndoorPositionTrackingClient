@@ -6,6 +6,8 @@
         AIzaSyA5b0gHo3-ZgrWKYFlF9XZTmrs4h86BYRU
     </string>
     <string name="google_app_id">964696897480</string>
+    <string name="title_activity_maps">Maps</string>
+
 
     <string name="app_name">Gloobar App</string>
     <string name="action_settings">Settings</string>

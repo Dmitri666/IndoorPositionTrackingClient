@@ -286,6 +286,10 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             case R.id.menu:
                 return true;
             case R.id.home:
+                Intent intent = new Intent(getApplicationContext(), BookingHistoryActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("id", roomId);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

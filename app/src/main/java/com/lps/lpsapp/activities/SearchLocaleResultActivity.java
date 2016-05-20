@@ -88,24 +88,24 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         if(params != null) {
             try {
                 this.mParameters = JsonSerializer.deserialize(params, RequestLocationData.class);
-                SharedPreferences settings = getSharedPreferences("parameters", 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("search", params);
-                editor.commit();
+//                SharedPreferences settings = getSharedPreferences("parameters", 0);
+//                SharedPreferences.Editor editor = settings.edit();
+//                editor.putString("search", params);
+//                editor.commit();
             } catch (IOException ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }
         } else {
-            SharedPreferences settings = getSharedPreferences("parameters", 0);
-            String search = settings.getString("search", null);
-            if(search != null)
-            {
-                try {
-                    this.mParameters = JsonSerializer.deserialize(search, RequestLocationData.class);
-                } catch (IOException ex) {
-                    Log.e(TAG, ex.getMessage(), ex);
-                }
-            }
+//            SharedPreferences settings = getSharedPreferences("parameters", 0);
+//            String search = settings.getString("search", null);
+//            if(search != null)
+//            {
+//                try {
+//                    this.mParameters = JsonSerializer.deserialize(search, RequestLocationData.class);
+//                } catch (IOException ex) {
+//                    Log.e(TAG, ex.getMessage(), ex);
+//                }
+//            }
         }
         this.loadLocales();
 

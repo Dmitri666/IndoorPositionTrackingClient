@@ -18,10 +18,12 @@ public class AsyncTaskResult<T> {
     public AsyncTaskResult(T result) {
         super();
         this.result = result;
+        this.error = null;
     }
 
     public AsyncTaskResult(Exception error) {
         super();
         this.error = error;
+        this.result = null;
     }
 }
