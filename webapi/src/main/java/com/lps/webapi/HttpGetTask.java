@@ -1,17 +1,14 @@
-package com.lps.core.webapi;
+package com.lps.webapi;
 
 
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.lps.lpsapp.services.AuthenticationService;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -19,51 +16,30 @@ import java.net.URL;
 /**
  * Created by dle on 23.07.2015.
  */
-public class HttpPostTask extends AsyncTask<String, Void, AsyncTaskResult<String>> {
-    private static String TAG = "HttpPostTask";
+public class HttpGetTask extends AsyncTask<String, Void, AsyncTaskResult<String>> {
+    private static String TAG = "HttpGetTask";
     private Exception exception;
     private boolean mAuthenticate;
     private IHttpResultListener mResultListener;
-    private String mParameter;
 
-    public HttpPostTask(String parameter, IHttpResultListener resultListener, boolean authenticate) {
-
-        this.mAuthenticate = authenticate;
-        this.mResultListener = resultListener;
-        this.mParameter = parameter;
-    }
-
-    public HttpPostTask(String parameter, boolean authenticate) {
+    public HttpGetTask(IHttpResultListener consumer, boolean authenticate) {
 
         this.mAuthenticate = authenticate;
-        this.mParameter = parameter;
+        this.mResultListener = consumer;
     }
+
 
     protected AsyncTaskResult<String> doInBackground(String... args) {
         HttpURLConnection urlConnection = null;
         try {
             URL url = new URL(args[0]);
             urlConnection = (HttpURLConnection) url.openConnection();
-            if (AuthenticationService.authenticationData != null && mAuthenticate) {
-                urlConnection.addRequestProperty("Authorization", "Bearer " + AuthenticationService.authenticationData.access_token);
+            if (AccessToken.CurrentToken != null && mAuthenticate) {
+                urlConnection.addRequestProperty("Authorization", "Bearer " + AccessToken.CurrentToken.access_token);
             }
             urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-
-            urlConnection.setUseCaches(false);
-            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
             urlConnection.setChunkedStreamingMode(0);
-
-            //Send request
-            OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
-            wr.write(mParameter);
-            wr.flush();
-            wr.close();
-
-            //Get Response
-            if(mResultListener == null)
-            {
-                //return null;
-            }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             StringBuilder out = new StringBuilder();
@@ -74,7 +50,6 @@ public class HttpPostTask extends AsyncTask<String, Void, AsyncTaskResult<String
             reader.close();
 
             return new AsyncTaskResult<String>(out.toString());
-
         } catch (FileNotFoundException e) {
             try {
                 int rCode = urlConnection.getResponseCode();
@@ -93,7 +68,6 @@ public class HttpPostTask extends AsyncTask<String, Void, AsyncTaskResult<String
                     String eror = response.toString();
                     Log.e(TAG, eror, e);
                 }
-
             } catch (IOException ee) {
                 Log.e(TAG, e.getMessage(), e);
             }
@@ -102,14 +76,16 @@ public class HttpPostTask extends AsyncTask<String, Void, AsyncTaskResult<String
             this.exception = e;
             new AsyncTaskResult<String>(e);
         } finally {
-            urlConnection.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
         }
         return null;
     }
 
     protected void onPostExecute(AsyncTaskResult<String> feed) {
         try {
-            if(mResultListener != null && feed != null) {
+            if(feed != null) {
                 mResultListener.OnResult(feed);
             }
             // TODO: check this.exception
@@ -118,6 +94,9 @@ public class HttpPostTask extends AsyncTask<String, Void, AsyncTaskResult<String
             Log.e(TAG, ex.getMessage(), ex);
         }
     }
-
-
 }
+
+
+
+
+

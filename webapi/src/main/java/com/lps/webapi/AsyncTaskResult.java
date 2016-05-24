@@ -1,4 +1,4 @@
-package com.lps.core.webapi;
+package com.lps.webapi;
 
 /**
  * Created by user on 15.10.2015.

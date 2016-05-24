@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
-import com.lps.core.webapi.IWebApiResultListener;
+import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.dialogs.DatePickerFragment;
 import com.lps.lpsapp.dialogs.NumberPickerFragment;
@@ -26,7 +26,7 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.services.IBookingStateChangedListener;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.booking.BookingRequest;
 import com.lps.lpsapp.viewModel.booking.TableReservationModelRequest;
 import com.lps.lpsapp.viewModel.booking.TableState;

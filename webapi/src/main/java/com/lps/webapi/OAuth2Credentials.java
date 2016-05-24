@@ -1,4 +1,4 @@
-package com.lps.core.webapi;
+package com.lps.webapi;
 
 import microsoft.aspnet.signalr.client.Credentials;
 import microsoft.aspnet.signalr.client.http.Request;

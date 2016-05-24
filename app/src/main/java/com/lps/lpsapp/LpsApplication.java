@@ -7,14 +7,15 @@ import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
-import com.lps.core.webapi.AccessToken;
-import com.lps.core.webapi.JsonSerializer;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.IAuthenticationListener;
+import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.Device;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
@@ -40,7 +41,13 @@ public class LpsApplication extends MultiDexApplication {
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        AuthenticationService.authenticationData = this.getAuthenticationData();
+        WebApiService.AuthenticationListener = new IAuthenticationListener() {
+            @Override
+            public void Autenticate() {
+                ShowLogin();
+            }
+        };
+        AccessToken.CurrentToken = this.getAuthenticationData();
         AuthenticationService.currentApplication = this;
         AndroidModel model = AndroidModel.forThisDevice();
         Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
@@ -51,7 +58,7 @@ public class LpsApplication extends MultiDexApplication {
 
         beaconService = new Intent(this, AltBeaconService.class);
         startService(beaconService);
-        if(AuthenticationService.authenticationData != null) {
+        if(AccessToken.CurrentToken != null) {
             puchService = new Intent(this, PushService.class);
             startService(puchService);
         }
@@ -101,10 +108,10 @@ public class LpsApplication extends MultiDexApplication {
         return accesstoken;
     }
 
-    public void saveAuthenticationData() {
-        if(AuthenticationService.authenticationData != null) {
+    public void saveAuthenticationData(AccessToken authenticationData) {
+        if(authenticationData != null) {
             try {
-                String token = JsonSerializer.serialize(AuthenticationService.authenticationData);
+                String token = JsonSerializer.serialize(authenticationData);
                 SharedPreferences settings = getSharedPreferences("token", 0);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("token", token);
@@ -112,6 +119,7 @@ public class LpsApplication extends MultiDexApplication {
 
                 puchService = new Intent(this, PushService.class);
                 startService(puchService);
+                AccessToken.CurrentToken = authenticationData;
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }
@@ -135,7 +143,7 @@ public class LpsApplication extends MultiDexApplication {
         editor.commit();
     }
 
-    public void Authenticate()
+    public void ShowLogin()
     {
         Intent myIntent = new Intent(this, LoginActivity.class);
         myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

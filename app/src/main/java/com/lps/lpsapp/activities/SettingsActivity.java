@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import com.lps.core.webapi.IWebApiResultListener;
+import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.rooms.RoomInfo;
 

@@ -21,13 +21,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
-import com.lps.core.webapi.IWebApiResultListener;
-import com.lps.core.webapi.JsonSerializer;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.helper.ComboBoxItem;
 import com.lps.lpsapp.helper.SimpleComboBoxAdapter;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.rooms.RequestLocationData;
 
 import java.io.IOException;

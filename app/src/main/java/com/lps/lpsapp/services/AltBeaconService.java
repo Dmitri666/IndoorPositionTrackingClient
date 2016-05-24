@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.lps.core.webapi.IWebApiResultListener;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
@@ -24,6 +23,8 @@ import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.RangingData;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.services.WebApiService;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -134,6 +135,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 }
 
             }
+
+
         });
 
 
@@ -204,7 +207,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         } else {
 
             final Context ctx = this;
-            LpsApplication app = (LpsApplication) this.getApplicationContext();
+            final LpsApplication app = (LpsApplication) this.getApplicationContext();
 
             String path =  WebApiActions.GetBeaconsInLocale() + "/" +  region.getUniqueId();
             WebApiService service = new WebApiService(BeaconModel.class,true);
@@ -218,6 +221,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                         Log.e(TAG, ex.getMessage(), ex);
                     }
                 }
+
+
             });
 
             path =  WebApiActions.SetPosition();

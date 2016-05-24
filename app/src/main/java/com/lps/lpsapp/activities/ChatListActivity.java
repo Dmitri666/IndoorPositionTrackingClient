@@ -12,11 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lps.core.webapi.IWebApiResultListener;
-import com.lps.core.webapi.JsonSerializer;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ConversationsData;
 

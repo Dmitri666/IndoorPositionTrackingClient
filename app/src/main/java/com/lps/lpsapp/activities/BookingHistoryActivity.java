@@ -15,12 +15,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lps.core.webapi.IWebApiResultListener;
+import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.IBookingStateChangedListener;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.booking.BookingJoinRoomData;
 import com.lps.lpsapp.viewModel.booking.BookingStateEnum;
 

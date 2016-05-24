@@ -27,25 +27,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.lps.core.webapi.IWebApiResultListener;
-import com.lps.core.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
 import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.IDevicePositionListener;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ChatMessage;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 import com.squareup.picasso.Picasso;
 
 import org.altbeacon.beacon.Beacon;
@@ -55,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+
 
 public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
     private static String TAG = "ActorsActivity";
@@ -180,6 +182,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             public void onResult(List objResult) {
                 setActors(view, objResult);
             }
+
+
         });
     }
 
@@ -306,7 +310,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     public boolean onLongClick(View view) {
         GuiDevice gDevice = (GuiDevice) view;
         //todo nur für test
-        if (AuthenticationService.authenticationData.userName == "admin") {
+        if (AccessToken.CurrentToken.userName == "admin") {
             if (gDevice.devicePosition.deviceId.equals("000")) {
                 return false;
             }
@@ -368,6 +372,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                                 Log.e(TAG, ex.getMessage(), ex);
                             }
                         }
+
+
                     });
                     mode.finish();
                     return true;
@@ -473,6 +479,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                             public void onResult(RoomModel objResult) {
                                 activity.setRoomModel(view, objResult);
                             }
+
+
                         });
 
 

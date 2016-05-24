@@ -15,11 +15,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.lps.core.webapi.JsonSerializer;
-import com.lps.core.webapi.OAuth2Credentials;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.BookingHistoryActivity;
 import com.lps.lpsapp.viewModel.booking.BookingJoinRoomData;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.OAuth2Credentials;
 
 import microsoft.aspnet.signalr.client.Action;
 import microsoft.aspnet.signalr.client.ErrorCallback;
@@ -79,8 +80,8 @@ public class BookingNotificationService extends Service {
         };
         // Connect to the server
         conn = new HubConnection(WebApiActions.Subscribe(), "", true, logger);
-        if(AuthenticationService.authenticationData != null) {
-            OAuth2Credentials credentials = new OAuth2Credentials(AuthenticationService.authenticationData.access_token);
+        if(AccessToken.CurrentToken != null) {
+            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
             conn.setCredentials(credentials);
         }
         // Create the hub proxy

@@ -18,7 +18,7 @@ import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.services.WebApiService;
+import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.BeaconData;
 
 import org.altbeacon.beacon.Beacon;

@@ -15,8 +15,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.lps.core.webapi.JsonSerializer;
-import com.lps.core.webapi.OAuth2Credentials;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.OAuth2Credentials;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.BookingHistoryActivity;
 import com.lps.lpsapp.activities.ChatActivity;
@@ -101,8 +102,8 @@ public class PushService extends Service {
                 Log.d(TAG, message);
             }
         });
-        if(AuthenticationService.authenticationData != null) {
-            OAuth2Credentials credentials = new OAuth2Credentials(AuthenticationService.authenticationData.access_token);
+        if(AccessToken.CurrentToken != null) {
+            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
             conn.setCredentials(credentials);
         }
         // Create the hub proxy
@@ -117,7 +118,7 @@ public class PushService extends Service {
                 Log.e(TAG, error.getMessage(), error);
                 if(error instanceof NegotiationException)
                 {
-                    AuthenticationService.currentApplication.Authenticate();
+                    AuthenticationService.currentApplication.ShowLogin();
                 }
                 else
                 {
@@ -183,7 +184,7 @@ public class PushService extends Service {
             public void onError(Throwable throwable) {
                 if(throwable instanceof NegotiationException)
                 {
-                    AuthenticationService.currentApplication.Authenticate();
+                    AuthenticationService.currentApplication.ShowLogin();
                 }
                 else
                 {
