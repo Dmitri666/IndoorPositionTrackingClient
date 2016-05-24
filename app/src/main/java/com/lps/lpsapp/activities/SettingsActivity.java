@@ -1,16 +1,19 @@
 package com.lps.lpsapp.activities;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 
-import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.rooms.RoomInfo;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.services.WebApiService;
 
 import org.altbeacon.beacon.BeaconManager;
 
@@ -19,15 +22,18 @@ import java.util.List;
 public class SettingsActivity extends BaseActivity {
     public static Boolean ShowCircles = false;
     public static Boolean UseBeaconSimulator = false;
+    public static String WebApiUrl;
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mUseBeaconSimulatorChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -60,6 +66,7 @@ public class SettingsActivity extends BaseActivity {
 
             }
         };
+
         Switch swUseSimulator =  (Switch)this.findViewById(R.id.switch_use_beacon_simulator);
         swUseSimulator.setChecked(UseBeaconSimulator);
         swUseSimulator.setOnCheckedChangeListener(mUseBeaconSimulatorChangeListener);
@@ -74,6 +81,26 @@ public class SettingsActivity extends BaseActivity {
         };
         Switch swShowCircles =  (Switch)this.findViewById(R.id.switch_show_circles);
         swShowCircles.setOnCheckedChangeListener(mShowCirclesChangeListener);
+
+
+        EditText url =  (EditText)this.findViewById(R.id.tbWebapiurl);
+        url.setText(WebApiUrl);
+        url.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                WebApiUrl = s.toString();
+            }
+        });
     }
 
     @Override

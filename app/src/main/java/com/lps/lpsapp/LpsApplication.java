@@ -7,16 +7,17 @@ import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
-import com.lps.webapi.AccessToken;
-import com.lps.webapi.IAuthenticationListener;
-import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.activities.LoginActivity;
+import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.Device;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.IAuthenticationListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -40,6 +41,18 @@ public class LpsApplication extends MultiDexApplication {
         refWatcher = LeakCanary.install(this);
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
+
+        SharedPreferences settings = getSharedPreferences("settings", 0);
+        String url = settings.getString("url",null);
+        if(url == null) {
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("url", this.getResources().getString(R.string.serverUrl));
+            editor.commit();
+        } else {
+            SettingsActivity.WebApiUrl = url;
+        }
+
+
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         WebApiService.AuthenticationListener = new IAuthenticationListener() {
             @Override
@@ -62,6 +75,8 @@ public class LpsApplication extends MultiDexApplication {
             puchService = new Intent(this, PushService.class);
             startService(puchService);
         }
+
+
 
 
     }

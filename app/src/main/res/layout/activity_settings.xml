@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.lps.lpsapp.activities.SettingsActivity">
 
     <include layout="@xml/app_bar" />
@@ -12,8 +13,7 @@
         android:layout_height="wrap_content"
         android:text="use beacon simulator"
         android:id="@+id/switch_use_beacon_simulator"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="68dp" />
+        />
 
     <Switch
         android:layout_width="wrap_content"
@@ -21,6 +21,11 @@
         android:text="show circles"
         android:id="@+id/switch_show_circles"
         android:layout_below="@+id/switch_use_beacon_simulator"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="68dp" />
-</RelativeLayout>
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tbWebapiurl"
+        />
+</LinearLayout>
