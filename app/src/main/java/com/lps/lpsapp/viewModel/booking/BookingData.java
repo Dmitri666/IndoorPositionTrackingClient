@@ -31,6 +31,9 @@ public class BookingData {
     public int state;
 
     @JsonIgnore
+    public Date createTime;
+
+    @JsonIgnore
     public BookingStateEnum getBookingState()
     {
         if(state == 0) {
