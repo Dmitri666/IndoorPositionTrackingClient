@@ -168,6 +168,9 @@ public class PushService extends Service {
         Subscription bookingSubscription = proxy.subscribe("bookingStateChanged");
         bookingSubscription.addReceivedHandler(onBookingStateChanged);
 
+        Subscription reservationModelSubscription = proxy.subscribe("changeTableReservationModel");
+        reservationModelSubscription.addReceivedHandler(onReservationModelChanged);
+
         Subscription chatSubscription = proxy.subscribe("NewChatMessage");
         chatSubscription.addReceivedHandler(onNewChatMessage);
 
@@ -230,6 +233,7 @@ public class PushService extends Service {
         proxy.removeSubscription("newchatmessage");
         proxy.removeSubscription("joinchat");
         proxy.removeSubscription("leavechat");
+        proxy.removeSubscription("changetablereservationmodel");
         if(conn.getState() != ConnectionState.Disconnected) {
             conn.stop();
         }
@@ -475,6 +479,28 @@ public class PushService extends Service {
                         }
                     }
                 }
+
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+
+    private Action<JsonElement[]> onReservationModelChanged =  new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+
+            try {
+
+                    if(bookingStateConsumers.size() > 0) {
+                        for (IBookingStateChangedListener consumer : bookingStateConsumers) {
+                            consumer.bookingStateChanged();
+                        }
+                    }
+
 
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
