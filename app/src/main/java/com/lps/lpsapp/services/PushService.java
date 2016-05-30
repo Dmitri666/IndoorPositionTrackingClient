@@ -191,7 +191,7 @@ public class PushService extends Service {
                 }
                 else
                 {
-
+                    Log.e(TAG,throwable.toString(),throwable);
                 }
             }
         });
@@ -199,6 +199,12 @@ public class PushService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
+        if(AccessToken.CurrentToken != null) {
+            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
+            conn.setCredentials(credentials);
+            Log.d(TAG, "setCredentials");
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
