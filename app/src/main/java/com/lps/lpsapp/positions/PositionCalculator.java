@@ -24,7 +24,7 @@ public class PositionCalculator {
     private static String TAG = "PositionCalculator";
     private BeaconModel beaconModel;
     public IPositionCalculatorListener positionCalculatorListener;
-
+    private PointD lastPosition;
 
     private HashMap<Integer,BeaconData> beaconsInRoom;
     private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
@@ -42,6 +42,7 @@ public class PositionCalculator {
     public PositionCalculator(BeaconModel model)
     {
         beaconModel = model;
+        lastPosition = null;
         beaconsInRoom = new HashMap<>();
         for(BeaconInRoom beacon:model.beacons)
         {
@@ -80,7 +81,7 @@ public class PositionCalculator {
 
         if(beaconDatas.size() == 0)
         {
-            return null;
+            return lastPosition;
         }
         else if(beaconDatas.size() == 1)
         {
@@ -88,7 +89,11 @@ public class PositionCalculator {
         }
         else if(beaconDatas.size() == 2)
         {
-            return new PointD(beaconDatas.get(0).x,beaconDatas.get(0).y);
+            if(lastPosition != null) {
+                return lastPosition;
+            } else {
+                return new PointD(beaconDatas.get(0).x, beaconDatas.get(0).y);
+            }
         }
 
         //calculateDistanceFactor(beaconDatas);
@@ -107,6 +112,7 @@ public class PositionCalculator {
             }
 
             PointD result = new PointD(region.exactCenterX(), region.exactCenterY());
+            lastPosition = result;
             Log.d(TAG,"Position (" + result.x / beaconModel.realScaleFactor  + "," + result.y / beaconModel.realScaleFactor + ")");
             return result;
         }

@@ -316,7 +316,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
         Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
-        beaconManager.setMonitorNotifier(this);
+        //beaconManager.setMonitorNotifier(this);
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
