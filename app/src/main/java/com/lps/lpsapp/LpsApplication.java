@@ -46,8 +46,10 @@ public class LpsApplication extends MultiDexApplication {
         String url = settings.getString("url",null);
         if(url == null) {
             SharedPreferences.Editor editor = settings.edit();
-            editor.putString("url", this.getResources().getString(R.string.serverUrl));
+            String defaultUrl = this.getResources().getString(R.string.serverUrl);
+            editor.putString("url", defaultUrl);
             editor.commit();
+            SettingsActivity.WebApiUrl = defaultUrl;
         } else {
             SettingsActivity.WebApiUrl = url;
         }
@@ -131,10 +133,17 @@ public class LpsApplication extends MultiDexApplication {
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("token", token);
                 editor.commit();
-
-                puchService = new Intent(this, PushService.class);
-                startService(puchService);
                 AccessToken.CurrentToken = authenticationData;
+
+                if(puchService == null) {
+                    puchService = new Intent(this, PushService.class);
+                    startService(puchService);
+                } else {
+                    stopService(puchService);
+                    startService(puchService);
+                }
+
+
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }

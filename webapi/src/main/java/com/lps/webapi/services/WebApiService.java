@@ -30,6 +30,7 @@ public class WebApiService<T> {
 
     public void performGet(String path,final IWebApiResultListener<T> resultListener)
     {
+        Log.d(TAG,"performGet: "  + path);
         new HttpGetTask(new IHttpResultListener() {
             @Override
             public void OnResult(AsyncTaskResult<String> result) {
@@ -55,6 +56,7 @@ public class WebApiService<T> {
 
     public void performGetList(String path,final IWebApiResultListener<List<T>> resultListener)
     {
+        Log.d(TAG,"performGetList: "  + path);
         new HttpGetTask(new IHttpResultListener() {
             @Override
             public void OnResult(AsyncTaskResult<String> result) {
@@ -81,6 +83,7 @@ public class WebApiService<T> {
 
     public <P> void performPost(String path,P parameter, final IWebApiResultListener<T> resultListener)
     {
+        Log.d(TAG,"performPost: "  + path);
         try {
             String strParameter = JsonSerializer.serialize(parameter);
             new HttpPostTask(strParameter,new IHttpResultListener() {
@@ -114,6 +117,7 @@ public class WebApiService<T> {
 
     public <P> void performPostList(String path,P parameter, final IWebApiResultListener<List<T>> resultListener)
     {
+        Log.d(TAG,"performPostList: "  + path);
         try {
             String strParameter = JsonSerializer.serialize(parameter);
             new HttpPostTask(strParameter,new IHttpResultListener() {
@@ -147,6 +151,7 @@ public class WebApiService<T> {
 
     public void performPost(String path,T parameter)
     {
+        Log.d(TAG,"performPost: "  + path);
         try {
             String strParameter = JsonSerializer.serialize(parameter);
             new HttpPostTask(strParameter,needAuthentication).execute(path);
