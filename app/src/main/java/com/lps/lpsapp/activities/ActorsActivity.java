@@ -195,19 +195,25 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         this.mActorListAdapter.addAll(model);
     }
 
-    private void actorJoined(Actor actor) {
-        boolean notExist = true;
-        for (int i = 0; i < this.mActorListAdapter.getCount(); i++) {
-            if (((Actor) this.mActorListAdapter.getItem(i)).userId == actor.userId) {
-                notExist = false;
-                break;
-            }
-        }
+    private void actorJoined(final Actor actor) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                boolean notExist = true;
+                for (int i = 0; i < mActorListAdapter.getCount(); i++) {
+                    if (((Actor) mActorListAdapter.getItem(i)).userId == actor.userId) {
+                        notExist = false;
+                        break;
+                    }
+                }
 
-        if (notExist) {
-            mActorListAdapter.add(actor);
-            mActorListAdapter.notifyDataSetInvalidated();
-        }
+                if (notExist) {
+                    mActorListAdapter.add(actor);
+                    mActorListAdapter.notifyDataSetInvalidated();
+                }
+            }//public void run() {
+        });
+
     }
 
     private void actorLeaved(Actor actor) {
