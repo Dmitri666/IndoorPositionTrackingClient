@@ -5,8 +5,8 @@ import android.util.Log;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lps.webapi.AccessToken;
 import com.lps.lpsapp.LpsApplication;
+import com.lps.webapi.AccessToken;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,20 +21,17 @@ import java.net.URLEncoder;
  */
 public class AuthenticationService {
     private static String TAG = "AuthenticationService";
-    public static LpsApplication currentApplication;
 
-    public void Authenticate(String userName, String password) throws Exception {
+    public AccessToken Authenticate(String userName, String password,String androidId) throws Exception {
 
         try {
-            String clientId = currentApplication.getAndroidId();
-            String data = "grant_type=password&client_id=" + URLEncoder.encode(clientId, "UTF-8") + "&username=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8");
+            String data = "grant_type=password&client_id=" + URLEncoder.encode(androidId, "UTF-8") + "&username=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8");
 
             String accessToken = new GetTokenTask().execute(data).get();
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AccessToken token = mapper.readValue(accessToken, AccessToken.class);
-            currentApplication.saveAuthenticationData(token);
-
+            return token;
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage(), ex);
             throw ex;
@@ -43,19 +40,14 @@ public class AuthenticationService {
 
     private boolean running = false;
 
-    public synchronized void RefreshToken() {
+    public synchronized void RefreshToken(LpsApplication app) {
         try {
-
-            if (AccessToken.CurrentToken == null) {
-                currentApplication.ShowLogin();
-                return;
-            }
             Log.d(TAG, "try refresh token");
             if (running) {
                 return;
             }
             running = true;
-            String deviceId = currentApplication.getAndroidId();
+            String deviceId = app.getAndroidId();
             String data = "grant_type=refresh_token&client_id=" + URLEncoder.encode(deviceId, "UTF-8") + "&refresh_token=" + URLEncoder.encode(AccessToken.CurrentToken.refresh_token, "UTF-8");
 
             String accessToken = new GetTokenTask().execute(data).get();
@@ -63,7 +55,7 @@ public class AuthenticationService {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AccessToken authenticationData = mapper.readValue(accessToken, AccessToken.class);
-            currentApplication.saveAuthenticationData(authenticationData);
+            app.saveAuthenticationData(authenticationData);
             running = false;
             Log.d(TAG, "refresh token");
         } catch (Exception ex) {

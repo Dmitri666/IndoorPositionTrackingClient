@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.AccessToken;
 import com.lps.webapi.JsonSerializer;
 import com.lps.webapi.OAuth2Credentials;
@@ -118,7 +119,7 @@ public class PushService extends Service {
                 Log.e(TAG, error.getMessage(), error);
                 if(error instanceof NegotiationException)
                 {
-                    AuthenticationService.currentApplication.ShowLogin();
+                    ((LpsApplication)getApplication()).ShowLogin();
                 }
                 else
                 {
@@ -187,7 +188,9 @@ public class PushService extends Service {
             public void onError(Throwable throwable) {
                 if(throwable instanceof NegotiationException)
                 {
-                    AuthenticationService.currentApplication.ShowLogin();
+                    sf.cancel(true);
+                    ((LpsApplication)getApplication()).ShowLogin();
+
                 }
                 else
                 {

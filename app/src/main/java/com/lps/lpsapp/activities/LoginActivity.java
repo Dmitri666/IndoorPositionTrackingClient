@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,6 +26,7 @@ import android.widget.TextView;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.AuthenticationService;
+import com.lps.webapi.AccessToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,28 +83,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
 
-        Button mEMessungenButton = (Button) findViewById(R.id.messungen);
-        mEMessungenButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            showMessunge();
 
-            }
-        });
 
     }
 
-    private void showMessunge()
-    {
-        try {
-            new AuthenticationService().RefreshToken();
-        }catch (Exception ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
-        }
-        //Intent myIntent = new Intent(this, BeaconListActivity.class);
-        //this.startActivity(myIntent);
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -201,7 +184,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
             LpsApplication app = (LpsApplication)getApplicationContext();
             try {
-                new AuthenticationService().Authenticate(email, password);
+                AccessToken token = new AuthenticationService().Authenticate(email, password,app.getAndroidId());
+                app.saveAuthenticationData(token);
                 showProgress(false);
                 onLogin();
             }

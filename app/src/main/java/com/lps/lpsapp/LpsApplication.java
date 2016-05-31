@@ -62,8 +62,9 @@ public class LpsApplication extends MultiDexApplication {
                 ShowLogin();
             }
         };
+
         AccessToken.CurrentToken = this.getAuthenticationData();
-        AuthenticationService.currentApplication = this;
+
         AndroidModel model = AndroidModel.forThisDevice();
         Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
 
@@ -77,10 +78,6 @@ public class LpsApplication extends MultiDexApplication {
             puchService = new Intent(this, PushService.class);
             startService(puchService);
         }
-
-
-
-
     }
 
     public static RefWatcher getRefWatcher(Context context) {
@@ -151,27 +148,16 @@ public class LpsApplication extends MultiDexApplication {
         }
     }
 
-    public void saveBaeconCountSetting(int beaconCount)
-    {
-        SharedPreferences settings = getSharedPreferences("settings", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("beaconCount", beaconCount);
-        editor.commit();
-    }
-
-    public void saveSendToServerSetting(Boolean sendToServer)
-    {
-        SharedPreferences settings = getSharedPreferences("settings", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("sendToServer", sendToServer);
-        editor.commit();
-    }
-
     public void ShowLogin()
     {
-        Intent myIntent = new Intent(this, LoginActivity.class);
-        myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.startActivity(myIntent);
+        if (AccessToken.CurrentToken == null) {
+            Intent myIntent = new Intent(this, LoginActivity.class);
+            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(myIntent);
+        } else {
+            new AuthenticationService().RefreshToken(this);
+        }
+
     }
 
 }
