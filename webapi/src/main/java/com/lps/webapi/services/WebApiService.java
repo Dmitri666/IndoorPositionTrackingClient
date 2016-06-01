@@ -34,11 +34,17 @@ public class WebApiService<T> {
         new HttpGetTask(new IHttpResultListener() {
             @Override
             public void OnResult(AsyncTaskResult<String> result) {
-                if(result.getError() instanceof AuthenticationException)
-                {
-                    AuthenticationListener.Autenticate();
-                    return;
+                Exception error = result.getError();
+                if(error != null) {
+                    if(error instanceof AuthenticationException)
+                    {
+                        AuthenticationListener.Autenticate();
+                        return;
+                    } else if (result.getError() instanceof Exception) {
+                        Log.e(TAG,error.getMessage(),error);
+                    }
                 }
+
                 if(result.getResult().length() > 0)
                 {
                     try {
@@ -60,10 +66,16 @@ public class WebApiService<T> {
         new HttpGetTask(new IHttpResultListener() {
             @Override
             public void OnResult(AsyncTaskResult<String> result) {
-                if(result.getError() instanceof AuthenticationException)
-                {
-                    AuthenticationListener.Autenticate();
-                    return;
+                Exception error = result.getError();
+                if(error != null) {
+                    if(error instanceof AuthenticationException)
+                    {
+                        AuthenticationListener.Autenticate();
+                        return;
+                    } else if (result.getError() instanceof Exception) {
+                        Log.e(TAG,error.getMessage(),error);
+                        return;
+                    }
                 }
 
                 if(result.getResult().length() > 0)

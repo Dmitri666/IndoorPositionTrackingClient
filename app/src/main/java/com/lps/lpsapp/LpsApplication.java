@@ -3,6 +3,10 @@ package com.lps.lpsapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
@@ -41,6 +45,12 @@ public class LpsApplication extends MultiDexApplication {
         refWatcher = LeakCanary.install(this);
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
+
+        Boolean isConnected = this.isNetworkConnected();
+        if(!isConnected) {
+            //WifiManager wManager = (WifiManager)this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            //wManager.setWifiEnabled(true); //t
+        }
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
         String url = settings.getString("url",null);
@@ -158,6 +168,30 @@ public class LpsApplication extends MultiDexApplication {
             new AuthenticationService().RefreshToken(this);
         }
 
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+
+        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
+        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
+        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
+        NetworkRequest networkRequest = builder.build();
+        //cm.requestNetwork(networkRequest, networkCallback);
+        //cm.registerNetworkCallback(networkRequest, new ConnectionDetector());
+
+        cm.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
+            @Override
+            public void onNetworkActive() {
+                Log.d(TAG,"NetworkActive");
+            }
+        });
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if(info == null) {
+            return false;
+        }
+        return info.isConnected();
     }
 
 }

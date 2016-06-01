@@ -74,7 +74,7 @@ public class HttpGetTask extends AsyncTask<String, Void, AsyncTaskResult<String>
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             this.exception = e;
-            new AsyncTaskResult<String>(e);
+            return new AsyncTaskResult<String>(e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

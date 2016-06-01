@@ -194,7 +194,7 @@ public class PushService extends Service {
                 }
                 else
                 {
-                    Log.e(TAG,throwable.toString(),throwable);
+                    Log.e(TAG,"sf: " + throwable.toString(),throwable);
                 }
             }
         });
@@ -218,6 +218,7 @@ public class PushService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind");
         // All clients have unbound with unbindService()
         //proxy.removeSubscription("devicepositionchanged");
         //proxy.removeSubscription("bookingstatechanged");
@@ -231,12 +232,14 @@ public class PushService extends Service {
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
+        Log.d(TAG, "onRebind");
         // A client is binding to the service with bindService(),
         // after onUnbind() has already been called
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         proxy.removeSubscription("devicepositionchanged");
         proxy.removeSubscription("bookingstatechanged");
         proxy.removeSubscription("newchatmessage");
@@ -320,6 +323,10 @@ public class PushService extends Service {
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("joinGroup", groupName);
             }
+            else if(sf.isCancelled())
+            {
+                return;
+            }
             else
             {
                 this.sf.done(new Action<Void>() {
@@ -347,6 +354,10 @@ public class PushService extends Service {
             {
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("leaveGroup", groupName);
+            }
+            else if(sf.isCancelled())
+            {
+                return;
             }
             else
             {
