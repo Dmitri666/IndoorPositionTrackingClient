@@ -3,17 +3,18 @@ package com.lps.lpsapp;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.network.ConnectionDetector;
+import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.Device;
@@ -26,6 +27,9 @@ import com.squareup.leakcanary.RefWatcher;
 
 import org.altbeacon.beacon.distance.AndroidModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
 
@@ -35,10 +39,11 @@ import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
 public class LpsApplication extends MultiDexApplication {
     private static final String TAG = "LpsApplication";
     private static Context mContext;
-    private AltBeaconService beaconService;
+    private Intent beaconService;
     private Intent puchService;
     private String mAndroidId;
     private Boolean mIsInternetAvailable;
+    public List<IInternetAvalabilityListener> mInternetAvalabilityConsomers;
 
     public void onCreate() {
         super.onCreate();
@@ -46,7 +51,7 @@ public class LpsApplication extends MultiDexApplication {
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 
-
+        mInternetAvalabilityConsomers = new ArrayList<>();
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
         String url = settings.getString("url",null);
@@ -72,8 +77,8 @@ public class LpsApplication extends MultiDexApplication {
 
         AccessToken.CurrentToken = this.getAuthenticationData();
 
-        Intent intent = new Intent(this, AltBeaconService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        beaconService = new Intent(this, AltBeaconService.class);
+        startService(beaconService);
 
 
 
@@ -97,32 +102,14 @@ public class LpsApplication extends MultiDexApplication {
     @Override
     public void onTerminate() {
         // Unbind from the service
-        //stopService(beaconService);
-        //beaconService = null;
+        stopService(beaconService);
+        beaconService = null;
         super.onTerminate();
 
 
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
-            beaconService = binder.getService();
-            ((LpsApplication)getApplicationContext()).CheckInternetAvailability();//mBound = true;
-            //mService.setBeaconServiceListener(listener);
-            //mService.monitoreBackgroundRegion(true);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            //mBound = false;
-
-        }
-    };
 
     private AccessToken getAuthenticationData() {
         SharedPreferences settings = getSharedPreferences("token", 0);
@@ -168,13 +155,13 @@ public class LpsApplication extends MultiDexApplication {
 
     public void ShowLogin()
     {
-        //if (AccessToken.CurrentToken == null) {
-            //Intent myIntent = new Intent(this, LoginActivity.class);
-            //myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //this.startActivity(myIntent);
-        //} else {
-        //    new AuthenticationService().RefreshToken(this);
-        //}
+        if (AccessToken.CurrentToken == null) {
+            Intent myIntent = new Intent(this, LoginActivity.class);
+            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(myIntent);
+        } else {
+            new AuthenticationService().RefreshToken(this);
+        }
 
     }
 
@@ -195,7 +182,10 @@ public class LpsApplication extends MultiDexApplication {
     private void GoIntoConnectedState() {
         Toast toast1 = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
         toast1.show();
-
+        for(IInternetAvalabilityListener consumer:mInternetAvalabilityConsomers)
+        {
+            consumer.Avalable();
+        }
         AndroidModel model = AndroidModel.forThisDevice();
         Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
 
@@ -208,7 +198,7 @@ public class LpsApplication extends MultiDexApplication {
             startService(puchService);
         }
 
-        beaconService.InitRegionBootstrap();
+
     }
 
     private void GoIntoDisconnectedState() {

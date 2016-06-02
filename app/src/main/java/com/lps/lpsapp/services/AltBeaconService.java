@@ -16,6 +16,8 @@ import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
+import com.lps.lpsapp.network.ConnectionDetector;
+import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.viewModel.BeaconData;
@@ -63,6 +65,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public Region backgroundRegion;
     public UUID currentLocaleId;
     private Boolean regionBootstrapInitialised = false;
+    private IInternetAvalabilityListener mIInternetAvalabilityListener;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
@@ -82,7 +85,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
     }
 
-    public void InitRegionBootstrap() {
+    private void InitRegionBootstrap() {
         if(!regionBootstrapInitialised) {
             WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
             service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
@@ -155,8 +158,19 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 //            BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
 //            ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
 //        }
-
+        mIInternetAvalabilityListener = new IInternetAvalabilityListener() {
+            @Override
+            public void Avalable() {
+                InitRegionBootstrap();
+            }
+        };
         beaconManager.bind(this);
+        if(new ConnectionDetector(this.getApplicationContext()).isConnectedToNetwork())
+        {
+            this.InitRegionBootstrap();
+        } else {
+            app.mInternetAvalabilityConsomers.add(mIInternetAvalabilityListener);
+        }
         Log.d(TAG,"Created");
     }
 
@@ -173,7 +187,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         super.onDestroy();
         Log.d(TAG, "Destroyed");
         beaconManager.unbind(this);
-
+        LpsApplication app = (LpsApplication) this.getApplicationContext();
+        if(app.mInternetAvalabilityConsomers.contains(this.mIInternetAvalabilityListener))
+        {
+            app.mInternetAvalabilityConsomers.remove(this.mIInternetAvalabilityListener);
+        }
     }
 
     @Nullable
