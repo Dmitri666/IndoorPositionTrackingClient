@@ -62,7 +62,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public IDevicePositionListener devicePositionListener;
     public Region backgroundRegion;
     public UUID currentLocaleId;
-
+    private Boolean regionBootstrapInitialised = false;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
@@ -73,11 +73,27 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         }
         if(this.mRegions.size() > 0) {
             this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
+            Log.i(TAG,"setRegions "  + this.mRegions.size());
         } else {
             this.beaconManager.setMonitorNotifier(this);
+            Log.i(TAG,"no Regions ");
         }
 
 
+    }
+
+    public void InitRegionBootstrap() {
+        if(!regionBootstrapInitialised) {
+            WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
+            service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
+                @Override
+                public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
+                    setRegions(objResult);
+                }
+
+
+            });
+        }
     }
 
     @Override
@@ -124,20 +140,9 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             beaconManager.getBeaconParsers().add(new BeaconParser().
                     setBeaconLayout("m:0-3=a7ae2eb7,i:4-19,i:20-21,i:22-23,p:24-24"));  // easiBeacons
         }
-        WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
-        service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
-            @Override
-            public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
-                setRegions(objResult);
-                for(int i = 0; i < objResult.size(); i++)
-                {
-                    Log.i(TAG, "setRegion:"  + objResult.get(i).roomId.toString());
-                }
-
-            }
 
 
-        });
+
 
 
         //beaconManager.setForegroundBetweenScanPeriod(5000);
@@ -151,6 +156,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 //            ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
 //        }
 
+        beaconManager.bind(this);
         Log.d(TAG,"Created");
     }
 

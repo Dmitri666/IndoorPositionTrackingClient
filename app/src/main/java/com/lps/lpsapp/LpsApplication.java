@@ -1,20 +1,19 @@
 package com.lps.lpsapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.net.NetworkRequest;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.AuthenticationService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.Device;
@@ -36,9 +35,10 @@ import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
 public class LpsApplication extends MultiDexApplication {
     private static final String TAG = "LpsApplication";
     private static Context mContext;
-    private Intent beaconService;
+    private AltBeaconService beaconService;
     private Intent puchService;
     private String mAndroidId;
+    private Boolean mIsInternetAvailable;
 
     public void onCreate() {
         super.onCreate();
@@ -46,11 +46,7 @@ public class LpsApplication extends MultiDexApplication {
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 
-        Boolean isConnected = this.isNetworkConnected();
-        if(!isConnected) {
-            //WifiManager wManager = (WifiManager)this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            //wManager.setWifiEnabled(true); //t
-        }
+
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
         String url = settings.getString("url",null);
@@ -64,6 +60,7 @@ public class LpsApplication extends MultiDexApplication {
             SettingsActivity.WebApiUrl = url;
         }
 
+        puchService = new Intent(this, PushService.class);
 
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
         WebApiService.AuthenticationListener = new IAuthenticationListener() {
@@ -75,19 +72,11 @@ public class LpsApplication extends MultiDexApplication {
 
         AccessToken.CurrentToken = this.getAuthenticationData();
 
-        AndroidModel model = AndroidModel.forThisDevice();
-        Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
-
-        WebApiService service = new WebApiService(Device.class,false);
-        service.performPost(WebApiActions.RegisterDevice(),device);
+        Intent intent = new Intent(this, AltBeaconService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
 
-        beaconService = new Intent(this, AltBeaconService.class);
-        startService(beaconService);
-        if(AccessToken.CurrentToken != null) {
-            puchService = new Intent(this, PushService.class);
-            startService(puchService);
-        }
+
     }
 
     public static RefWatcher getRefWatcher(Context context) {
@@ -108,13 +97,32 @@ public class LpsApplication extends MultiDexApplication {
     @Override
     public void onTerminate() {
         // Unbind from the service
-        stopService(beaconService);
-        beaconService = null;
+        //stopService(beaconService);
+        //beaconService = null;
         super.onTerminate();
 
 
     }
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
+            beaconService = binder.getService();
+            ((LpsApplication)getApplicationContext()).CheckInternetAvailability();//mBound = true;
+            //mService.setBeaconServiceListener(listener);
+            //mService.monitoreBackgroundRegion(true);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            //mBound = false;
+
+        }
+    };
 
     private AccessToken getAuthenticationData() {
         SharedPreferences settings = getSharedPreferences("token", 0);
@@ -160,38 +168,78 @@ public class LpsApplication extends MultiDexApplication {
 
     public void ShowLogin()
     {
-        if (AccessToken.CurrentToken == null) {
-            Intent myIntent = new Intent(this, LoginActivity.class);
-            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(myIntent);
-        } else {
-            new AuthenticationService().RefreshToken(this);
-        }
+        //if (AccessToken.CurrentToken == null) {
+            //Intent myIntent = new Intent(this, LoginActivity.class);
+            //myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //this.startActivity(myIntent);
+        //} else {
+        //    new AuthenticationService().RefreshToken(this);
+        //}
 
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-
-        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
-        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
-        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
-        NetworkRequest networkRequest = builder.build();
-        //cm.requestNetwork(networkRequest, networkCallback);
-        //cm.registerNetworkCallback(networkRequest, new ConnectionDetector());
-
-        cm.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
-            @Override
-            public void onNetworkActive() {
-                Log.d(TAG,"NetworkActive");
+    public void CheckInternetAvailability() {
+        ConnectionDetector cd = new ConnectionDetector(this);
+        Boolean state = cd.isConnectedToNetwork();
+        if(this.mIsInternetAvailable == null ||this.mIsInternetAvailable != state) {
+            this.mIsInternetAvailable = state;
+            if(this.mIsInternetAvailable) {
+                this.GoIntoConnectedState();
+            } else {
+                this.GoIntoDisconnectedState();
             }
-        });
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        if(info == null) {
-            return false;
         }
-        return info.isConnected();
+
     }
+
+    private void GoIntoConnectedState() {
+        Toast toast1 = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
+        toast1.show();
+
+        AndroidModel model = AndroidModel.forThisDevice();
+        Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
+
+        WebApiService service = new WebApiService(Device.class,false);
+        service.performPost(WebApiActions.RegisterDevice(),device);
+
+
+        if(AccessToken.CurrentToken != null) {
+
+            startService(puchService);
+        }
+
+        beaconService.InitRegionBootstrap();
+    }
+
+    private void GoIntoDisconnectedState() {
+        Toast toast1 = Toast.makeText(getApplicationContext(), "Not connected Internet", Toast.LENGTH_LONG);
+        toast1.show();
+        ComponentName cn =  puchService.getComponent();
+        stopService(puchService);
+    }
+
+//    private boolean isNetworkConnected() {
+//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+//
+//        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
+//        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
+//        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
+//        NetworkRequest networkRequest = builder.build();
+//        //cm.requestNetwork(networkRequest, networkCallback);
+//        //cm.registerNetworkCallback(networkRequest, new ConnectionDetector());
+//
+//        cm.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
+//            @Override
+//            public void onNetworkActive() {
+//                Log.d(TAG,"NetworkActive");
+//            }
+//        });
+//        NetworkInfo info = cm.getActiveNetworkInfo();
+//        if(info == null) {
+//            return false;
+//        }
+//        return info.isConnected();
+//    }
 
 }

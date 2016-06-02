@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
@@ -321,7 +322,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                 return false;
             }
         } else {
-            if (gDevice.devicePosition.deviceId.equals(mMyApp.getAndroidId())) {
+            if (gDevice.devicePosition.deviceId.equals(((LpsApplication)getApplication()).getAndroidId())) {
                 return false;
             }
         }

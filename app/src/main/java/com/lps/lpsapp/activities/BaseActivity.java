@@ -24,7 +24,7 @@ import com.squareup.leakcanary.RefWatcher;
  * Created by user on 16.08.2015.
  */
 public class BaseActivity extends AppCompatActivity {
-    protected LpsApplication mMyApp;
+
     protected ProgressBar mProgressBar;
 
     public final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
@@ -34,7 +34,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mMyApp = (LpsApplication)this.getApplicationContext();
+        LpsApplication mMyApp = (LpsApplication)this.getApplicationContext();
 
         // Create a progress bar to display while the list loads
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content).getRootView();
