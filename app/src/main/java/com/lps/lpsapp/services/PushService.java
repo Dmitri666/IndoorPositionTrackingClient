@@ -247,7 +247,12 @@ public class PushService extends Service {
         proxy.removeSubscription("leavechat");
         proxy.removeSubscription("changetablereservationmodel");
         if(conn.getState() != ConnectionState.Disconnected) {
-            conn.stop();
+            try {
+                conn.stop();
+            } catch (Exception ex) {
+                Log.e(TAG,ex.getMessage(),ex);
+            }
+
         }
         super.onDestroy();
     }

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.lps.lpsapp.R;
+import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 
@@ -58,15 +59,6 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		View btn =  MenuActivity.this.findViewById(R.id.btnChat);
-		btn.setEnabled(SettingsActivity.UseBeaconSimulator);
-		Log.d(TAG, "onStart");
-
-	}
-
-	@Override
 	protected void onStop() {
 		Log.d(TAG, "onStop");
 		if (mBound) {
@@ -86,14 +78,12 @@ public class MenuActivity extends BaseActivity {
 		Intent intent = new Intent(this, AltBeaconService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "onDestroy");
+		View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
+		btn.setEnabled(new ConnectionDetector(getApplicationContext()).isConnectedToNetwork());
 
 	}
+
+
 
 	public void onNewsClicked(View view) {
 		Intent myIntent = new Intent(this, LoginActivity.class);

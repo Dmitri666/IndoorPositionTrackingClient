@@ -80,7 +80,7 @@ public class LpsApplication extends MultiDexApplication {
         beaconService = new Intent(this, AltBeaconService.class);
         startService(beaconService);
 
-
+        this.CheckInternetAvailability();
 
     }
 

@@ -21,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
@@ -57,7 +58,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStart() {
         super.onStart();
-        this.loadFilterContent();
+
     }
 
     @Override
@@ -75,6 +76,15 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    protected Boolean InitialiseActivity() {
+        if(new ConnectionDetector(getApplicationContext()).isConnectedToNetwork()) {
+            this.loadFilterContent();
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -29,12 +29,12 @@ public class BaseActivity extends AppCompatActivity {
 
     public final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
     public final int MY_PERMISSIONS_READ_CONTACTS = 2;
-
+    private Boolean mIsInitialised;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LpsApplication mMyApp = (LpsApplication)this.getApplicationContext();
+        this.mIsInitialised = false;
 
         // Create a progress bar to display while the list loads
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content).getRootView();
@@ -50,6 +50,19 @@ public class BaseActivity extends AppCompatActivity {
         rl.addView(mProgressBar);
         root.addView(rl, params);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ((LpsApplication)getApplication()).CheckInternetAvailability();
+        if(!this.mIsInitialised) {
+            this.mIsInitialised = this.InitialiseActivity();
+        }
+    }
+
+    protected Boolean InitialiseActivity() {
+        return false;
     }
 
     @Override
