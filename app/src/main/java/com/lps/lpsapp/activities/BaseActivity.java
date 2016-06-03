@@ -53,8 +53,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         ((LpsApplication)getApplication()).CheckInternetAvailability();
         if(!this.mIsInitialised) {
             this.mIsInitialised = this.InitialiseActivity();

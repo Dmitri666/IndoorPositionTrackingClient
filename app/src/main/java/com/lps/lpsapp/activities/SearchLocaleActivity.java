@@ -63,6 +63,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
     @Override
     protected void onStop() {
+        super.onStop();
         if(mGoogleApiClient != null) {
             this.mGoogleApiClient.disconnect();
             this.mGoogleApiClient.unregisterConnectionCallbacks(this);
@@ -70,7 +71,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
             this.mGoogleApiClient = null;
         }
 
-        super.onStop();
+
     }
 
     @Override

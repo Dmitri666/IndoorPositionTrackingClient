@@ -60,6 +60,7 @@ public class MenuActivity extends BaseActivity {
 
 	@Override
 	protected void onStop() {
+		super.onStop();
 		Log.d(TAG, "onStop");
 		if (mBound) {
 			mService.removeBeaconServiceListener(listener);
@@ -67,7 +68,7 @@ public class MenuActivity extends BaseActivity {
 			mService = null;
 			mBound = false;
 		}
-		super.onStop();
+
 	}
 
 	@Override

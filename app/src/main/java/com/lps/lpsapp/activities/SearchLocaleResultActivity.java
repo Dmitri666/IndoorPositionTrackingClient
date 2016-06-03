@@ -122,7 +122,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
 
     @Override
     protected void onDestroy() {
-
+        super.onDestroy();
         if (mMap != null) {
             mMap.setMyLocationEnabled(false);
             mMap.setOnInfoWindowClickListener(null);
@@ -132,7 +132,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         }
         myMapFragment = null;
 
-        super.onDestroy();
+
     }
 
     @Override

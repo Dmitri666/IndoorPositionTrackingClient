@@ -17,19 +17,17 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.lps.webapi.IWebApiResultListener;
-import com.lps.webapi.JsonSerializer;
-import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.helper.ChatAdapter;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ChatMessage;
 import com.lps.lpsapp.viewModel.chat.ConversationsData;
-import com.squareup.leakcanary.RefWatcher;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +50,9 @@ public class ChatActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         chatMessageListener = new IChatListener() {
             @Override
             public void messageResived(ChatMessage chatMessage) {
@@ -86,30 +86,30 @@ public class ChatActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
+        super.onResume();
         if (!mBound) {
             bindService(new Intent(this, PushService.class), mConnection, Context.BIND_AUTO_CREATE);
         }
-        super.onResume();
+
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
         mPushService.removeChatMessageListener(chatMessageListener);
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
             mPushService = null;
         }
-        super.onStop();
+
 
     }
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
-        RefWatcher refWatcher = LpsApplication.getRefWatcher(this);
-        refWatcher.watch(this);
+
     }
 
     @Override

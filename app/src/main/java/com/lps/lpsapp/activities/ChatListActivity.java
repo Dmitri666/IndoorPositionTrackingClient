@@ -70,6 +70,7 @@ public class ChatListActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
+        super.onResume();
         String path = WebApiActions.GetRoomConversations();
         if(this.mRoomId != null) {
             path += "/" + this.mRoomId.toString();
@@ -82,7 +83,7 @@ public class ChatListActivity extends BaseActivity {
                 setConversations(objResult);
             }
         });
-        super.onResume();
+
     }
 
     private void setConversations(List<ConversationsData> data)

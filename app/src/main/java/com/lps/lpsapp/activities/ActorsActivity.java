@@ -137,6 +137,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     @Override
     protected void onResume() {
+        super.onResume();
         Log.d(TAG, "onResume");
         if (!mPushServiceBound) {
             bindService(new Intent(this, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
@@ -144,11 +145,12 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         if (!mBeaconServiceBound) {
             bindService(new Intent(this, AltBeaconService.class), mBeaconServiceConnection, Context.BIND_AUTO_CREATE);
         }
-        super.onResume();
+
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
         Log.d(TAG, "onStop");
         mPushService.removeActorPositionListener(actorPositionListener);
         mPushService.removeChatMessageListener(chatListener);
@@ -170,7 +172,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconServiceBound = false;
             mBeaconService = null;
         }
-        super.onStop();
+
 
     }
 

@@ -105,11 +105,12 @@ public class SettingsActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         Switch swSendToServer =  (Switch)this.findViewById(R.id.switch_show_circles);
         swSendToServer.setOnCheckedChangeListener(null);
 
         Switch swUseSimulator =  (Switch)this.findViewById(R.id.switch_use_beacon_simulator);
         swUseSimulator.setOnCheckedChangeListener(null);
-        super.onDestroy();
+
     }
 }
