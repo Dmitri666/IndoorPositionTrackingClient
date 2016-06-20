@@ -2,7 +2,6 @@
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/lps/lpsapp/helper/ChatAdapter.java" charset="windows-1252" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/lps/lpsapp/helper/PlaceAutocompleteAdapter.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/lps/lpsapp/viewModel/chat/ChatMessage.java" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/in_message_bg.9.png" charset="windows-1252" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/out_message_bg.9.png" charset="windows-1252" />

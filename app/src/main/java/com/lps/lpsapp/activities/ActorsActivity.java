@@ -43,7 +43,6 @@ import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ChatMessage;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
-import com.lps.webapi.AccessToken;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
 import com.lps.webapi.services.WebApiService;
@@ -318,16 +317,10 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     @Override
     public boolean onLongClick(View view) {
         GuiDevice gDevice = (GuiDevice) view;
-        //todo nur für test
-        if (AccessToken.CurrentToken.userName == "admin") {
-            if (gDevice.devicePosition.deviceId.equals("000")) {
-                return false;
-            }
-        } else {
-            if (gDevice.devicePosition.deviceId.equals(((LpsApplication)getApplication()).getAndroidId())) {
-                return false;
-            }
+        if (gDevice.devicePosition.deviceId.equals(((LpsApplication)getApplication()).getAndroidId())) {
+            return false;
         }
+
         if (mActionMode != null) {
             return false;
         }

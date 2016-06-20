@@ -24,6 +24,7 @@ import android.widget.ImageView;
 
 import com.lps.core.gui.ScalableView;
 import com.lps.core.gui.ScaleGestureDetectorCompat;
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.BookingActivity;
@@ -344,6 +345,15 @@ public class CustomerMapView extends ScalableView  {
         ActorsActivity host = (ActorsActivity)((ContextThemeWrapper)this.getContext()).getBaseContext();
         this.actors.add(actor);
         GuiDevice myButton = new GuiDevice(getContext(),actor.position);
+
+        if(actor.position.deviceId.equals(((LpsApplication)this.getContext().getApplicationContext()).getAndroidId())) {
+            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_yellow));
+        }
+        else
+        {
+            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_blau));
+        }
+
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)actor.position.guiElement.wight,(int) actor.position.guiElement.height);
         lp.leftMargin = (int)this.getDrawX((float)actor.position.x);
         lp.topMargin = (int)(this.getDrawY((float)actor.position.y) - actor.position.guiElement.height);

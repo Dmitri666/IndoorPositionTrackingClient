@@ -21,16 +21,6 @@ public class GuiDevice extends Button {
         this.height = 20f;
         this.devicePosition = actor;
         this.devicePosition.guiElement = this;
-        if(actor.deviceId.equals("001")) {
-            this.setBackground(getResources().getDrawable(R.drawable.round_button));
-        }
-        else if(actor.deviceId.equals("4444"))
-        {
-            this.setBackground(getResources().getDrawable(R.drawable.round_button_yellow));
-        }
-        else
-        {
-            this.setBackground(getResources().getDrawable(R.drawable.round_button_blau));
-        }
+
     }
 }
