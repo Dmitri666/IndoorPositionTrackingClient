@@ -18,8 +18,8 @@ import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
-import com.lps.lpsapp.positions.PointD;
 import com.lps.lpsapp.positions.PositionCalculator;
+import com.lps.lpsapp.positions.PositionData;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.RangingData;
@@ -350,7 +350,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     }
 
                     if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
-                        PointD position = mPositionCalculator.calculatePosition(beacons);
+                        PositionData position = mPositionCalculator.calculatePosition(beacons);
                         if (position != null) {
 
                             LpsApplication app = (LpsApplication) getApplicationContext();
@@ -358,8 +358,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                             DevicePosition param = new DevicePosition();
                             param.deviceId = app.getAndroidId();
                             param.roomId = UUID.fromString(region.getUniqueId());
-                            param.x = position.x;
-                            param.y = position.y;
+                            param.x = position.position.x;
+                            param.y = position.position.y;
                             WebApiService service = new WebApiService(DevicePosition.class, true);
                             service.performPost(path, param);
                         }

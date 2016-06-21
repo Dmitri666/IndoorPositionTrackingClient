@@ -24,7 +24,7 @@ public class PositionCalculator {
     private static String TAG = "PositionCalculator";
     private BeaconModel beaconModel;
     public IPositionCalculatorListener positionCalculatorListener;
-    private PointD lastPosition;
+    private PositionData lastPosition;
 
     private HashMap<Integer,BeaconData> beaconsInRoom;
     private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
@@ -52,7 +52,7 @@ public class PositionCalculator {
     }
 
 
-    public PointD calculatePosition(Collection<Beacon> beacons)
+    public PositionData calculatePosition(Collection<Beacon> beacons)
     {
         if(beacons.size() == 0 || beaconsInRoom.size() == 0)
         {
@@ -79,21 +79,20 @@ public class PositionCalculator {
             beaconDatas.add(beaconInRoom);
         }
 
-        if(beaconDatas.size() == 0)
-        {
-            return lastPosition;
-        }
-        else if(beaconDatas.size() == 1)
-        {
-            return new PointD(beaconDatas.get(0).x,beaconDatas.get(0).y);
-        }
-        else if(beaconDatas.size() == 2)
+        if(beaconDatas.size() < 3)
         {
             if(lastPosition != null) {
                 return lastPosition;
             } else {
-                return new PointD(beaconDatas.get(0).x, beaconDatas.get(0).y);
+                if(beaconDatas.size() == 0) {
+                    return lastPosition;
+                } else if (beaconDatas.size() == 1) {
+                    return new PositionData(new GroupKey(beaconDatas.get(0).id3),new PointD(beaconDatas.get(0).x, beaconDatas.get(0).y));
+                }  else if (beaconDatas.size() == 2) {
+                    return new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3),new PointD((beaconDatas.get(0).x + beaconDatas.get(1).x) / 2f, (beaconDatas.get(0).y + beaconDatas.get(1).y) / 2f));
+                }
             }
+
         }
 
         //calculateDistanceFactor(beaconDatas);
@@ -110,10 +109,9 @@ public class PositionCalculator {
             for (BeaconData data:beaconDatas) {
                 //msg += "Id=" + data.beaconId + " distance=" + data.getDistance() + '\n';
             }
-
-            PointD result = new PointD(region.exactCenterX(), region.exactCenterY());
+            PositionData result = new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3,beaconDatas.get(2).id3),new PointD(region.exactCenterX(), region.exactCenterY()));
             lastPosition = result;
-            Log.d(TAG,"Position (" + result.x / beaconModel.realScaleFactor  + "," + result.y / beaconModel.realScaleFactor + ")");
+            Log.d(TAG,"Position (" + result.position.x / beaconModel.realScaleFactor  + "," + result.position.y / beaconModel.realScaleFactor + ")");
             return result;
         }
     }

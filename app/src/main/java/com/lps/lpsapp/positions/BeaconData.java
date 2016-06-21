@@ -9,7 +9,7 @@ public class BeaconData
     private double distance;
     public float x;
     public float y;
-    private int id3;
+    public int id3;
 
 
     public BeaconData(int id3,float x,float y)
