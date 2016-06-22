@@ -9,6 +9,7 @@
 
     <string name="GetRegions">/api/AltBeaconsData</string>
     <string name="PostMeasurement">/api/AltBeaconsData/SubmitMeasurement</string>
+    <string name="SavePositionLog">/api/AltBeaconsData/SavePositionLog</string>
     <string name="GetLocaleMap">/api/RoomMobile</string>
     <string name="GetCities">/api/RoomMobile/cities</string>
     <string name="GetLocaleNames">/api/RoomMobile/names</string>

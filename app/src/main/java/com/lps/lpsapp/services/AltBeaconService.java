@@ -22,6 +22,7 @@ import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.positions.PositionData;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
+import com.lps.lpsapp.viewModel.PositionLogData;
 import com.lps.lpsapp.viewModel.RangingData;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
@@ -362,6 +363,19 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                             param.y = position.position.y;
                             WebApiService service = new WebApiService(DevicePosition.class, true);
                             service.performPost(path, param);
+
+
+                            path = WebApiActions.SavePositionLog();
+                            PositionLogData log = new PositionLogData();
+                            log.deviceId = app.getAndroidId();
+                            log.roomId = UUID.fromString(region.getUniqueId());
+                            log.x = position.position.x;
+                            log.y = position.position.y;
+                            log.key1 = position.key.key1;
+                            log.key2 = position.key.key2;
+                            log.key3 = position.key.key3;
+                            service = new WebApiService(PositionLogData.class, true);
+                            service.performPost(path, log);
                         }
                     }
 
@@ -369,8 +383,6 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             }
 
         });
-
-
     }
 
 

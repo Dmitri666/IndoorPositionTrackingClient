@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by dle on 31.07.2015.
@@ -337,6 +338,20 @@ public class CustomerMapView extends ScalableView  {
             //TextView text = new TextView(getContext());
             //text.setText(table.description);
 
+        }
+    }
+
+    public void clearActors() {
+        for(Actor actor:this.actors) {
+            this.removeView(actor.position.guiElement);
+        }
+    }
+
+    public void removeActor(UUID userId) {
+        for(Actor actor:this.actors) {
+            if(actor.userId.equals(userId)) {
+                this.removeView(actor.position.guiElement);
+            }
         }
     }
 

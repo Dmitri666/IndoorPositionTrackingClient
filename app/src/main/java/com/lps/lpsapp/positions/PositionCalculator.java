@@ -111,6 +111,7 @@ public class PositionCalculator {
             }
             PositionData result = new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3,beaconDatas.get(2).id3),new PointD(region.exactCenterX(), region.exactCenterY()));
             lastPosition = result;
+            Log.d(TAG,"GroupKey (" + result.key.key1 + "," + result.key.key2 + "," + result.key.key3 + ")");
             Log.d(TAG,"Position (" + result.position.x / beaconModel.realScaleFactor  + "," + result.position.y / beaconModel.realScaleFactor + ")");
             return result;
         }

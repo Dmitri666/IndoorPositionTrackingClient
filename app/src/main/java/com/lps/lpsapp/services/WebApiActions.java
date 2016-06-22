@@ -152,4 +152,9 @@ public class WebApiActions {
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.DeleteFavorit);
     }
+
+    public static String SavePositionLog()
+    {
+        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.SavePositionLog);
+    }
 }

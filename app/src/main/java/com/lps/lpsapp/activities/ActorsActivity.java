@@ -190,43 +190,64 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     }
 
     private void setActors(CustomerMapView view, List<Actor> model) {
+        this.mActorListAdapter.clear();
+        view.clearActors();
         for (Actor actor : model) {
             view.addActor(actor);
+            if(!actor.position.deviceId.equals(((LpsApplication)getApplicationContext()).getAndroidId())) {
+                this.mActorListAdapter.add(actor);
+            }
         }
-        this.mActorListAdapter.clear();
-        this.mActorListAdapter.addAll(model);
+
+
     }
 
     private void actorJoined(final Actor actor) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                boolean notExist = true;
-                for (int i = 0; i < mActorListAdapter.getCount(); i++) {
-                    if (((Actor) mActorListAdapter.getItem(i)).userId == actor.userId) {
-                        notExist = false;
-                        break;
-                    }
-                }
-
-                if (notExist) {
-                    mActorListAdapter.add(actor);
-                    mActorListAdapter.notifyDataSetInvalidated();
-                }
-            }//public void run() {
-        });
-
-    }
-
-    private void actorLeaved(Actor actor) {
-        for (int i = 0; i < this.mActorListAdapter.getCount(); i++) {
-            if (((Actor) this.mActorListAdapter.getItem(i)).userId == actor.userId) {
-                this.mActorListAdapter.remove(this.mActorListAdapter.getItem(i));
-                this.mActorListAdapter.notifyDataSetInvalidated();
+        final CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
+        boolean notExist = true;
+        for (int i = 0; i < mActorListAdapter.getCount(); i++) {
+            if (((Actor) mActorListAdapter.getItem(i)).userId.equals(actor.userId)) {
+                notExist = false;
                 break;
             }
         }
 
+        if (notExist) {
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (!actor.position.deviceId.equals(((LpsApplication) getApplicationContext()).getAndroidId())) {
+                        mActorListAdapter.add(actor);
+                        mActorListAdapter.notifyDataSetInvalidated();
+                    }
+
+                    view.addActor(actor);
+                }
+
+            });
+        }
+
+
+    }
+
+    private void actorLeaved(final Actor actor) {
+        final CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < mActorListAdapter.getCount(); i++) {
+                    if (((Actor) mActorListAdapter.getItem(i)).userId.equals(actor.userId)) {
+                        mActorListAdapter.remove(mActorListAdapter.getItem(i));
+                        view.removeActor(actor.userId);
+                        mActorListAdapter.notifyDataSetInvalidated();
+                        break;
+                    }
+                }
+            }
+
+        });
     }
 
 
