@@ -351,32 +351,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     }
 
                     if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
-                        PositionData position = mPositionCalculator.calculatePosition(beacons);
-                        if (position != null) {
-
-                            LpsApplication app = (LpsApplication) getApplicationContext();
-                            String path = WebApiActions.SetPosition();
-                            DevicePosition param = new DevicePosition();
-                            param.deviceId = app.getAndroidId();
-                            param.roomId = UUID.fromString(region.getUniqueId());
-                            param.x = position.position.x;
-                            param.y = position.position.y;
-                            WebApiService service = new WebApiService(DevicePosition.class, true);
-                            service.performPost(path, param);
-
-
-                            path = WebApiActions.SavePositionLog();
-                            PositionLogData log = new PositionLogData();
-                            log.deviceId = app.getAndroidId();
-                            log.roomId = UUID.fromString(region.getUniqueId());
-                            log.x = position.position.x;
-                            log.y = position.position.y;
-                            log.key1 = position.key.key1;
-                            log.key2 = position.key.key2;
-                            log.key3 = position.key.key3;
-                            service = new WebApiService(PositionLogData.class, true);
-                            service.performPost(path, log);
-                        }
+                        new PositionsThread(beacons,region).start();
                     }
 
                 }
@@ -465,6 +440,44 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         public AltBeaconService getService() {
             // Return this instance of LocalService so clients can call public methods
             return AltBeaconService.this;
+        }
+    }
+
+    private class PositionsThread extends Thread {
+        Collection<Beacon> beacons;
+        Region region;
+        public PositionsThread(Collection<Beacon> beacons, Region region) {
+            this.beacons = beacons;
+            this.region = region;
+        }
+        @Override
+        public void run() {
+            PositionData position = mPositionCalculator.calculatePosition(beacons);
+            if (position != null) {
+
+                LpsApplication app = (LpsApplication) getApplicationContext();
+                String path = WebApiActions.SetPosition();
+                DevicePosition param = new DevicePosition();
+                param.deviceId = app.getAndroidId();
+                param.roomId = UUID.fromString(region.getUniqueId());
+                param.x = position.position.x;
+                param.y = position.position.y;
+                WebApiService service = new WebApiService(DevicePosition.class, true);
+                service.performPost(path, param);
+
+
+                path = WebApiActions.SavePositionLog();
+                PositionLogData log = new PositionLogData();
+                log.deviceId = app.getAndroidId();
+                log.roomId = UUID.fromString(region.getUniqueId());
+                log.x = position.position.x;
+                log.y = position.position.y;
+                log.key1 = position.key.key1;
+                log.key2 = position.key.key2;
+                log.key3 = position.key.key3;
+                service = new WebApiService(PositionLogData.class, true);
+                service.performPost(path, log);
+            }
         }
     }
 }
