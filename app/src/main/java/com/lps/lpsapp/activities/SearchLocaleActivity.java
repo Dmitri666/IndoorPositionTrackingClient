@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
@@ -166,8 +165,8 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(Places.PLACE_DETECTION_API)
+                    //.addApi(Places.GEO_DATA_API)
+                    //.addApi(Places.PLACE_DETECTION_API)
                     .build();
         }
 

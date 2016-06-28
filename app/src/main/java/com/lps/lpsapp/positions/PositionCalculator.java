@@ -5,16 +5,12 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.util.Log;
 
-import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
-import com.lps.lpsapp.viewModel.chat.BeaconModel;
-
 import org.altbeacon.beacon.Beacon;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,11 +18,10 @@ import java.util.List;
  */
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
-    private BeaconModel beaconModel;
+    private BeaconGroups beaconModel;
     public IPositionCalculatorListener positionCalculatorListener;
     private PositionData lastPosition;
 
-    private HashMap<Integer,BeaconData> beaconsInRoom;
     private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
         @Override
         public int compare(Beacon lhs, Beacon rhs) {
@@ -39,44 +34,19 @@ public class PositionCalculator {
         }
     };
 
-    public PositionCalculator(BeaconModel model)
+    public PositionCalculator(BeaconGroups model)
     {
         beaconModel = model;
         lastPosition = null;
-        beaconsInRoom = new HashMap<>();
-        for(BeaconInRoom beacon:model.beacons)
-        {
-            BeaconData data = new BeaconData(beacon.id3,beacon.x,beacon.y);
-            beaconsInRoom.put(beacon.id3,data);
-        }
     }
 
 
     public PositionData calculatePosition(Collection<Beacon> beacons)
     {
-        if(beacons.size() == 0 || beaconsInRoom.size() == 0)
+        List<BeaconData> beaconDatas = this.beaconModel.getCalculationModel(beacons);
+        if(beaconDatas == null || beaconDatas.size() == 0)
         {
             return null;
-        }
-
-        List<Beacon> list = new ArrayList<>(beacons);
-        Collections.sort(list,comparator);
-
-        if(list.size() > 3) {
-            list = list.subList(0,3);
-        }
-
-        List<BeaconData> beaconDatas = new ArrayList<>();
-        for(int i = 0;i < list.size();i++)
-        {
-            BeaconData beaconInRoom = beaconsInRoom.get(list.get(i).getId3().toInt());
-            if(beaconInRoom == null)
-            {
-                Log.e(TAG,"Beacon " + list.get(i).getId1() + ":" + list.get(i).getId2() + ":" + list.get(i).getId3() + " not found");
-                continue;
-            }
-            beaconInRoom.setDistance(list.get(i).getDistance() * beaconModel.realScaleFactor);
-            beaconDatas.add(beaconInRoom);
         }
 
         if(beaconDatas.size() < 3)
@@ -112,7 +82,7 @@ public class PositionCalculator {
             PositionData result = new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3,beaconDatas.get(2).id3),new PointD(region.exactCenterX(), region.exactCenterY()));
             lastPosition = result;
             Log.d(TAG,"GroupKey (" + result.key.key1 + "," + result.key.key2 + "," + result.key.key3 + ")");
-            Log.d(TAG,"Position (" + result.position.x / beaconModel.realScaleFactor  + "," + result.position.y / beaconModel.realScaleFactor + ")");
+            Log.d(TAG,"Position (" + result.position.x / beaconModel.getRealScaleFactor()  + "," + result.position.y / beaconModel.getRealScaleFactor() + ")");
             return result;
         }
     }
@@ -137,7 +107,7 @@ public class PositionCalculator {
     {
         try
         {
-            Region clip = new Region(0, 0, Math.round(beaconModel.wight), Math.round(beaconModel.height));
+            Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
 
             for(int i = 0;i < 1000;i++) {
 
