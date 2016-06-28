@@ -59,6 +59,7 @@ public class BeaconGroups extends HashMap<BeaconGroupKey,BeaconGroupPoints> {
         ArrayList<BeaconData> result = new ArrayList<>();
         for(int id3:subSet.get(0).keySet()) {
             BeaconData data = new BeaconData(id3,subSet.get(0).get(id3).getX(),subSet.get(0).get(id3).getY());
+            data.setDistance(distances.get(id3));
             result.add(data);
         }
 
