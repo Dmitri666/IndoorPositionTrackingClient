@@ -113,7 +113,14 @@ public class PositionCalculator {
         try
         {
             Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
-
+            /*Path tpath = new Path();
+            tpath.moveTo(beaconDatas.get(0).x,beaconDatas.get(0).y);
+            tpath.lineTo(beaconDatas.get(1).x,beaconDatas.get(1).y);
+            tpath.lineTo(beaconDatas.get(2).x,beaconDatas.get(2).y);
+            tpath.lineTo(beaconDatas.get(0).x,beaconDatas.get(0).y);
+            tpath.close();
+            Region tregion = new Region();
+            tregion.setPath(tpath, clip);*/
             for(int i = 0;i < 1000;i++) {
 
                 Region firstRegion = null;

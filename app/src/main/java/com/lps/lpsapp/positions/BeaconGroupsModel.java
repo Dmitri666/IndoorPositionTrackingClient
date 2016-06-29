@@ -86,7 +86,7 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
                     if(points.containsKey(beacon.getId3().toInt())) {
                         Point2D point = points.get(beacon.getId3().toInt());
                         BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
-                        data.setDistance(beacon.getDistance());
+                        data.setDistance(beacon.getDistance() * this.realScaleFactor);
                         result.add(data);
                         return result;
                     }
@@ -101,7 +101,7 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
                     if(points.containsKey(beacon.getId3().toInt())) {
                         Point2D point = points.get(beacon.getId3().toInt());
                         BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
-                        data.setDistance(beacon.getDistance());
+                        data.setDistance(beacon.getDistance()* this.realScaleFactor);
                         result.add(data);
                         if(result.size() == 2) {
                             return result;
@@ -124,7 +124,7 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
 
         for(int id3:subSet.get(0).keySet()) {
             BeaconData data = new BeaconData(id3,subSet.get(0).get(id3).x,subSet.get(0).get(id3).y);
-            data.setDistance(distances.get(id3));
+            data.setDistance(distances.get(id3) * this.realScaleFactor);
             result.add(data);
         }
 
