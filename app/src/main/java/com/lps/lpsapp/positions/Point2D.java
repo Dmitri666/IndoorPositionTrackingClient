@@ -3,11 +3,11 @@ package com.lps.lpsapp.positions;
 /**
  * Created by dle on 30.10.2015.
  */
-public class PointD {
-    public double x;
-    public double y;
+public class Point2D {
+    public float x;
+    public float y;
 
-    public PointD(double x,double y)
+    public Point2D(float x, float y)
     {
         this.x = x;
         this.y = y;

@@ -18,17 +18,13 @@ import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
-import com.lps.lpsapp.positions.BeaconGroupKey;
-import com.lps.lpsapp.positions.BeaconGroupPoints;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
-import com.lps.lpsapp.positions.BeaconPoint;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.positions.PositionData;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.PositionLogData;
 import com.lps.lpsapp.viewModel.RangingData;
-import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
 import com.lps.webapi.IWebApiResultListener;
@@ -72,7 +68,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public UUID currentLocaleId;
     private Boolean regionBootstrapInitialised = false;
     private IInternetAvalabilityListener mIInternetAvalabilityListener;
-    private BeaconGroupsModel groups;
+    private BeaconGroupsModel beaconGroupsModel;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
@@ -245,48 +241,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             service.performGet(path, new IWebApiResultListener<BeaconModel>() {
                 @Override
                 public void onResult(BeaconModel objResult) {
-
-                    groups = new BeaconGroupsModel(objResult);
-
-
-                    for(int i = 0; i < objResult.beacons.size(); i++)
-                    {
-
-                        for(int j = i + 1; j < objResult.beacons.size(); j++) {
-
-                            for(int k = j + 1; k < objResult.beacons.size(); k++) {
-
-
-                                BeaconGroupKey key = new BeaconGroupKey();
-                                BeaconGroupPoints points = new BeaconGroupPoints();
-                                BeaconInRoom br1 = objResult.beacons.get(i);
-                                BeaconInRoom br2 = objResult.beacons.get(j);
-                                BeaconInRoom br3 = objResult.beacons.get(k);
-
-                                key.add(br1.id3);
-                                points.put(br1.id3,new BeaconPoint(br1.x,br1.y));
-
-                                key.add(br2.id3);
-                                points.put(br2.id3,new BeaconPoint(br2.x,br2.y));
-
-                                key.add(br3.id3);
-                                points.put(br3.id3,new BeaconPoint(br3.x,br3.y));
-
-                                if(!groups.containsKey(key)) {
-                                    if(points.IsValide()) {
-                                        groups.put(key, points);
-                                    }
-                                }
-                            }
-
-                        }
-
-
-                    }
-
-
-
-                    mPositionCalculator = new PositionCalculator(groups);
+                    beaconGroupsModel = new BeaconGroupsModel(objResult);
+                    mPositionCalculator = new PositionCalculator(beaconGroupsModel);
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {
@@ -337,7 +293,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     @Override
     public void didExitRegion(final Region region) {
         Log.d(TAG, "did exit region." + region.getUniqueId());
-        groups = null;
+        beaconGroupsModel = null;
         if (region.getUniqueId().equals(this.backgroundRegion.getUniqueId())) {
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
@@ -399,7 +355,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     }
 
                     if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
-                        new PositionsThread(beacons,region).start();
+                        new PositionsThread(beacons,UUID.fromString(region.getUniqueId())).start();
                     }
 
                 }
@@ -493,10 +449,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
     private class PositionsThread extends Thread {
         Collection<Beacon> beacons;
-        Region region;
-        public PositionsThread(Collection<Beacon> beacons, Region region) {
+        UUID roomId;
+
+        public PositionsThread(Collection<Beacon> beacons, UUID roomId) {
             this.beacons = beacons;
-            this.region = region;
+            this.roomId = roomId;
         }
         @Override
         public void run() {
@@ -507,7 +464,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 String path = WebApiActions.SetPosition();
                 DevicePosition param = new DevicePosition();
                 param.deviceId = app.getAndroidId();
-                param.roomId = UUID.fromString(region.getUniqueId());
+                param.roomId = this.roomId;
                 param.x = position.position.x;
                 param.y = position.position.y;
                 WebApiService service = new WebApiService(DevicePosition.class, true);
@@ -517,12 +474,20 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 path = WebApiActions.SavePositionLog();
                 PositionLogData log = new PositionLogData();
                 log.deviceId = app.getAndroidId();
-                log.roomId = UUID.fromString(region.getUniqueId());
+                log.roomId = this.roomId;
                 log.x = position.position.x;
                 log.y = position.position.y;
-                log.key1 = position.key.key1;
-                log.key2 = position.key.key2;
-                log.key3 = position.key.key3;
+
+                List<Integer> keys = new ArrayList<>(position.key);
+                if(keys.size() > 0 ) {
+                    log.key1 = keys.get(0);
+                }
+                if(keys.size() > 1) {
+                    log.key2 = keys.get(1);
+                }
+                if(keys.size() > 2) {
+                    log.key3 = keys.get(2);
+                }
                 service = new WebApiService(PositionLogData.class, true);
                 service.performPost(path, log);
             }

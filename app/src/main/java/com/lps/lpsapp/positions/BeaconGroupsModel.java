@@ -1,5 +1,6 @@
 package com.lps.lpsapp.positions;
 
+import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 
 import org.altbeacon.beacon.Beacon;
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Created by dle on 28.06.2016.
  */
-public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints> {
+public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
     private float realScaleFactor;
     private float wight;
     private float height;
@@ -24,6 +25,41 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
         this.height = model.height;
         this.wight = model.wight;
         this.realScaleFactor = model.realScaleFactor;
+
+        for(int i = 0; i < model.beacons.size(); i++)
+        {
+
+            for(int j = i + 1; j < model.beacons.size(); j++) {
+
+                for(int k = j + 1; k < model.beacons.size(); k++) {
+
+
+                    BeaconGroupKey key = new BeaconGroupKey();
+                    BeaconGroup group = new BeaconGroup();
+                    BeaconInRoom br1 = model.beacons.get(i);
+                    BeaconInRoom br2 = model.beacons.get(j);
+                    BeaconInRoom br3 = model.beacons.get(k);
+
+                    key.add(br1.id3);
+                    group.put(br1.id3,new Point2D(br1.x,br1.y));
+
+                    key.add(br2.id3);
+                    group.put(br2.id3,new Point2D(br2.x,br2.y));
+
+                    key.add(br3.id3);
+                    group.put(br3.id3,new Point2D(br3.x,br3.y));
+
+                    if(!this.containsKey(key)) {
+                        if(group.IsValide(this.wight / 10,this.height / 10)) {
+                            this.put(key, group);
+                        }
+                    }
+                }
+
+            }
+
+
+        }
     }
 
     public float getRealScaleFactor() {
@@ -46,10 +82,10 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
 
         if(beacons.size() == 1) {
             for(Beacon beacon:beacons) {
-                for(BeaconGroupPoints points:this.values()) {
+                for(BeaconGroup points:this.values()) {
                     if(points.containsKey(beacon.getId3().toInt())) {
-                        BeaconPoint point = points.get(beacon.getId3().toInt());
-                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.getX(),point.getY());
+                        Point2D point = points.get(beacon.getId3().toInt());
+                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
                         data.setDistance(beacon.getDistance());
                         result.add(data);
                         return result;
@@ -61,10 +97,10 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
 
         if(beacons.size() == 2) {
             for(Beacon beacon:beacons) {
-                for(BeaconGroupPoints points:this.values()) {
+                for(BeaconGroup points:this.values()) {
                     if(points.containsKey(beacon.getId3().toInt())) {
-                        BeaconPoint point = points.get(beacon.getId3().toInt());
-                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.getX(),point.getY());
+                        Point2D point = points.get(beacon.getId3().toInt());
+                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
                         data.setDistance(beacon.getDistance());
                         result.add(data);
                         if(result.size() == 2) {
@@ -82,12 +118,12 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
         for(Beacon beacon:beacons) {
             distances.put(beacon.getId3().toInt(),beacon.getDistance());
         }
-        List<BeaconGroupPoints> subSet = getSubSet(distances.keySet());
+        List<BeaconGroup> subSet = getSubSet(distances.keySet());
         Collections.sort(subSet,new BeaconGroupPointsComporator(distances));
 
 
         for(int id3:subSet.get(0).keySet()) {
-            BeaconData data = new BeaconData(id3,subSet.get(0).get(id3).getX(),subSet.get(0).get(id3).getY());
+            BeaconData data = new BeaconData(id3,subSet.get(0).get(id3).x,subSet.get(0).get(id3).y);
             data.setDistance(distances.get(id3));
             result.add(data);
         }
@@ -95,8 +131,8 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
         return result;
     }
 
-    private List<BeaconGroupPoints> getSubSet(Set<Integer> keys) {
-        List<BeaconGroupPoints> subSet = new ArrayList<>();
+    private List<BeaconGroup> getSubSet(Set<Integer> keys) {
+        List<BeaconGroup> subSet = new ArrayList<>();
         for(BeaconGroupKey key:this.keySet()) {
             if(keys.containsAll(key)) {
                 subSet.add(this.get(key));
@@ -106,14 +142,14 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroupPoints>
         return subSet;
     }
 
-    private class BeaconGroupPointsComporator implements Comparator<BeaconGroupPoints> {
+    private class BeaconGroupPointsComporator implements Comparator<BeaconGroup> {
         HashMap<Integer,Double> distances;
         public BeaconGroupPointsComporator(HashMap<Integer,Double> distances) {
             this.distances = distances;
         }
 
         @Override
-        public int compare(BeaconGroupPoints source, BeaconGroupPoints target) {
+        public int compare(BeaconGroup source, BeaconGroup target) {
             float sourceDistance = source.getSummDistance(distances);
             float targetDistance = target.getSummDistance(distances);
             if(sourceDistance < targetDistance) {

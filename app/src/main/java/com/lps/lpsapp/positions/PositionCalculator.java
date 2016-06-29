@@ -57,9 +57,14 @@ public class PositionCalculator {
                 if(beaconDatas.size() == 0) {
                     return lastPosition;
                 } else if (beaconDatas.size() == 1) {
-                    return new PositionData(new GroupKey(beaconDatas.get(0).id3),new PointD(beaconDatas.get(0).x, beaconDatas.get(0).y));
+                    BeaconGroupKey key = new BeaconGroupKey();
+                    key.add(beaconDatas.get(0).id3);
+                    return new PositionData(key,new Point2D(beaconDatas.get(0).x, beaconDatas.get(0).y));
                 }  else if (beaconDatas.size() == 2) {
-                    return new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3),new PointD((beaconDatas.get(0).x + beaconDatas.get(1).x) / 2f, (beaconDatas.get(0).y + beaconDatas.get(1).y) / 2f));
+                    BeaconGroupKey key = new BeaconGroupKey();
+                    key.add(beaconDatas.get(0).id3);
+                    key.add(beaconDatas.get(1).id3);
+                    return new PositionData(key,new Point2D((beaconDatas.get(0).x + beaconDatas.get(1).x) / 2f, (beaconDatas.get(0).y + beaconDatas.get(1).y) / 2f));
                 }
             }
 
@@ -75,13 +80,13 @@ public class PositionCalculator {
         }
         else
         {
-            String msg = "";
-            for (BeaconData data:beaconDatas) {
-                //msg += "Id=" + data.beaconId + " distance=" + data.getDistance() + '\n';
-            }
-            PositionData result = new PositionData(new GroupKey(beaconDatas.get(0).id3,beaconDatas.get(1).id3,beaconDatas.get(2).id3),new PointD(region.exactCenterX(), region.exactCenterY()));
+            BeaconGroupKey key = new BeaconGroupKey();
+            key.add(beaconDatas.get(0).id3);
+            key.add(beaconDatas.get(1).id3);
+            key.add(beaconDatas.get(2).id3);
+            PositionData result = new PositionData(key,new Point2D(region.exactCenterX(), region.exactCenterY()));
             lastPosition = result;
-            Log.d(TAG,"GroupKey (" + result.key.key1 + "," + result.key.key2 + "," + result.key.key3 + ")");
+            Log.d(TAG,"GroupKey (" + beaconDatas.get(0).id3 + "," + beaconDatas.get(1).id3 + "," + beaconDatas.get(2).id3 + ")");
             Log.d(TAG,"Position (" + result.position.x / beaconModel.getRealScaleFactor()  + "," + result.position.y / beaconModel.getRealScaleFactor() + ")");
             return result;
         }

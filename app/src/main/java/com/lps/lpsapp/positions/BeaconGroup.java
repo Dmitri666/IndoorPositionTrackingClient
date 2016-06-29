@@ -7,21 +7,23 @@ import java.util.List;
 /**
  * Created by dle on 28.06.2016.
  */
-public class BeaconGroupPoints extends HashMap<Integer,BeaconPoint> {
+public class BeaconGroup extends HashMap<Integer,Point2D> {
 
 
-    public Boolean IsValide() {
+    public Boolean IsValide(float xDelta,float yDelta) {
+        //return true;
+
         List<Float> x = new ArrayList<>();
         List<Float> y = new ArrayList<>();
 
-        double mX = 0;
-        double mY = 0;
+        float mX = 0;
+        float mY = 0;
 
 
 
-        for(BeaconPoint point:this.values()) {
-            x.add(point.getX());
-            y.add(point.getY());
+        for(Point2D point:this.values()) {
+            x.add(point.x);
+            y.add(point.y);
         }
 
         for(int i = 0;i < x.size();i++) {
@@ -53,7 +55,7 @@ public class BeaconGroupPoints extends HashMap<Integer,BeaconPoint> {
         }
 
 
-        if(diffX < 20 || diffY < 20 ) {
+        if(diffX < xDelta || diffY < yDelta ) {
             return false;
         }
 
