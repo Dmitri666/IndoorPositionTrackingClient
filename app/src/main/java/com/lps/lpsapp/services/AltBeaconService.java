@@ -20,7 +20,7 @@ import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.positions.BeaconGroupKey;
 import com.lps.lpsapp.positions.BeaconGroupPoints;
-import com.lps.lpsapp.positions.BeaconGroups;
+import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.BeaconPoint;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.positions.PositionData;
@@ -72,7 +72,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public UUID currentLocaleId;
     private Boolean regionBootstrapInitialised = false;
     private IInternetAvalabilityListener mIInternetAvalabilityListener;
-    private BeaconGroups groups;
+    private BeaconGroupsModel groups;
 
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
     {
@@ -246,7 +246,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 @Override
                 public void onResult(BeaconModel objResult) {
 
-                    groups = new BeaconGroups(objResult);
+                    groups = new BeaconGroupsModel(objResult);
 
 
                     for(int i = 0; i < objResult.beacons.size(); i++)

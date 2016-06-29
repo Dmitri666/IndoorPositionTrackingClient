@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
-    private BeaconGroups beaconModel;
+    private BeaconGroupsModel beaconModel;
     public IPositionCalculatorListener positionCalculatorListener;
     private PositionData lastPosition;
 
@@ -34,7 +34,7 @@ public class PositionCalculator {
         }
     };
 
-    public PositionCalculator(BeaconGroups model)
+    public PositionCalculator(BeaconGroupsModel model)
     {
         beaconModel = model;
         lastPosition = null;

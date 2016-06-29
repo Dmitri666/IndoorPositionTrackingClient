@@ -196,10 +196,15 @@ public class ChatActivity extends BaseActivity {
 
     }
 
-    public void displayMessage(ChatMessage message) {
-        adapter.add(message);
-        adapter.notifyDataSetChanged();
-        scroll();
+    public void displayMessage(final ChatMessage message) {
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                adapter.add(message);
+                adapter.notifyDataSetChanged();
+                scroll();
+            }
+        });
+
     }
 
     private void scroll() {

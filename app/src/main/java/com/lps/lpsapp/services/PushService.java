@@ -172,7 +172,7 @@ public class PushService extends Service {
         Subscription reservationModelSubscription = proxy.subscribe("changeTableReservationModel");
         reservationModelSubscription.addReceivedHandler(onReservationModelChanged);
 
-        Subscription chatSubscription = proxy.subscribe("NewChatMessage");
+        Subscription chatSubscription = proxy.subscribe("newchatmessage");
         chatSubscription.addReceivedHandler(onNewChatMessage);
 
         Subscription joinChatSubscription = proxy.subscribe("joinchat");
