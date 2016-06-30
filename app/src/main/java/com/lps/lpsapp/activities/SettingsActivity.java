@@ -11,6 +11,7 @@ import com.lps.lpsapp.R;
 import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
+import com.lps.lpsapp.viewModel.rooms.Point;
 import com.lps.lpsapp.viewModel.rooms.RoomInfo;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.services.WebApiService;
@@ -23,6 +24,7 @@ public class SettingsActivity extends BaseActivity {
     public static Boolean ShowCircles = false;
     public static Boolean UseBeaconSimulator = false;
     public static String WebApiUrl;
+    public static Point  TestPosition;
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
@@ -101,6 +103,62 @@ public class SettingsActivity extends BaseActivity {
                 WebApiUrl = s.toString();
             }
         });
+
+
+        EditText testX =  (EditText)this.findViewById(R.id.txtX);
+        EditText testY =  (EditText)this.findViewById(R.id.txtY);
+
+        testX.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setTestPosition();
+            }
+        });
+
+
+        testY.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setTestPosition();
+            }
+        });
+    }
+
+
+    private void setTestPosition() {
+        EditText testX =  (EditText)this.findViewById(R.id.txtX);
+        EditText testY =  (EditText)this.findViewById(R.id.txtY);
+
+        if(testX.getText().toString().length() == 0 || testY.getText().toString().length() == 0) {
+            TestPosition = null;
+            return;
+        }
+
+        float x = Float.parseFloat(testX.getText().toString());
+        float y = Float.parseFloat(testY.getText().toString());
+
+        TestPosition = new Point(x,y);
+
     }
 
     @Override

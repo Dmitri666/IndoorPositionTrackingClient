@@ -86,6 +86,9 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 				currentPoint = new Point(center.x + radius * (float) Math.cos(radian), center.y + radius * (float) Math.sin(radian));
 				Log.d(TAG, "TestPoint (" + currentPoint.x + "," + currentPoint.y + ")");
 			}
+			if(SettingsActivity.TestPosition != null) {
+				currentPoint = new Point(SettingsActivity.TestPosition.x / this.mBeaconmodel.realScaleFactor,SettingsActivity.TestPosition.y / this.mBeaconmodel.realScaleFactor);
+			}
 			for (Beacon b : beacons) {
 				BeaconInRoom beacon = null;
 				for (BeaconInRoom beaconInRoom : mBeaconmodel.beacons) {
@@ -173,7 +176,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 						e.printStackTrace();
 					}
 				}
-			}, 4, 10, TimeUnit.SECONDS);
+			}, 1, 1, TimeUnit.SECONDS);
 		} 
 	}
 

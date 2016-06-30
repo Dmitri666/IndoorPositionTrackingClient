@@ -43,6 +43,17 @@ public class PositionCalculator {
 
     public PositionData calculatePosition(Collection<Beacon> beacons)
     {
+        List<Beacon> list = new ArrayList<>(beacons);
+        Collections.sort(list,comparator);
+
+        if(list.size() > 3) {
+            list = list.subList(0,3);
+        }
+
+        for(int i = 0; i < list.size();i++) {
+            Log.d(TAG," min :" + list.get(i).getId3().toString());
+        }
+
         List<BeaconData> beaconDatas = this.beaconModel.getCalculationModel(beacons);
         if(beaconDatas == null || beaconDatas.size() == 0)
         {
