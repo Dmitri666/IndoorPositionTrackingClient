@@ -76,7 +76,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 			return new ArrayList<>();
 		} else if (this.mBeaconmodel != null) {
 			Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f, this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
-			float radius = center.x / 1.5f;
+			float radius = center.x ;
 			i++;
 			if (i % 5 == 0) {
 				angle += 20.0;
@@ -101,7 +101,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 				if (beacon != null && currentPoint != null) {
 					double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
 					double rssi = calc.calculateRssi(-55, distance);
-					double d = calc.calculateDistance(-55, rssi);
+					//rssi = rssi * 0.8;
 					b.setRssi(Math.round(Math.round(rssi)));
 					//Log.d(TAG,"distance " + distance);
 				}

@@ -72,4 +72,6 @@ public class BeaconGroup extends HashMap<Integer,Point2D> {
         }
         return distance;
     }
+
+
 }

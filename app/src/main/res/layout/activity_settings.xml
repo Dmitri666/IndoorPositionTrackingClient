@@ -23,6 +23,13 @@
         android:layout_below="@+id/switch_use_beacon_simulator"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Test Coordinate"
+        android:id="@+id/textView2" />
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,6 +43,20 @@
         android:inputType="numberDecimal"
         android:ems="10"
         android:id="@+id/txtY" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Beacon Group Count"
+        android:id="@+id/textView3" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/txtBeaconGroupCount" />
 
     <EditText
         android:layout_width="match_parent"

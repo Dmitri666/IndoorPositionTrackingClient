@@ -19,8 +19,8 @@ import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
+import com.lps.lpsapp.positions.Point2D;
 import com.lps.lpsapp.positions.PositionCalculator;
-import com.lps.lpsapp.positions.PositionData;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.PositionLogData;
@@ -457,7 +457,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         }
         @Override
         public void run() {
-            PositionData position = mPositionCalculator.calculatePosition(beacons);
+            Point2D position = mPositionCalculator.calculatePosition(beacons);
             if (position != null) {
 
                 LpsApplication app = (LpsApplication) getApplicationContext();
@@ -465,8 +465,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 DevicePosition param = new DevicePosition();
                 param.deviceId = app.getAndroidId();
                 param.roomId = this.roomId;
-                param.x = position.position.x;
-                param.y = position.position.y;
+                param.x = position.x;
+                param.y = position.y;
                 WebApiService service = new WebApiService(DevicePosition.class, true);
                 service.performPost(path, param);
 
@@ -475,21 +475,12 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 PositionLogData log = new PositionLogData();
                 log.deviceId = app.getAndroidId();
                 log.roomId = this.roomId;
-                log.x = position.position.x;
-                log.y = position.position.y;
+                log.x = position.x;
+                log.y = position.y;
 
-                List<Integer> keys = new ArrayList<>(position.key);
-                if(keys.size() > 0 ) {
-                    log.key1 = keys.get(0);
-                }
-                if(keys.size() > 1) {
-                    log.key2 = keys.get(1);
-                }
-                if(keys.size() > 2) {
-                    log.key3 = keys.get(2);
-                }
-                service = new WebApiService(PositionLogData.class, true);
-                service.performPost(path, log);
+
+                //service = new WebApiService(PositionLogData.class, true);
+                //service.performPost(path, log);
             }
         }
     }

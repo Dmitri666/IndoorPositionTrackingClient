@@ -25,6 +25,7 @@ public class SettingsActivity extends BaseActivity {
     public static Boolean UseBeaconSimulator = false;
     public static String WebApiUrl;
     public static Point  TestPosition;
+    public static Integer BeaconGroupCount;
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
@@ -108,6 +109,11 @@ public class SettingsActivity extends BaseActivity {
         EditText testX =  (EditText)this.findViewById(R.id.txtX);
         EditText testY =  (EditText)this.findViewById(R.id.txtY);
 
+        if(TestPosition != null) {
+            testX.setText(Float.toString(TestPosition.x));
+            testY.setText(Float.toString(TestPosition.y));
+        }
+
         testX.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -142,6 +148,32 @@ public class SettingsActivity extends BaseActivity {
                 setTestPosition();
             }
         });
+
+
+        EditText bgc =  (EditText)this.findViewById(R.id.txtBeaconGroupCount);
+        if(BeaconGroupCount != null) {
+            bgc.setText(Integer.toString(BeaconGroupCount));
+
+        }
+
+        bgc.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                BeaconGroupCount = Integer.parseInt(s.toString());
+            }
+        });
+
     }
 
 

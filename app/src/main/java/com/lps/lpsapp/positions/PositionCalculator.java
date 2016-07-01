@@ -41,7 +41,7 @@ public class PositionCalculator {
     }
 
 
-    public PositionData calculatePosition(Collection<Beacon> beacons)
+    public Point2D calculatePosition(Collection<Beacon> beacons)
     {
         List<Beacon> list = new ArrayList<>(beacons);
         Collections.sort(list,comparator);
@@ -54,8 +54,8 @@ public class PositionCalculator {
             Log.d(TAG," min :" + list.get(i).getId3().toString());
         }
 
-        List<BeaconData> beaconDatas = this.beaconModel.getCalculationModel(beacons);
-        if(beaconDatas == null || beaconDatas.size() == 0)
+        BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
+       /* if(beaconDatas == null || beaconDatas.size() == 0)
         {
             return null;
         }
@@ -79,28 +79,32 @@ public class PositionCalculator {
                 }
             }
 
-        }
+        }*/
 
         //calculateDistanceFactor(beaconDatas);
-
-        Rect region = calculateRegion(beaconDatas);
-        if(region == null)
-        {
-            Log.e(TAG,"position not found");
-            return null;
+        List<Point2D> results = new ArrayList<>();
+        for(List<BeaconData> data:calculationModel.values()) {
+            Rect region = calculateRegion(data);
+            if(region != null) {
+                Point2D result = new Point2D(region.exactCenterX(), region.exactCenterY());
+                results.add(result);
+            }
         }
-        else
-        {
-            BeaconGroupKey key = new BeaconGroupKey();
-            key.add(beaconDatas.get(0).id3);
-            key.add(beaconDatas.get(1).id3);
-            key.add(beaconDatas.get(2).id3);
-            PositionData result = new PositionData(key,new Point2D(region.exactCenterX(), region.exactCenterY()));
-            lastPosition = result;
-            Log.d(TAG,"GroupKey (" + beaconDatas.get(0).id3 + "," + beaconDatas.get(1).id3 + "," + beaconDatas.get(2).id3 + ")");
-            Log.d(TAG,"Position (" + result.position.x / beaconModel.getRealScaleFactor()  + "," + result.position.y / beaconModel.getRealScaleFactor() + ")");
+
+        Point2D result = new Point2D(0,0);
+        if(results.size() == 0) {
             return result;
         }
+
+        for(Point2D point:results) {
+            result.x += point.x;
+            result.y += point.y;
+        }
+
+        result.x = result.x / results.size();
+        result.y = result.y / results.size();
+
+        return result;
     }
 
     private void calculateDistanceFactor(List<BeaconData> beaconDatas)
@@ -124,14 +128,7 @@ public class PositionCalculator {
         try
         {
             Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
-            /*Path tpath = new Path();
-            tpath.moveTo(beaconDatas.get(0).x,beaconDatas.get(0).y);
-            tpath.lineTo(beaconDatas.get(1).x,beaconDatas.get(1).y);
-            tpath.lineTo(beaconDatas.get(2).x,beaconDatas.get(2).y);
-            tpath.lineTo(beaconDatas.get(0).x,beaconDatas.get(0).y);
-            tpath.close();
-            Region tregion = new Region();
-            tregion.setPath(tpath, clip);*/
+
             for(int i = 0;i < 1000;i++) {
 
                 Region firstRegion = null;
@@ -148,10 +145,7 @@ public class PositionCalculator {
                     }
                     else
                     {
-                        if(!firstRegion.op(region,Region.Op.INTERSECT))
-                        {
-                            break;
-                        }
+                        firstRegion.op(region,Region.Op.INTERSECT);
                     }
                 }
 
@@ -169,6 +163,7 @@ public class PositionCalculator {
                         this.positionCalculatorListener.calculationResult(beaconDatas,bounds);
                     }
                     Log.d(TAG,"Iteration count:" + i);
+
                     return bounds;
                 }
             }

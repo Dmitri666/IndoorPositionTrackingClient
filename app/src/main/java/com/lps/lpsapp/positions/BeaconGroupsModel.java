@@ -1,5 +1,6 @@
 package com.lps.lpsapp.positions;
 
+import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 
@@ -28,12 +29,8 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
 
         for(int i = 0; i < model.beacons.size(); i++)
         {
-
             for(int j = i + 1; j < model.beacons.size(); j++) {
-
                 for(int k = j + 1; k < model.beacons.size(); k++) {
-
-
                     BeaconGroupKey key = new BeaconGroupKey();
                     BeaconGroup group = new BeaconGroup();
                     BeaconInRoom br1 = model.beacons.get(i);
@@ -55,10 +52,7 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
                         }
                     }
                 }
-
             }
-
-
         }
     }
 
@@ -74,8 +68,8 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
         return this.height;
     }
 
-    public List<BeaconData> getCalculationModel(Collection<Beacon> beacons) {
-        ArrayList<BeaconData> result = new ArrayList<>();
+    public BeaconCalculationModel getCalculationModel(Collection<Beacon> beacons) {
+        /*ArrayList<BeaconData> result = new ArrayList<>();
         if(beacons.size() == 0) {
             return result;
         }
@@ -112,23 +106,39 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
                 }
             }
             return result;
-        }
+        }*/
 
         HashMap<Integer,Double> distances = new HashMap<>();
         for(Beacon beacon:beacons) {
             distances.put(beacon.getId3().toInt(),beacon.getDistance());
         }
         List<BeaconGroup> subSet = getSubSet(distances.keySet());
-        Collections.sort(subSet,new BeaconGroupPointsComporator(distances));
-
-
-        for(int id3:subSet.get(0).keySet()) {
-            BeaconData data = new BeaconData(id3,subSet.get(0).get(id3).x,subSet.get(0).get(id3).y);
-            data.setDistance(distances.get(id3) * this.realScaleFactor);
-            result.add(data);
+        Collections.sort(subSet,new BeaconGroupComporator(distances));
+        if(subSet.size() > 0) {
+            int count = 1;
+            if(SettingsActivity.BeaconGroupCount != null) {
+                count = SettingsActivity.BeaconGroupCount;
+                if(count > subSet.size()) {
+                    count = subSet.size();
+                }
+            }
+            subSet = subSet.subList(0, count);
         }
 
-        return result;
+        BeaconCalculationModel calculationModel = new BeaconCalculationModel();
+        for(BeaconGroup group:subSet) {
+            BeaconGroupKey key = new BeaconGroupKey();
+            List<BeaconData> datas = new ArrayList<>();
+            for(int id3:group.keySet()) {
+                BeaconData data = new BeaconData(id3,group.get(id3).x,group.get(id3).y);
+                data.setDistance(distances.get(id3) * this.realScaleFactor);
+                datas.add(data);
+            }
+            key.addAll(group.keySet());
+            calculationModel.put(key,datas);
+        }
+
+        return calculationModel;
     }
 
     private List<BeaconGroup> getSubSet(Set<Integer> keys) {
@@ -142,9 +152,9 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey,BeaconGroup> {
         return subSet;
     }
 
-    private class BeaconGroupPointsComporator implements Comparator<BeaconGroup> {
+    private class BeaconGroupComporator implements Comparator<BeaconGroup> {
         HashMap<Integer,Double> distances;
-        public BeaconGroupPointsComporator(HashMap<Integer,Double> distances) {
+        public BeaconGroupComporator(HashMap<Integer,Double> distances) {
             this.distances = distances;
         }
 
