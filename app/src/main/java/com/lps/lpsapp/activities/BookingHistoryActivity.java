@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.IBookingStateChangedListener;
@@ -101,6 +102,10 @@ public class BookingHistoryActivity extends BaseActivity {
                 for (BookingJoinRoomData info : objResult) {
                     adapter.add(info);
                 }
+            }
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
         });
     }

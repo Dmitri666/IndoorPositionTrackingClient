@@ -1,6 +1,5 @@
 package com.lps.lpsapp;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,27 +10,24 @@ import android.widget.Toast;
 
 import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.network.ConnectionDetector;
-import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.AuthenticationService;
+import com.lps.lpsapp.services.AuthenticationManager;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.Device;
 import com.lps.webapi.AccessToken;
-import com.lps.webapi.IAuthenticationListener;
+import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.JsonSerializer;
 import com.lps.webapi.services.WebApiService;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import org.altbeacon.beacon.distance.AndroidModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
+import microsoft.aspnet.signalr.client.transport.NegotiationException;
+
+//import com.squareup.leakcanary.LeakCanary;
+//import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by dyoung on 12/13/13.
@@ -42,16 +38,15 @@ public class LpsApplication extends MultiDexApplication {
     private Intent beaconService;
     private Intent puchService;
     private String mAndroidId;
-    private Boolean mIsInternetAvailable;
-    public List<IInternetAvalabilityListener> mInternetAvalabilityConsomers;
+
 
     public void onCreate() {
         super.onCreate();
-        refWatcher = LeakCanary.install(this);
+        //refWatcher = LeakCanary.install(this);
         mContext = this;
+        AppManager.app = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 
-        mInternetAvalabilityConsomers = new ArrayList<>();
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
         String url = settings.getString("url",null);
@@ -65,30 +60,23 @@ public class LpsApplication extends MultiDexApplication {
             SettingsActivity.WebApiUrl = url;
         }
 
-        puchService = new Intent(this, PushService.class);
+
 
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        WebApiService.AuthenticationListener = new IAuthenticationListener() {
-            @Override
-            public void Autenticate() {
-                ShowLogin();
-            }
-        };
 
         AccessToken.CurrentToken = this.getAuthenticationData();
 
+        puchService = new Intent(this, PushService.class);
         beaconService = new Intent(this, AltBeaconService.class);
-        startService(beaconService);
 
-        this.CheckInternetAvailability();
 
     }
 
-    public static RefWatcher getRefWatcher(Context context) {
-        return refWatcher;
-    }
+    //public static RefWatcher getRefWatcher(Context context) {
+    //    return refWatcher;
+    //}
 
-    private static RefWatcher refWatcher;
+    //private static RefWatcher refWatcher;
 
     public static Context getContext() {
         return mContext;
@@ -160,76 +148,49 @@ public class LpsApplication extends MultiDexApplication {
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(myIntent);
         } else {
-            new AuthenticationService().RefreshToken(this);
+            new AuthenticationManager().RefreshToken(this);
         }
 
     }
 
-    public void CheckInternetAvailability() {
-        ConnectionDetector cd = new ConnectionDetector(this);
-        Boolean state = cd.isConnectedToNetwork();
-        if(this.mIsInternetAvailable == null ||this.mIsInternetAvailable != state) {
-            this.mIsInternetAvailable = state;
-            if(this.mIsInternetAvailable) {
-                this.GoIntoConnectedState();
-            } else {
-                this.GoIntoDisconnectedState();
-            }
+    public void HandleError(Exception ex) {
+        if(ex instanceof AuthenticationException || ex instanceof NegotiationException) {
+            //stopService(beaconService);
+            //stopService(puchService);
+            Intent myIntent = new Intent(this, LoginActivity.class);
+            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(myIntent);
+        } else {
+            Log.e(TAG, ex.toString(), ex);
         }
-
     }
 
-    private void GoIntoConnectedState() {
-        Toast toast1 = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
-        toast1.show();
-        for(IInternetAvalabilityListener consumer:mInternetAvalabilityConsomers)
-        {
-            consumer.Avalable();
-        }
+    protected void GoIntoConnectedState() {
+        Toast toast = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
+        toast.show();
         AndroidModel model = AndroidModel.forThisDevice();
         Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
 
         WebApiService service = new WebApiService(Device.class,false);
         service.performPost(WebApiActions.RegisterDevice(),device);
 
-
         if(AccessToken.CurrentToken != null) {
-
-            startService(puchService);
+            //startService(beaconService);
+            //startService(puchService);
+        } else {
+            this.ShowLogin();
         }
 
 
     }
 
-    private void GoIntoDisconnectedState() {
+    protected void GoIntoDisconnectedState() {
         Toast toast1 = Toast.makeText(getApplicationContext(), "Not connected Internet", Toast.LENGTH_LONG);
         toast1.show();
-        ComponentName cn =  puchService.getComponent();
+        stopService(beaconService);
         stopService(puchService);
     }
 
-//    private boolean isNetworkConnected() {
-//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-//
-//        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
-//        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
-//        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
-//        NetworkRequest networkRequest = builder.build();
-//        //cm.requestNetwork(networkRequest, networkCallback);
-//        //cm.registerNetworkCallback(networkRequest, new ConnectionDetector());
-//
-//        cm.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
-//            @Override
-//            public void onNetworkActive() {
-//                Log.d(TAG,"NetworkActive");
-//            }
-//        });
-//        NetworkInfo info = cm.getActiveNetworkInfo();
-//        if(info == null) {
-//            return false;
-//        }
-//        return info.isConnected();
-//    }
+
 
 }

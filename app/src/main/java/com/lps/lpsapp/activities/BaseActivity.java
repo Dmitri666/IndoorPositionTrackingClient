@@ -16,9 +16,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.lps.lpsapp.LpsApplication;
+import com.lps.lpsapp.AppManager;
 import com.lps.lpsapp.R;
-import com.squareup.leakcanary.RefWatcher;
+//import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by user on 16.08.2015.
@@ -30,6 +30,7 @@ public class BaseActivity extends AppCompatActivity {
     public final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
     public final int MY_PERMISSIONS_READ_CONTACTS = 2;
     private Boolean mIsInitialised;
+    public Boolean mConnectedToInternet;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +56,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        ((LpsApplication)getApplication()).CheckInternetAvailability();
+        this.mConnectedToInternet = AppManager.CheckInternatAvalability();
         if(!this.mIsInitialised) {
             this.mIsInitialised = this.InitialiseActivity();
         }
@@ -79,8 +80,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-        RefWatcher refWatcher = LpsApplication.getRefWatcher(this);
-        refWatcher.watch(this);
+        //RefWatcher refWatcher = LpsApplication.getRefWatcher(this);
+        //refWatcher.watch(this);
     }
 
     @Override

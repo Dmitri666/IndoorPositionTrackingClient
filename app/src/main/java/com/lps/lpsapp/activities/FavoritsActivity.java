@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.WebApiActions;
@@ -79,6 +80,10 @@ public class FavoritsActivity extends BaseActivity {
             @Override
             public void onResult(List objResult) {
                 setRooms(objResult);
+            }
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
         });
     }

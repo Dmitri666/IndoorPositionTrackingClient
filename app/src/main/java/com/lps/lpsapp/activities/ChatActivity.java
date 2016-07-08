@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.helper.ChatAdapter;
 import com.lps.lpsapp.services.IChatListener;
@@ -222,6 +223,10 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onResult(ConversationsData objResult) {
                 setConversation(objResult);
+            }
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
         });
     }

@@ -19,8 +19,8 @@ import java.net.URLEncoder;
 /**
  * Created by user on 05.08.2015.
  */
-public class AuthenticationService {
-    private static String TAG = "AuthenticationService";
+public class AuthenticationManager {
+    private static String TAG = "AuthenticationManager";
 
     public AccessToken Authenticate(String userName, String password,String androidId) throws Exception {
 

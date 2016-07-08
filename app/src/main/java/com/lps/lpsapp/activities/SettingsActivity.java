@@ -7,6 +7,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import com.lps.lpsapp.services.WebApiActions;
@@ -58,8 +59,18 @@ public class SettingsActivity extends BaseActivity {
                                         ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons(objResult);
 
                                     }
+
+                                    @Override
+                                    public void onError(Exception err) {
+                                        ((LpsApplication)getApplicationContext()).HandleError(err);
+                                    }
                                 });
                             }
+                        }
+
+                        @Override
+                        public void onError(Exception err) {
+                            ((LpsApplication)getApplicationContext()).HandleError(err);
                         }
                     });
 

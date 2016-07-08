@@ -5,4 +5,5 @@ package com.lps.webapi;
  */
 public interface IHttpResultListener {
     void OnResult(AsyncTaskResult<String> result);
+
 }

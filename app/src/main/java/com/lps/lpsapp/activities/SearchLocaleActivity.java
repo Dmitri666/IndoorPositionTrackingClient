@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
@@ -203,6 +204,11 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
             }
 
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
+            }
+
         });
 
         service = new WebApiService(String.class,true);
@@ -226,6 +232,11 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                     }
 
                 }
+            }
+
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
 
         });
@@ -258,6 +269,11 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                 ArrayAdapter adapter = new SimpleComboBoxAdapter(SearchLocaleActivity.this, items);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
 
         });
