@@ -23,13 +23,13 @@
  */
 package org.altbeacon.beacon;
 
-import org.altbeacon.beacon.logging.LogManager;
-import org.altbeacon.beacon.service.MonitoringData;
-import org.altbeacon.beacon.service.RangingData;
-
 import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.content.Intent;
+
+import org.altbeacon.beacon.logging.LogManager;
+import org.altbeacon.beacon.service.MonitoringData;
+import org.altbeacon.beacon.service.RangingData;
 
 /**
  * Converts internal intents to notifier callbacks
