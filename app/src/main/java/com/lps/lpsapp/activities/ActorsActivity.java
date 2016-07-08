@@ -179,10 +179,16 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         view.setmRoomModel(map);
         String path = WebApiActions.GetActorsInLocale() + "/" + this.roomId.toString();
         WebApiService service = new WebApiService(Actor.class, true);
+
         service.performGetList(path, new IWebApiResultListener<List>() {
             @Override
             public void onResult(List objResult) {
                 setActors(view, objResult);
+            }
+
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
 
 
@@ -380,6 +386,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                 case R.id.action_chat:
                     GuiDevice actor = (GuiDevice) mode.getTag();
                     mode.finish();
+
                     String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
                     WebApiService service = new WebApiService(Actor.class, true);
                     service.performGet(path, new IWebApiResultListener() {
@@ -395,7 +402,10 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                                 Log.e(TAG, ex.getMessage(), ex);
                             }
                         }
-
+                        @Override
+                        public void onError(Exception err) {
+                            ((LpsApplication)getApplicationContext()).HandleError(err);
+                        }
 
                     });
                     mode.finish();
@@ -501,6 +511,11 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                             @Override
                             public void onResult(RoomModel objResult) {
                                 activity.setRoomModel(view, objResult);
+                            }
+
+                            @Override
+                            public void onError(Exception err) {
+                                ((LpsApplication)getContext().getApplicationContext()).HandleError(err);
                             }
 
 

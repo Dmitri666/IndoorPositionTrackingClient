@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
@@ -208,6 +209,11 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
                 public void onResult(List objResult) {
                     loadingFinished(objResult);
                 }
+
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                }
             });
         } else {
             WebApiService service = new WebApiService(RoomInfo.class,true);
@@ -215,6 +221,11 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
                 @Override
                 public void onResult(List objResult) {
                     loadingFinished(objResult);
+                }
+
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
                 }
             });
         }

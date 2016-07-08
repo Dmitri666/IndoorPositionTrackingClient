@@ -6,7 +6,6 @@ import com.lps.webapi.AsyncTaskResult;
 import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.HttpGetTask;
 import com.lps.webapi.HttpPostTask;
-import com.lps.webapi.IAuthenticationListener;
 import com.lps.webapi.IHttpResultListener;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
@@ -19,7 +18,6 @@ import java.util.List;
  */
 public class WebApiService<T> {
     private static String TAG = "WebApiService";
-    public static IAuthenticationListener AuthenticationListener;
     final Class<T> typeParameterClass;
     private boolean needAuthentication;
 
@@ -36,13 +34,8 @@ public class WebApiService<T> {
             public void OnResult(AsyncTaskResult<String> result) {
                 Exception error = result.getError();
                 if(error != null) {
-                    if(error instanceof AuthenticationException)
-                    {
-                        AuthenticationListener.Autenticate();
-                        return;
-                    } else if (result.getError() instanceof Exception) {
-                        Log.e(TAG,error.getMessage(),error);
-                    }
+                    resultListener.onError(error);
+                    return;
                 }
 
                 if(result.getResult().length() > 0)
@@ -68,14 +61,8 @@ public class WebApiService<T> {
             public void OnResult(AsyncTaskResult<String> result) {
                 Exception error = result.getError();
                 if(error != null) {
-                    if(error instanceof AuthenticationException)
-                    {
-                        AuthenticationListener.Autenticate();
-                        return;
-                    } else if (result.getError() instanceof Exception) {
-                        Log.e(TAG,error.getMessage(),error);
-                        return;
-                    }
+                    resultListener.onError(error);
+                    return;
                 }
 
                 if(result.getResult().length() > 0)
@@ -103,9 +90,10 @@ public class WebApiService<T> {
                 public void OnResult(AsyncTaskResult<String> result) {
                     if(result.getError() instanceof AuthenticationException)
                     {
-                        AuthenticationListener.Autenticate();
+                        resultListener.onError(result.getError());
                         return;
                     }
+
                     if(result.getResult().length() > 0)
                     {
                         try {
@@ -137,7 +125,7 @@ public class WebApiService<T> {
                 public void OnResult(AsyncTaskResult<String> result) {
                     if(result.getError() instanceof AuthenticationException)
                     {
-                        AuthenticationListener.Autenticate();
+                        resultListener.onError(result.getError());
                         return;
                     }
                     if(result.getResult().length() > 0)

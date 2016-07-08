@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
@@ -81,6 +82,10 @@ public class ChatListActivity extends BaseActivity {
             @Override
             public void onResult(List objResult) {
                 setConversations(objResult);
+            }
+            @Override
+            public void onError(Exception err) {
+                ((LpsApplication)getApplicationContext()).HandleError(err);
             }
         });
 

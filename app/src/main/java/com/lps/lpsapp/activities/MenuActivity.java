@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 
@@ -80,7 +79,10 @@ public class MenuActivity extends BaseActivity {
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
 		View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
-		btn.setEnabled(new ConnectionDetector(getApplicationContext()).isConnectedToNetwork());
+		btn.setEnabled(this.mConnectedToInternet);
+
+		View btn1 =  MenuActivity.this.findViewById(R.id.btnNews);
+		btn1.setEnabled(this.mConnectedToInternet);
 
 	}
 

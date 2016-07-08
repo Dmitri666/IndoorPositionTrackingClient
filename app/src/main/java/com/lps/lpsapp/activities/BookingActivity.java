@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.dialogs.DatePickerFragment;
@@ -73,6 +74,11 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                         view.setmRoomModel(objResult);
                         BookingActivity.this.setDate();
                         BookingActivity.this.mProgressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception err) {
+                        ((LpsApplication)getApplicationContext()).HandleError(err);
                     }
                 });
             }
@@ -234,6 +240,10 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                 public void onResult(List objResult) {
                     CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
                     view.setBooking(objResult);
+                }
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
                 }
             });
         }

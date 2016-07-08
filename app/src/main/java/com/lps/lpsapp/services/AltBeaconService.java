@@ -12,11 +12,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.lps.lpsapp.AppManager;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
-import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.Point2D;
@@ -93,7 +93,10 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
                     setRegions(objResult);
                 }
-
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                }
 
             });
         }
@@ -165,11 +168,9 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
             }
         };
         beaconManager.bind(this);
-        if(new ConnectionDetector(this.getApplicationContext()).isConnectedToNetwork())
+        if(AppManager.CheckInternatAvalability())
         {
             this.InitRegionBootstrap();
-        } else {
-            app.mInternetAvalabilityConsomers.add(mIInternetAvalabilityListener);
         }
         Log.d(TAG,"Created");
     }
@@ -188,10 +189,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         Log.d(TAG, "Destroyed");
         beaconManager.unbind(this);
         LpsApplication app = (LpsApplication) this.getApplicationContext();
-        if(app.mInternetAvalabilityConsomers.contains(this.mIInternetAvalabilityListener))
-        {
-            app.mInternetAvalabilityConsomers.remove(this.mIInternetAvalabilityListener);
-        }
+
     }
 
     @Nullable
@@ -247,6 +245,10 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     }
                 }
 
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                }
 
             });
 

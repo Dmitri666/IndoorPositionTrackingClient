@@ -5,4 +5,5 @@ package com.lps.webapi;
  */
 public interface IWebApiResultListener<T> {
     void onResult(T objResult);
+    void onError(Exception err);
 }

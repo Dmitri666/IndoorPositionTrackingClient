@@ -117,14 +117,7 @@ public class PushService extends Service {
             @Override
             public void onError(Throwable error) {
                 Log.e(TAG, error.getMessage(), error);
-                if(error instanceof NegotiationException)
-                {
-                    ((LpsApplication)getApplication()).ShowLogin();
-                }
-                else
-                {
-
-                }
+                ((LpsApplication)getApplication()).HandleError(new Exception(error));
             }
         });
 
@@ -189,12 +182,13 @@ public class PushService extends Service {
                 if(throwable instanceof NegotiationException)
                 {
                     sf.cancel(true);
-                    ((LpsApplication)getApplication()).ShowLogin();
+                    ((LpsApplication)getApplication()).HandleError(new Exception(throwable));
 
                 }
                 else
                 {
                     Log.e(TAG,"sf: " + throwable.toString(),throwable);
+                    ((LpsApplication)getApplication()).HandleError(new Exception(throwable));
                 }
             }
         });
