@@ -60,12 +60,14 @@ public class LpsApplication extends MultiDexApplication {
             SettingsActivity.WebApiUrl = url;
         }
 
-        puchService = new Intent(this, PushService.class);
-        beaconService = new Intent(this, AltBeaconService.class);
+
 
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         AccessToken.CurrentToken = this.getAuthenticationData();
+
+        puchService = new Intent(this, PushService.class);
+        beaconService = new Intent(this, AltBeaconService.class);
 
 
     }
@@ -153,8 +155,8 @@ public class LpsApplication extends MultiDexApplication {
 
     public void HandleError(Exception ex) {
         if(ex instanceof AuthenticationException || ex instanceof NegotiationException) {
-            stopService(beaconService);
-            stopService(puchService);
+            //stopService(beaconService);
+            //stopService(puchService);
             Intent myIntent = new Intent(this, LoginActivity.class);
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(myIntent);
@@ -173,8 +175,8 @@ public class LpsApplication extends MultiDexApplication {
         service.performPost(WebApiActions.RegisterDevice(),device);
 
         if(AccessToken.CurrentToken != null) {
-            startService(beaconService);
-            startService(puchService);
+            //startService(beaconService);
+            //startService(puchService);
         } else {
             this.ShowLogin();
         }
