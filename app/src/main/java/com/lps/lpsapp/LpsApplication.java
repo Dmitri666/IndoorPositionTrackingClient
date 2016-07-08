@@ -1,6 +1,5 @@
 package com.lps.lpsapp;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,7 +13,7 @@ import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.lpsapp.network.IInternetAvalabilityListener;
 import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.AuthenticationService;
+import com.lps.lpsapp.services.AuthenticationManager;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.Device;
@@ -160,7 +159,7 @@ public class LpsApplication extends MultiDexApplication {
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(myIntent);
         } else {
-            new AuthenticationService().RefreshToken(this);
+            new AuthenticationManager().RefreshToken(this);
         }
 
     }
@@ -204,32 +203,9 @@ public class LpsApplication extends MultiDexApplication {
     private void GoIntoDisconnectedState() {
         Toast toast1 = Toast.makeText(getApplicationContext(), "Not connected Internet", Toast.LENGTH_LONG);
         toast1.show();
-        ComponentName cn =  puchService.getComponent();
         stopService(puchService);
     }
 
-//    private boolean isNetworkConnected() {
-//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkRequest.Builder builder = new NetworkRequest.Builder();
-//
-//        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
-//        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
-//        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
-//        NetworkRequest networkRequest = builder.build();
-//        //cm.requestNetwork(networkRequest, networkCallback);
-//        //cm.registerNetworkCallback(networkRequest, new ConnectionDetector());
-//
-//        cm.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
-//            @Override
-//            public void onNetworkActive() {
-//                Log.d(TAG,"NetworkActive");
-//            }
-//        });
-//        NetworkInfo info = cm.getActiveNetworkInfo();
-//        if(info == null) {
-//            return false;
-//        }
-//        return info.isConnected();
-//    }
+
 
 }

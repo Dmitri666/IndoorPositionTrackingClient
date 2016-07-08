@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.AuthenticationService;
+import com.lps.lpsapp.services.AuthenticationManager;
 import com.lps.webapi.AccessToken;
 
 /**
@@ -38,6 +38,11 @@ public class LoginActivity extends BaseActivity {
 
         // Set up the login form.
         mUserNameView = (EditText) findViewById(R.id.userName);
+
+        if(AccessToken.CurrentToken != null) {
+            mUserNameView.setText(AccessToken.CurrentToken.userName);
+        }
+
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -131,7 +136,7 @@ public class LoginActivity extends BaseActivity {
 
             LpsApplication app = (LpsApplication)getApplicationContext();
             try {
-                AccessToken token = new AuthenticationService().Authenticate(email, password,app.getAndroidId());
+                AccessToken token = new AuthenticationManager().Authenticate(email, password,app.getAndroidId());
                 app.saveAuthenticationData(token);
                 onLogin();
             }

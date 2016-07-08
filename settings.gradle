@@ -1,1 +1,1 @@
-include ':app', ':webapi'//,':libs:android-beacon-library'
+include ':app', ':webapi',':android-beacon-library'
