@@ -31,9 +31,9 @@ android {
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':android-beacon-library')
+    //compile project(':android-beacon-library')
     compile project(':webapi')
-    //compile 'org.altbeacon:android-beacon-library:2.4'
+    compile 'org.altbeacon:android-beacon-library:2.4'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:support-v4:24.0.0'

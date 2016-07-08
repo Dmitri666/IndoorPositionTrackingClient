@@ -79,10 +79,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         }
         if(this.mRegions.size() > 0) {
             this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
-            Log.i(TAG,"setRegions "  + this.mRegions.size());
-        } else {
-            this.beaconManager.setMonitorNotifier(this);
-            Log.i(TAG,"no Regions ");
+
         }
 
 
