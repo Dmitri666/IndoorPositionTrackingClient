@@ -15,6 +15,7 @@ import com.lps.lpsapp.network.IAppStateListener;
 import com.lps.lpsapp.services.AltBeaconService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
+import com.lps.webapi.AccessToken;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.services.WebApiService;
 
@@ -42,7 +43,7 @@ public class ServiceManager {
             service.performGet(path, new IWebApiResultListener() {
                 @Override
                 public void onResult(Object objResult) {
-                    AppState.IsAutenticated = true;
+                    AppState.IsAuthenticated = true;
                     puchService = new Intent(app, PushService.class);
                     beaconService = new Intent(app, AltBeaconService.class);
                     app.startService(beaconService);
@@ -53,7 +54,7 @@ public class ServiceManager {
 
                 @Override
                 public void onError(Exception err) {
-                    AppState.IsAutenticated = false;
+                    AppState.IsAuthenticated = false;
                     Intent intent = new Intent(app,LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     app.startActivity(intent);
@@ -63,6 +64,17 @@ public class ServiceManager {
 
     }
 
+    public static void SetAuthenticatingToken(AccessToken accessToken) {
+        if(AppState.IsAuthenticated && !AccessToken.CurrentToken.userName.equals(accessToken.userName)) {
+            app.stopService(puchService);
+            AccessToken.CurrentToken = accessToken;
+            app.saveAuthenticationData(accessToken);
+            app.startService(puchService);
+        } else {
+            AccessToken.CurrentToken = accessToken;
+            app.saveAuthenticationData(accessToken);
+        }
+    }
     private static boolean IsConnectedToNetwork(){
         ConnectivityManager connectivity = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null)

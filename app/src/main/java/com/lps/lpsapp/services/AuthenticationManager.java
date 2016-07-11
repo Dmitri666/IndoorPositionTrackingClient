@@ -55,7 +55,7 @@ public class AuthenticationManager {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AccessToken authenticationData = mapper.readValue(accessToken, AccessToken.class);
-            app.saveAuthenticationData(authenticationData);
+            //app.saveAuthenticationData(authenticationData);
             running = false;
             Log.d(TAG, "refresh token");
         } catch (Exception ex) {

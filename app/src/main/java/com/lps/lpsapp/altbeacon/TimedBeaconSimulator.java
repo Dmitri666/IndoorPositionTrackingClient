@@ -169,7 +169,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
 							beacons.add(finalBeacons.get(beacons.size()));
 						else {
 							scheduleTaskExecutor.shutdown();
-							createBasicSimulatedBeacons();
+							//createBasicSimulatedBeacons();
 						}
 						
 					}catch(Exception e){

@@ -44,10 +44,10 @@ public class MenuActivity extends BaseActivity {
 			@Override
 			public void StateChanged(AppState state) {
 				View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
-				btn.setEnabled(state.IsAutenticated);
+				btn.setEnabled(state.IsAuthenticated);
 
 				View btn1 =  MenuActivity.this.findViewById(R.id.btnNews);
-				btn1.setEnabled(state.IsAutenticated);
+				btn1.setEnabled(state.IsAuthenticated);
 			}
 		});
 

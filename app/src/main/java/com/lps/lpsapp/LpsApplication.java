@@ -107,7 +107,7 @@ public class LpsApplication extends MultiDexApplication {
         return accesstoken;
     }
 
-    public void saveAuthenticationData(AccessToken authenticationData) {
+    protected void saveAuthenticationData(AccessToken authenticationData) {
         if(authenticationData != null) {
             try {
                 String token = JsonSerializer.serialize(authenticationData);
@@ -115,7 +115,6 @@ public class LpsApplication extends MultiDexApplication {
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putString("token", token);
                 editor.commit();
-                AccessToken.CurrentToken = authenticationData;
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }

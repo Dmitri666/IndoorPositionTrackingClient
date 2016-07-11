@@ -58,7 +58,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStart() {
         super.onStart();
-        if(ServiceManager.AppState.IsAutenticated) {
+        if(ServiceManager.AppState.IsAuthenticated) {
             this.loadFilterContent();
         }
     }

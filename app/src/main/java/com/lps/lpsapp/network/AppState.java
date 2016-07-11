@@ -8,11 +8,11 @@ import java.util.UUID;
 public class AppState {
     public Boolean IsConnectedToInternet;
     public Boolean IsBlootuthOn;
-    public Boolean IsAutenticated;
+    public Boolean IsAuthenticated;
     public UUID LocaleId;
 
     public AppState() {
-        this.IsAutenticated = false;
+        this.IsAuthenticated = false;
         this.IsBlootuthOn = false;
         this.IsConnectedToInternet = false;
         this.LocaleId = null;

@@ -131,29 +131,6 @@ public class CustomerMapView extends ScalableView  {
             mBackground.draw(canvas);
         }
 
-
-//        float width = this.getDrawX(0.1f) - this.getDrawX(0f);
-//        mPaint.setStrokeWidth(width);
-//        Path path = new Path();
-//        for(int i = 0; i < mRoomModel.border.size();i++)
-//        {
-//            Point point = this.mRoomModel.border.get(i);
-//            if(i == 0)
-//            {
-//                path.moveTo(this.getDrawX( point.x),this.getDrawY(point.y));
-//            }
-//            else
-//            {
-//                path.lineTo(this.getDrawX(point.x), this.getDrawY(point.y));
-//            }
-//        }
-//        path.close();
-//        canvas.clipPath(path, Region.Op.DIFFERENCE);
-//        canvas.drawColor(Color.BLACK);
-
-
-        //mBackground.draw(canvas);
-
         if(SettingsActivity.ShowCircles && this.beaconDatas != null && this.calculationResult != null)
         {
             canvas.save();
@@ -171,41 +148,7 @@ public class CustomerMapView extends ScalableView  {
             canvas.restore();
         }
 
-
-
-        //canvas.clipPath(path);
-        //canvas.drawColor(Color.MAGENTA);
-
         this.setLayoutForMapObjects();
-
-
-        /*Point lastPoint = null;
-        for(int i = 0; i < mRoomModel.border.size();i++)
-        {
-            Point point = this.mRoomModel.border.get(i);
-            if(i == 0)
-            {
-                lastPoint = point;
-                continue;
-            }
-            else
-            {
-                canvas.drawLine(this.getDrawX(point.x), this.getDrawY(point.y), this.getDrawX(lastPoint.x), this.getDrawY(lastPoint.y), mPaint);
-                lastPoint = point;
-            }
-
-            if(i == mRoomModel.border.size() - 1)
-            {
-                canvas.drawLine(this.getDrawX(lastPoint.x), this.getDrawY(lastPoint.y), this.getDrawX(this.mRoomModel.border.get(0).x), this.getDrawY(this.mRoomModel.border.get(0).y), mPaint);
-            }
-        }
-
-        for(int i = 1; i < mRoomModel.wight;i++) {
-            canvas.drawLine(this.getDrawX(0), this.getDrawY(i), this.getDrawX(mRoomModel.height), this.getDrawY(i), mCPaint);
-        }
-        for(int j = 1; j < mRoomModel.height;j++) {
-            canvas.drawLine(this.getDrawX(j), this.getDrawY(0), this.getDrawX(j), this.getDrawY(mRoomModel.wight), mCPaint);
-        }*/
 
     }
 
@@ -236,15 +179,6 @@ public class CustomerMapView extends ScalableView  {
         return super.getDrawY(y1);
     }
 
-//    @Override
-//    protected float getDrawWidth(float width) {
-//        return super.getDrawWidth(width * mContentRect.width() / this.mRoomModel.wight);
-//    }
-//
-//    @Override
-//    protected float getDrawHeight(float height) {
-//        return super.getDrawHeight(height * mContentRect.height() / this.mRoomModel.height);
-//    }
 
     public void setBooking(List<TableState> model)
     {
