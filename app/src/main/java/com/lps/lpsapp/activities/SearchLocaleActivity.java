@@ -20,8 +20,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.lps.lpsapp.ServiceManager;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.lpsapp.network.ConnectionDetector;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
@@ -58,7 +58,9 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStart() {
         super.onStart();
-
+        if(ServiceManager.AppState.IsAutenticated) {
+            this.loadFilterContent();
+        }
     }
 
     @Override
@@ -79,14 +81,6 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
         super.onDestroy();
     }
 
-    @Override
-    protected Boolean InitialiseActivity() {
-        if(new ConnectionDetector(getApplicationContext()).isConnectedToNetwork()) {
-            this.loadFilterContent();
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

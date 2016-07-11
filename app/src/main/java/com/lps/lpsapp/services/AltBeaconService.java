@@ -12,12 +12,12 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.lps.lpsapp.AppManager;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
+import com.lps.lpsapp.ServiceManager;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
-import com.lps.lpsapp.network.IInternetAvalabilityListener;
+import com.lps.lpsapp.network.IAppStateListener;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.Point2D;
 import com.lps.lpsapp.positions.PositionCalculator;
@@ -65,42 +65,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public PositionCalculator mPositionCalculator;
     public IDevicePositionListener devicePositionListener;
     public Region backgroundRegion;
-    public UUID currentLocaleId;
     private Boolean regionBootstrapInitialised = false;
-    private IInternetAvalabilityListener mIInternetAvalabilityListener;
+    private IAppStateListener mIInternetAvalabilityListener;
     private BeaconGroupsModel beaconGroupsModel;
 
-    private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
-    {
-        for (com.lps.lpsapp.viewModel.Region r :regions) {
-            Region roomRegion = new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null);
-            this.mRegions.add(roomRegion);
 
-        }
-        if(this.mRegions.size() > 0) {
-            this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
-
-        }
-
-
-    }
-
-    private void InitRegionBootstrap() {
-        if(!regionBootstrapInitialised) {
-            WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
-            service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
-                @Override
-                public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
-                    setRegions(objResult);
-                }
-                @Override
-                public void onError(Exception err) {
-                    ((LpsApplication)getApplicationContext()).HandleError(err);
-                }
-
-            });
-        }
-    }
 
     @Override
     public void onCreate() {
@@ -156,22 +125,9 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         //beaconManager.setBackgroundBetweenScanPeriod(BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
         this.backgroundPowerSaver = new BackgroundPowerSaver(app);
 
-        // If you wish to test beacon detection in the Android Emulator, you can use code like this:
-//        if(!avalable) {
-//            BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
-//            ((TimedBeaconSimulator) BeaconManager.getBeaconSimulator()).createTimedSimulatedBeacons();
-//        }
-        mIInternetAvalabilityListener = new IInternetAvalabilityListener() {
-            @Override
-            public void Avalable() {
-                InitRegionBootstrap();
-            }
-        };
         beaconManager.bind(this);
-        if(AppManager.CheckInternatAvalability())
-        {
-            this.InitRegionBootstrap();
-        }
+        this.InitRegionBootstrap();
+
         Log.d(TAG,"Created");
     }
 
@@ -188,8 +144,6 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         super.onDestroy();
         Log.d(TAG, "Destroyed");
         beaconManager.unbind(this);
-        LpsApplication app = (LpsApplication) this.getApplicationContext();
-
     }
 
     @Nullable
@@ -273,12 +227,11 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 }
             });
 
-            currentLocaleId = param.roomId;
-            // The very first time since boot that we detect an beacon, we launch the
-            // MainActivity
+            ServiceManager.AppState.LocaleId = param.roomId;
+
             Intent intent = new Intent(this, ActorsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("id", UUID.fromString(region.getUniqueId()));
+
             // Important:  make sure to add android:launchMode="singleInstance" in the manifest
             // to keep multiple copies of this activity from getting created if the user has
             // already manually launched the app.
@@ -321,7 +274,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     toast1.show();
                 }
             });
-            currentLocaleId = null;
+            ServiceManager.AppState.LocaleId = null;
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
                 if(mPositionCalculator != null)
@@ -384,6 +337,38 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public void removeBeaconServiceListener(IBeaconServiceListener consumer)
     {
         this.consumers.remove(consumer);
+    }
+
+    private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions)
+    {
+        for (com.lps.lpsapp.viewModel.Region r :regions) {
+            Region roomRegion = new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null);
+            this.mRegions.add(roomRegion);
+
+        }
+        if(this.mRegions.size() > 0) {
+            this.regionBootstrap = new RegionBootstrap(this, this.mRegions);
+
+        }
+
+
+    }
+
+    private void InitRegionBootstrap() {
+        if(!regionBootstrapInitialised) {
+            WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
+            service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {
+                @Override
+                public void onResult(List<com.lps.lpsapp.viewModel.Region> objResult) {
+                    setRegions(objResult);
+                }
+                @Override
+                public void onError(Exception err) {
+                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                }
+
+            });
+        }
     }
 
     private void postDeviceCoordinate(Collection<Beacon> beacons) {
@@ -478,8 +463,8 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                 log.y = position.y;
 
 
-                //service = new WebApiService(PositionLogData.class, true);
-                //service.performPost(path, log);
+                service = new WebApiService(PositionLogData.class, true);
+                service.performPost(path, log);
             }
         }
     }

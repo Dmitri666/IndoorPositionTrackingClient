@@ -10,9 +10,6 @@ import android.widget.Toast;
 
 import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.AuthenticationManager;
-import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.Device;
 import com.lps.webapi.AccessToken;
@@ -35,8 +32,6 @@ import microsoft.aspnet.signalr.client.transport.NegotiationException;
 public class LpsApplication extends MultiDexApplication {
     private static final String TAG = "LpsApplication";
     private static Context mContext;
-    private Intent beaconService;
-    private Intent puchService;
     private String mAndroidId;
 
 
@@ -44,7 +39,7 @@ public class LpsApplication extends MultiDexApplication {
         super.onCreate();
         //refWatcher = LeakCanary.install(this);
         mContext = this;
-        AppManager.app = this;
+        ServiceManager.app = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 
 
@@ -66,8 +61,6 @@ public class LpsApplication extends MultiDexApplication {
 
         AccessToken.CurrentToken = this.getAuthenticationData();
 
-        puchService = new Intent(this, PushService.class);
-        beaconService = new Intent(this, AltBeaconService.class);
 
 
     }
@@ -90,8 +83,7 @@ public class LpsApplication extends MultiDexApplication {
     @Override
     public void onTerminate() {
         // Unbind from the service
-        stopService(beaconService);
-        beaconService = null;
+
         super.onTerminate();
 
 
@@ -124,16 +116,6 @@ public class LpsApplication extends MultiDexApplication {
                 editor.putString("token", token);
                 editor.commit();
                 AccessToken.CurrentToken = authenticationData;
-
-                if(puchService == null) {
-                    puchService = new Intent(this, PushService.class);
-                    startService(puchService);
-                } else {
-                    stopService(puchService);
-                    startService(puchService);
-                }
-
-
             } catch (Exception ex) {
                 Log.e(TAG, ex.getMessage(), ex);
             }
@@ -141,22 +123,9 @@ public class LpsApplication extends MultiDexApplication {
         }
     }
 
-    public void ShowLogin()
-    {
-        if (AccessToken.CurrentToken == null) {
-            Intent myIntent = new Intent(this, LoginActivity.class);
-            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(myIntent);
-        } else {
-            new AuthenticationManager().RefreshToken(this);
-        }
-
-    }
 
     public void HandleError(Exception ex) {
         if(ex instanceof AuthenticationException || ex instanceof NegotiationException) {
-            //stopService(beaconService);
-            //stopService(puchService);
             Intent myIntent = new Intent(this, LoginActivity.class);
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(myIntent);
@@ -165,7 +134,7 @@ public class LpsApplication extends MultiDexApplication {
         }
     }
 
-    protected void GoIntoConnectedState() {
+    public void GoIntoConnectedState() {
         Toast toast = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
         toast.show();
         AndroidModel model = AndroidModel.forThisDevice();
@@ -174,21 +143,13 @@ public class LpsApplication extends MultiDexApplication {
         WebApiService service = new WebApiService(Device.class,false);
         service.performPost(WebApiActions.RegisterDevice(),device);
 
-        if(AccessToken.CurrentToken != null) {
-            //startService(beaconService);
-            //startService(puchService);
-        } else {
-            this.ShowLogin();
-        }
-
 
     }
 
     protected void GoIntoDisconnectedState() {
         Toast toast1 = Toast.makeText(getApplicationContext(), "Not connected Internet", Toast.LENGTH_LONG);
         toast1.show();
-        stopService(beaconService);
-        stopService(puchService);
+
     }
 
 

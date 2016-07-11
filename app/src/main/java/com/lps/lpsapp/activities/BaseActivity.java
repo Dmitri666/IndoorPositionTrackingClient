@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.lps.lpsapp.AppManager;
 import com.lps.lpsapp.R;
 //import com.squareup.leakcanary.RefWatcher;
 
@@ -29,13 +28,12 @@ public class BaseActivity extends AppCompatActivity {
 
     public final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
     public final int MY_PERMISSIONS_READ_CONTACTS = 2;
-    private Boolean mIsInitialised;
-    public Boolean mConnectedToInternet;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.mIsInitialised = false;
+
 
         // Create a progress bar to display while the list loads
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content).getRootView();
@@ -56,15 +54,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        this.mConnectedToInternet = AppManager.CheckInternatAvalability();
-        if(!this.mIsInitialised) {
-            this.mIsInitialised = this.InitialiseActivity();
-        }
+
     }
 
-    protected Boolean InitialiseActivity() {
-        return false;
-    }
+
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {

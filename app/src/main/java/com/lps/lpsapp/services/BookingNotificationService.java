@@ -15,7 +15,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.BookingHistoryActivity;
 import com.lps.lpsapp.viewModel.booking.BookingJoinRoomData;
@@ -69,7 +68,7 @@ public class BookingNotificationService extends Service {
                 if(error instanceof NegotiationException)
                 {
                     try {
-                        ((LpsApplication)getApplication()).ShowLogin();
+
                     }
                     catch (Exception ex)
                     {

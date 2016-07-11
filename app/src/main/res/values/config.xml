@@ -1,5 +1,5 @@
 <resources>
-    <string name="serverUrl">@string/urlGloobar</string>
+    <string name="serverUrl">@string/urlEmulator</string>
     <string name="getToken">/token</string>
     <string name="images">/FileUploads/</string>
     <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
@@ -29,6 +29,7 @@
     <string name="CreateConversation">/api/Chat/CreateConversation</string>
     <string name="GetConversation">/api/Chat/GetConversation</string>
     <string name="GetRoomConversations">/api/Chat/Conversations</string>
+    <string name="IsAuthenticated">/api/Account/IsAuthenticated</string>
 
 
     <string name="GetBookings">/api/Booking/Model</string>
