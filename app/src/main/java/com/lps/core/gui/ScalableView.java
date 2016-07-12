@@ -109,7 +109,8 @@ public class ScalableView extends FrameLayout {
 
     public void zoomIn() {
         mZoomer.forceFinished(true);
-
+        mScrollerStartViewport.set(mCurrentViewport);
+        mScroller.forceFinished(true);
         if (hitTest(mContentRect.exactCenterX(), mContentRect.exactCenterY(), mZoomFocalPoint)) {
             mZoomer.startZoom(ZOOM_AMOUNT);
         }
@@ -118,8 +119,10 @@ public class ScalableView extends FrameLayout {
 
     public void zoomOut() {
         mZoomer.forceFinished(true);
+        mScrollerStartViewport.set(mCurrentViewport);
+        mScroller.forceFinished(true);
         if (hitTest(mContentRect.exactCenterX(), mContentRect.exactCenterY(), mZoomFocalPoint)) {
-            mZoomer.startZoom(1.f / ZOOM_AMOUNT);
+            mZoomer.startZoom(-ZOOM_AMOUNT);
         }
 
         ViewCompat.postInvalidateOnAnimation(ScalableView.this);

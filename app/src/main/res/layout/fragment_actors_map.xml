@@ -1,31 +1,49 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     tools:context="com.lps.lpsapp.activities.ActorsActivity$PlaceholderFragment">
 
-    <com.lps.lpsapp.map.CustomerMapView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.lps.lpsapp.map.CustomerMapView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingLeft="0dp"
+        android:id="@+id/CustomerMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:clipChildren="false"
         android:paddingBottom="0dp"
+        android:paddingLeft="0dp"
         android:paddingRight="0dp"
         android:paddingTop="0dp"
-        android:clipChildren="false"
         android:scaleType="fitCenter"
-        android:id="@+id/CustomerMapView"
+        android:theme="@style/Base.AlertDialog.AppCompat.Light"
         app:mapViewDimension="24sp"
         app:wandColor="#33b5e5"
         app:wandWidth="10"
-        android:theme="@style/Base.AlertDialog.AppCompat.Light"
-        android:background="@android:color/black"
 
         />
-</RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnZoomPlus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_zoom_in_black_24dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnZoomMinus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_zoom_out_black_24dp"
+        app:layout_anchor="@id/btnZoomPlus"
+        app:layout_anchorGravity="right" />
+</android.support.design.widget.CoordinatorLayout>
 
 
 

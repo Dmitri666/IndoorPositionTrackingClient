@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -525,6 +526,27 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
                     }
                 });
+                FloatingActionButton btnZoomIn = (FloatingActionButton)rootView.findViewById(R.id.btnZoomPlus);
+                if(btnZoomIn != null) {
+
+                    btnZoomIn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            view.zoomIn();
+                        }
+                    });
+                };
+
+                FloatingActionButton btnZoomOut = (FloatingActionButton)rootView.findViewById(R.id.btnZoomMinus);
+                if(btnZoomOut != null) {
+
+                    btnZoomOut.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            view.zoomOut();
+                        }
+                    });
+                };
                 return rootView;
             } else {
                 View rootView = inflater.inflate(R.layout.fragment_actors_list, container, false);

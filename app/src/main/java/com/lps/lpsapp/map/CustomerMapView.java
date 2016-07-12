@@ -402,12 +402,12 @@ public class CustomerMapView extends ScalableView  {
         mTextPaint.setColor(mWandColor);
 
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        //mTextHeight = fontMetrics.bottom;
     }
 
-    public void positionChanged(DevicePosition position) {
+    public void positionChanged(final DevicePosition position) {
         if(this.actors.containsKey(position.deviceId)) {
-            GuiDevice device = this.actors.get(position.deviceId).position.guiElement;
+            final DevicePosition pos = this.actors.get(position.deviceId).position;
+            GuiDevice device = pos.guiElement;
             device.animate().x(this.getDrawX((float)position.x)).y(this.getDrawY((float)position.y));
         } else {
             DevicePosition pos = new DevicePosition();
