@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
+import com.lps.lpsapp.ServiceManager;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
@@ -60,7 +61,7 @@ import java.util.UUID;
 
 public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
     private static String TAG = "ActorsActivity";
-    private UUID roomId;
+
     private IDevicePositionListener actorPositionListener;
     private IBeaconServiceListener beaconServiceListener;
     private boolean mPushServiceBound = false;
@@ -77,7 +78,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         setContentView(R.layout.activity_chat_actors);
 
         Log.d(TAG, "onCreate");
-        this.roomId = (UUID) getIntent().getExtras().get("id");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         actorPositionListener = new IDevicePositionListener() {
@@ -153,7 +154,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         Log.d(TAG, "onStop");
         mPushService.removeActorPositionListener(actorPositionListener);
         mPushService.removeChatMessageListener(chatListener);
-        mPushService.leavePositionConsumerGroup(roomId);
+        mPushService.leavePositionConsumerGroup(ServiceManager.AppState.LocaleId);
         if (mPushServiceBound) {
             unbindService(mPushServiceConnection);
             mPushServiceBound = false;
@@ -177,7 +178,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     public void setRoomModel(final CustomerMapView view, RoomModel map) {
         view.setmRoomModel(map);
-        String path = WebApiActions.GetActorsInLocale() + "/" + this.roomId.toString();
+        String path = WebApiActions.GetActorsInLocale() + "/" + ServiceManager.AppState.LocaleId.toString();
         WebApiService service = new WebApiService(Actor.class, true);
 
         service.performGetList(path, new IWebApiResultListener<List>() {
@@ -282,7 +283,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
             mPushService.setActorPositionListener(actorPositionListener);
             mPushService.setChatListener(chatListener);
-            mPushService.joinPositionConsumerGroup(roomId);
+            mPushService.joinPositionConsumerGroup(ServiceManager.AppState.LocaleId);
             Log.d(TAG, "onServiceConnected");
 
         }
@@ -505,7 +506,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                     public void onGlobalLayout() {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                        String path = WebApiActions.GetTableModel() + "/" + activity.roomId.toString();
+                        String path = WebApiActions.GetTableModel() + "/" + ServiceManager.AppState.LocaleId.toString();
                         WebApiService service = new WebApiService(RoomModel.class, true);
                         service.performGet(path, new IWebApiResultListener<RoomModel>() {
                             @Override

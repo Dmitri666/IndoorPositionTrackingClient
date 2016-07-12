@@ -157,4 +157,9 @@ public class WebApiActions {
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.SavePositionLog);
     }
+
+    public static String IsAuthenticated()
+    {
+        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.IsAuthenticated);
+    }
 }

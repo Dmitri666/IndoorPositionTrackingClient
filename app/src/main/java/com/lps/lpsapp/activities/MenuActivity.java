@@ -1,23 +1,14 @@
 package com.lps.lpsapp.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 
+import com.lps.lpsapp.ServiceManager;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.AltBeaconService;
-import com.lps.lpsapp.services.IBeaconServiceListener;
-
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.Region;
-
-import java.util.Collection;
-import java.util.UUID;
+import com.lps.lpsapp.network.AppState;
+import com.lps.lpsapp.network.IAppStateListener;
 
 /**
  * 
@@ -26,34 +17,13 @@ import java.util.UUID;
  */
 public class MenuActivity extends BaseActivity {
 	protected static final String TAG = "MenuActivity";
-	AltBeaconService mService;
-	boolean mBound = false;
-	IBeaconServiceListener listener;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG,"Created");
 		setContentView(R.layout.activity_menu);
-
-		this.listener = new IBeaconServiceListener() {
-			@Override
-			public void beaconsInRange(Collection<Beacon> beacon,Region region) {
-
-			}
-
-			@Override
-			public void deviceInLocale(final UUID localeId,final boolean isInLocale) {
-				MenuActivity.this.runOnUiThread(new Runnable() {
-					public void run() {
-						View btn =  MenuActivity.this.findViewById(R.id.btnChat);
-						btn.setEnabled(isInLocale);
-							}
-				});
-
-			}
-		};
-
 		this.mProgressBar.setVisibility(View.GONE);
 	}
 
@@ -61,12 +31,7 @@ public class MenuActivity extends BaseActivity {
 	protected void onStop() {
 		super.onStop();
 		Log.d(TAG, "onStop");
-		if (mBound) {
-			mService.removeBeaconServiceListener(listener);
-			unbindService(mConnection);
-			mService = null;
-			mBound = false;
-		}
+
 
 	}
 
@@ -75,14 +40,21 @@ public class MenuActivity extends BaseActivity {
 		super.onResume();
 		Log.d(TAG, "onResume");
 		// Bind to LocalService
-		Intent intent = new Intent(this, AltBeaconService.class);
-		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		ServiceManager.CheckSeviceAvalability(new IAppStateListener() {
+			@Override
+			public void StateChanged(AppState state) {
+				View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
+				btn.setEnabled(state.IsAuthenticated);
 
-		View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
-		btn.setEnabled(this.mConnectedToInternet);
+				View btn1 =  MenuActivity.this.findViewById(R.id.btnNews);
+				btn1.setEnabled(state.IsAuthenticated);
+			}
+		});
 
-		View btn1 =  MenuActivity.this.findViewById(R.id.btnNews);
-		btn1.setEnabled(this.mConnectedToInternet);
+
+		View btn =  MenuActivity.this.findViewById(R.id.btnChat);
+		btn.setEnabled(ServiceManager.AppState.LocaleId != null);
+
 
 	}
 
@@ -98,7 +70,6 @@ public class MenuActivity extends BaseActivity {
 	public void onChatClicked(View view) {
 		Intent myIntent = new Intent(this, ActorsActivity.class);
 		myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		myIntent.putExtra("id", mService.currentLocaleId);
 		this.startActivity(myIntent);
 	}
 
@@ -115,29 +86,6 @@ public class MenuActivity extends BaseActivity {
 	}
 
 
-	/** Defines callbacks for service binding, passed to bindService() */
-	private ServiceConnection mConnection = new ServiceConnection() {
 
-		@Override
-		public void onServiceConnected(ComponentName className,
-									   IBinder service) {
-			// We've bound to LocalService, cast the IBinder and get LocalService instance
-			AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
-			mService = binder.getService();
-			mBound = true;
-			mService.setBeaconServiceListener(listener);
-			View btn =  MenuActivity.this.findViewById(R.id.btnChat);
-			btn.setEnabled(mService.currentLocaleId != null);
-
-			Log.d(TAG, "onServiceConnected");
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			mBound = false;
-			Log.d(TAG, "onServiceDisconnected");
-
-		}
-	};
 
 }

@@ -158,7 +158,7 @@ public abstract class CycledLeScanner {
     protected void scanLeDevice(final Boolean enable) {
         mScanCyclerStarted = true;
         if (getBluetoothAdapter() == null) {
-            LogManager.e(TAG, "No Bluetooth adapter.  beaconService cannot scan.");
+            LogManager.d(TAG, "No Bluetooth adapter.  beaconService cannot scan.");
         }
         if (enable) {
             if (deferScanIfNeeded()) {

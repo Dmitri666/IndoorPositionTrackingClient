@@ -31,7 +31,8 @@
                 android:minWidth="100dp"
                 android:nestedScrollingEnabled="false"
                 android:onClick="onSearchButtonClicked"
-                android:text="@string/search_room" />
+                android:text="@string/search_room"
+                android:enabled="false" />
 
             <Button
                 android:id="@+id/btnNews"
