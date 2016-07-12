@@ -40,8 +40,8 @@ import com.lps.lpsapp.viewModel.rooms.Table;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by dle on 31.07.2015.
@@ -56,7 +56,7 @@ public class CustomerMapView extends ScalableView  {
     private float mPaintStrokeWidth;
     private Paint mPaint;
     private Paint mCPaint;
-    private List<Actor> actors;
+    private HashMap<String,Actor> actors;
     private RoomModel mRoomModel;
 
     private List<BeaconData> beaconDatas;
@@ -68,7 +68,9 @@ public class CustomerMapView extends ScalableView  {
         setWillNotDraw(false);
         init(attrs, 0);
         ScaleGestureDetectorCompat.synchronizeScale = true;
-        actors = new ArrayList<>();
+        actors = new HashMap<>();
+
+
     }
 
     @Override
@@ -276,23 +278,26 @@ public class CustomerMapView extends ScalableView  {
     }
 
     public void clearActors() {
-        for(Actor actor:this.actors) {
+        for(Actor actor:this.actors.values()) {
             this.removeView(actor.position.guiElement);
         }
+        this.actors.clear();
+        this.invalidate();
     }
 
-    public void removeActor(UUID userId) {
-        for(Actor actor:this.actors) {
-            if(actor.userId.equals(userId)) {
-                this.removeView(actor.position.guiElement);
-            }
+    public void removeActor(String deviceId) {
+        if(this.actors.containsKey(deviceId)) {
+            Actor actor = this.actors.get(deviceId);
+            this.removeView(actor.position.guiElement);
+            this.actors.remove(deviceId);
+            this.invalidate();
         }
     }
 
     public void addActor(Actor actor)
     {
         ActorsActivity host = (ActorsActivity)((ContextThemeWrapper)this.getContext()).getBaseContext();
-        this.actors.add(actor);
+        this.actors.put(actor.position.deviceId, actor);
         GuiDevice myButton = new GuiDevice(getContext(),actor.position);
 
         if(actor.position.deviceId.equals(((LpsApplication)this.getContext().getApplicationContext()).getAndroidId())) {
@@ -317,7 +322,7 @@ public class CustomerMapView extends ScalableView  {
             table.guiElement.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams)table.guiElement.getLayoutParams(),table));
         }
 
-        for (Actor actor:this.actors) {
+        for (Actor actor:this.actors.values()) {
             float width = this.getDrawX((float)(actor.position.x + actor.position.guiElement.wight)) - this.getDrawX((float)actor.position.x);
             float hight = this.getDrawY((float)(actor.position.y + actor.position.guiElement.height)) - this.getDrawY((float)actor.position.y);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int)width,(int)hight);
@@ -401,19 +406,10 @@ public class CustomerMapView extends ScalableView  {
     }
 
     public void positionChanged(DevicePosition position) {
-        boolean exists = false;
-        for (Actor actor:this.actors) {
-            if(actor.position.deviceId.equals(position.deviceId))
-            {
-                actor.position.x = position.x;
-                actor.position.y = position.y;
-                exists = true;
-                break;
-            }
-        }
-
-        if(!exists)
-        {
+        if(this.actors.containsKey(position.deviceId)) {
+            GuiDevice device = this.actors.get(position.deviceId).position.guiElement;
+            device.animate().x(this.getDrawX((float)position.x)).y(this.getDrawY((float)position.y));
+        } else {
             DevicePosition pos = new DevicePosition();
             pos.deviceId = position.deviceId;
             pos.x = position.x;
@@ -423,7 +419,8 @@ public class CustomerMapView extends ScalableView  {
             actor.position = position;
 
             this.addActor(actor);
+            this.invalidate();
         }
-        this.invalidate();
+
     }
 }

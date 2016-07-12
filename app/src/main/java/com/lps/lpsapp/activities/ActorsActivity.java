@@ -247,7 +247,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                 for (int i = 0; i < mActorListAdapter.getCount(); i++) {
                     if (((Actor) mActorListAdapter.getItem(i)).userId.equals(actor.userId)) {
                         mActorListAdapter.remove(mActorListAdapter.getItem(i));
-                        view.removeActor(actor.userId);
+                        view.removeActor(actor.position.deviceId);
                         mActorListAdapter.notifyDataSetInvalidated();
                         break;
                     }
@@ -496,7 +496,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                                  Bundle savedInstanceState) {
             final ActorsActivity activity = (ActorsActivity) getActivity();
             int tabNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-            if (tabNumber == 2) {
+            if (tabNumber == 1) {
                 View rootView = inflater.inflate(R.layout.fragment_actors_map, container, false);
 
                 final CustomerMapView view = (CustomerMapView) rootView.findViewById(R.id.CustomerMapView);

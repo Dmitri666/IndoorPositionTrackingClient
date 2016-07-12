@@ -134,6 +134,7 @@ public class WebApiActions {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.CreateConversation);
     }
 
+
     public static String GetConversation()
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetConversation);

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context="com.lps.lpsapp.activities.ActorsActivity$PlaceholderFragment">
 
     <com.lps.lpsapp.map.CustomerMapView
@@ -22,6 +23,7 @@
         app:wandWidth="10"
         android:theme="@style/Base.AlertDialog.AppCompat.Light"
         android:background="@android:color/black"
+
         />
 </RelativeLayout>
 

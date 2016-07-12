@@ -107,6 +107,24 @@ public class ScalableView extends FrameLayout {
         super(context, attrs, defStyle);
     }
 
+    public void zoomIn() {
+        mZoomer.forceFinished(true);
+
+        if (hitTest(mContentRect.exactCenterX(), mContentRect.exactCenterY(), mZoomFocalPoint)) {
+            mZoomer.startZoom(ZOOM_AMOUNT);
+        }
+        ViewCompat.postInvalidateOnAnimation(ScalableView.this);
+    }
+
+    public void zoomOut() {
+        mZoomer.forceFinished(true);
+        if (hitTest(mContentRect.exactCenterX(), mContentRect.exactCenterY(), mZoomFocalPoint)) {
+            mZoomer.startZoom(1.f / ZOOM_AMOUNT);
+        }
+
+        ViewCompat.postInvalidateOnAnimation(ScalableView.this);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean retVal = mScaleGestureDetector.onTouchEvent(event);
@@ -506,6 +524,8 @@ public class ScalableView extends FrameLayout {
             ViewCompat.postInvalidateOnAnimation(ScalableView.this);
             return true;
         }
+
+
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
