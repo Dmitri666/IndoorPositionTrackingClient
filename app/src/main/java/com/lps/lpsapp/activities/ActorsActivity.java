@@ -356,7 +356,9 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
         // Start the CAB using the ActionMode.Callback defined above
         mActionMode = startActionMode(mActionModeCallback);
-        mActionMode.setTag(view);
+        CustomerMapView map = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
+        Actor actor = map.findActorByDeviceId(gDevice.devicePosition.deviceId);
+        mActionMode.setTag(actor);
         view.setSelected(true);
         return true;
 
@@ -386,31 +388,18 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_chat:
-                    GuiDevice actor = (GuiDevice) mode.getTag();
+                    Actor actor = (Actor)mode.getTag();
                     mode.finish();
+                    try {
+                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        String serActor = JsonSerializer.serialize(actor);
+                        intent.putExtra("actor", serActor);
+                        startActivity(intent);
+                    } catch (JsonProcessingException ex) {
+                        Log.e(TAG, ex.getMessage(), ex);
+                    }
 
-                    String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
-                    WebApiService service = new WebApiService(Actor.class, true);
-                    service.performGet(path, new IWebApiResultListener() {
-                        @Override
-                        public void onResult(Object objResult) {
-                            try {
-                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                String serActor = JsonSerializer.serialize(objResult);
-                                intent.putExtra("actor", serActor);
-                                startActivity(intent);
-                            } catch (JsonProcessingException ex) {
-                                Log.e(TAG, ex.getMessage(), ex);
-                            }
-                        }
-                        @Override
-                        public void onError(Exception err) {
-                            ((LpsApplication)getApplicationContext()).HandleError(err);
-                        }
-
-                    });
-                    mode.finish();
                     return true;
                 case R.id.action_showProfile:
                     Intent intent = new Intent(getApplicationContext(), ActorProfileActivity.class);

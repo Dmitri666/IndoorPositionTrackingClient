@@ -20,6 +20,7 @@ import com.lps.webapi.services.WebApiService;
 import org.altbeacon.beacon.distance.AndroidModel;
 
 import microsoft.aspnet.signalr.client.Platform;
+import microsoft.aspnet.signalr.client.http.InvalidHttpStatusCodeException;
 import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
 import microsoft.aspnet.signalr.client.transport.NegotiationException;
 
@@ -119,12 +120,18 @@ public class LpsApplication extends MultiDexApplication {
                 Log.e(TAG, ex.getMessage(), ex);
             }
 
+        } else {
+            SharedPreferences settings = getSharedPreferences("token", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("token", null);
+            editor.commit();
         }
     }
 
 
     public void HandleError(Exception ex) {
-        if(ex instanceof AuthenticationException || ex instanceof NegotiationException) {
+        if(ex instanceof AuthenticationException || ex instanceof NegotiationException || ex.getCause() instanceof InvalidHttpStatusCodeException) {
+            ServiceManager.AppState.IsAuthenticated = false;
             Intent myIntent = new Intent(this, LoginActivity.class);
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(myIntent);

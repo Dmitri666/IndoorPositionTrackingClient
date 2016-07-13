@@ -31,11 +31,6 @@ public class WebApiActions {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.SaveBackgroundBeacons);
     }
 
-    public static String RegisterUserCurrentDevice()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.RegisterUserCurrentDevice);
-    }
-
     public static String RegisterDevice()
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.RegisterDevice);
@@ -64,11 +59,6 @@ public class WebApiActions {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetLocaleTypes);
     }
 
-    public static String GetLocaleSpecializings()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetLocaleSpecializing);
-    }
-
     public static String GetCities()
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetCities);
@@ -87,15 +77,7 @@ public class WebApiActions {
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.RemovePosition);
     }
-    public static String GetActorByDevice()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetActorByDevice);
-    }
 
-    public static String GetBookingModel()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.GetBookings);
-    }
 
     public static String GetBookingState()
     {
@@ -128,12 +110,6 @@ public class WebApiActions {
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.PostChatMessage);
     }
-
-    public static String CreateConversation()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.CreateConversation);
-    }
-
 
     public static String GetConversation()
     {

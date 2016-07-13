@@ -64,8 +64,15 @@ public class ServiceManager {
 
     }
 
+    public static void LogOut(){
+        AppState.IsAuthenticated = false;
+        AccessToken.CurrentToken = null;
+        app.saveAuthenticationData(null);
+    }
+
     public static void SetAuthenticatingToken(AccessToken accessToken) {
-        if(AppState.IsAuthenticated && !AccessToken.CurrentToken.userName.equals(accessToken.userName)) {
+        if(!AppState.IsAuthenticated || !AccessToken.CurrentToken.userName.equals(accessToken.userName)) {
+            AppState.IsAuthenticated = true;
             app.stopService(puchService);
             AccessToken.CurrentToken = accessToken;
             app.saveAuthenticationData(accessToken);

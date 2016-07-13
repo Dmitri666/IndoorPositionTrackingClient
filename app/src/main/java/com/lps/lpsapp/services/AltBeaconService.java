@@ -122,7 +122,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
         //beaconManager.setForegroundBetweenScanPeriod(5000);
         //beaconManager.setBackgroundScanPeriod(BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD);
-        //beaconManager.setBackgroundBetweenScanPeriod(BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
+        beaconManager.setBackgroundBetweenScanPeriod(10000);
         this.backgroundPowerSaver = new BackgroundPowerSaver(app);
 
         beaconManager.bind(this);
@@ -297,7 +297,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
         Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
-        //beaconManager.setMonitorNotifier(this);
+
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
@@ -307,7 +307,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                     }
 
                     if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
-                        new PositionsThread(beacons,UUID.fromString(region.getUniqueId())).start();
+                        new PositionsThread(beacons,UUID.fromString(region.getUniqueId())).run();
                     }
 
                 }
@@ -431,7 +431,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
         }
     }
 
-    private class PositionsThread extends Thread {
+    private class PositionsThread implements Runnable {
         Collection<Beacon> beacons;
         UUID roomId;
 
