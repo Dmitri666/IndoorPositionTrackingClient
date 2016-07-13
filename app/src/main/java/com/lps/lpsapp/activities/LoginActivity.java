@@ -138,7 +138,7 @@ public class LoginActivity extends BaseActivity {
             LpsApplication app = (LpsApplication)getApplicationContext();
             try {
                 AccessToken token = new AuthenticationManager().Authenticate(email, password,app.getAndroidId());
-                ServiceManager.SetAuthenticatingToken(token);
+                ServiceManager.OnLogIn(token);
                 onLogin();
             }
             catch (Exception e)

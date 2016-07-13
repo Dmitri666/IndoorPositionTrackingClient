@@ -40,7 +40,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key_b" />
 
-        <service android:name=".services.AltBeaconService" />
+        <service android:name=".services.InDoorPositionService" />
         <service android:name=".services.PushService" />
         <service android:name=".services.BookingNotificationService" />
 

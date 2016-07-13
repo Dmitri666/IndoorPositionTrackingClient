@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.services.WebApiService;
@@ -37,7 +37,7 @@ public class BeaconListActivity extends BaseActivity {
     ArrayList<Beacon> listItems = new ArrayList<Beacon>();
     boolean mBound = false;
     IBeaconServiceListener listener;
-    AltBeaconService mService;
+    InDoorPositionService mService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class BeaconListActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         // Bind to LocalService
-        Intent intent = new Intent(this, AltBeaconService.class);
+        Intent intent = new Intent(this, InDoorPositionService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -152,7 +152,7 @@ public class BeaconListActivity extends BaseActivity {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
             mService.setBeaconServiceListener(listener);

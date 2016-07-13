@@ -52,8 +52,8 @@ import java.util.UUID;
 /**
  * Created by dle on 27.07.2015.
  */
-public class AltBeaconService extends Service implements BootstrapNotifier, BeaconConsumer {
-    private static final String TAG = "AltBeaconService";
+public class InDoorPositionService extends Service implements BootstrapNotifier, BeaconConsumer {
+    private static final String TAG = "InDoorPositionService";
     private BeaconManager beaconManager;
     private List<Region> mRegions;
     private final IBinder mBinder = new LocalBinder();
@@ -122,7 +122,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
 
         //beaconManager.setForegroundBetweenScanPeriod(5000);
         //beaconManager.setBackgroundScanPeriod(BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD);
-        beaconManager.setBackgroundBetweenScanPeriod(10000);
+        //beaconManager.setBackgroundBetweenScanPeriod(10000);
         this.backgroundPowerSaver = new BackgroundPowerSaver(app);
 
         beaconManager.bind(this);
@@ -306,7 +306,7 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
                         consumer.beaconsInRange(beacons,region);
                     }
 
-                    if(!region.getUniqueId().equals(AltBeaconService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
+                    if(!region.getUniqueId().equals(InDoorPositionService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
                         new PositionsThread(beacons,UUID.fromString(region.getUniqueId())).run();
                     }
 
@@ -425,9 +425,9 @@ public class AltBeaconService extends Service implements BootstrapNotifier, Beac
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class LocalBinder extends Binder {
-        public AltBeaconService getService() {
+        public InDoorPositionService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return AltBeaconService.this;
+            return InDoorPositionService.this;
         }
     }
 

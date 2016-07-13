@@ -35,7 +35,7 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
-import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.IDevicePositionListener;
@@ -68,7 +68,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mBeaconServiceBound = false;
-    private AltBeaconService mBeaconService;
+    private InDoorPositionService mBeaconService;
     private MyArrayAdapter mActorListAdapter;
     private IChatListener chatListener;
     private ActionMode mActionMode;
@@ -144,7 +144,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             bindService(new Intent(this, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
         }
         if (!mBeaconServiceBound) {
-            bindService(new Intent(this, AltBeaconService.class), mBeaconServiceConnection, Context.BIND_AUTO_CREATE);
+            bindService(new Intent(this, InDoorPositionService.class), mBeaconServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
     }
@@ -316,7 +316,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mBeaconService = binder.getService();
             mBeaconServiceBound = true;
 
