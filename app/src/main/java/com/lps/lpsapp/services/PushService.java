@@ -16,9 +16,6 @@ import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.AccessToken;
-import com.lps.webapi.JsonSerializer;
-import com.lps.webapi.OAuth2Credentials;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.BookingHistoryActivity;
 import com.lps.lpsapp.activities.ChatActivity;
@@ -27,6 +24,9 @@ import com.lps.lpsapp.viewModel.booking.BookingStateEnum;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ChatMessage;
 import com.lps.lpsapp.viewModel.chat.DevicePosition;
+import com.lps.webapi.AccessToken;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.OAuth2Credentials;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +116,6 @@ public class PushService extends Service {
 
             @Override
             public void onError(Throwable error) {
-                Log.e(TAG, error.getMessage(), error);
                 ((LpsApplication)getApplication()).HandleError(new Exception(error));
             }
         });
@@ -319,6 +318,9 @@ public class PushService extends Service {
         try {
             if(this.sf.isDone())
             {
+                if(conn.getState() == ConnectionState.Disconnected) {
+                    conn.start();
+                }
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("joinGroup", groupName);
             }
@@ -351,6 +353,9 @@ public class PushService extends Service {
         try {
             if(sf.isDone())
             {
+                if(conn.getState() == ConnectionState.Disconnected) {
+                    conn.start();
+                }
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("leaveGroup", groupName);
             }

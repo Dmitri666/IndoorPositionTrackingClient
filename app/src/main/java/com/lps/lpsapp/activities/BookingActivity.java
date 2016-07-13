@@ -141,6 +141,29 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                 }
             });
         };
+
+        FloatingActionButton btnZoomIn = (FloatingActionButton)this.findViewById(R.id.btnZoomPlus);
+        if(btnZoomIn != null) {
+
+            btnZoomIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    view.zoomIn();
+                }
+            });
+        };
+
+        FloatingActionButton btnZoomOut = (FloatingActionButton)this.findViewById(R.id.btnZoomMinus);
+        if(btnZoomOut != null) {
+
+            btnZoomOut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    view.zoomOut();
+                }
+            });
+        };
+
     }
 
     @Override

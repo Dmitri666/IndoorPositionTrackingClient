@@ -12,7 +12,7 @@ import android.provider.Settings;
 import com.lps.lpsapp.activities.LoginActivity;
 import com.lps.lpsapp.network.AppState;
 import com.lps.lpsapp.network.IAppStateListener;
-import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.AccessToken;
@@ -38,14 +38,14 @@ public class ServiceManager {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             app.startActivity(intent);
         } else {
+            puchService = new Intent(app, PushService.class);
+            beaconService = new Intent(app, InDoorPositionService.class);
             String path = WebApiActions.IsAuthenticated();
             WebApiService service = new WebApiService(Boolean.class,true);
             service.performGet(path, new IWebApiResultListener() {
                 @Override
                 public void onResult(Object objResult) {
                     AppState.IsAuthenticated = true;
-                    puchService = new Intent(app, PushService.class);
-                    beaconService = new Intent(app, AltBeaconService.class);
                     app.startService(beaconService);
                     app.startService(puchService);
                     app.GoIntoConnectedState();
@@ -64,8 +64,17 @@ public class ServiceManager {
 
     }
 
-    public static void SetAuthenticatingToken(AccessToken accessToken) {
-        if(AppState.IsAuthenticated && !AccessToken.CurrentToken.userName.equals(accessToken.userName)) {
+    public static void LogOut(){
+        app.stopService(beaconService);
+        app.stopService(puchService);
+        AppState.IsAuthenticated = false;
+        AccessToken.CurrentToken = null;
+        app.saveAuthenticationData(null);
+    }
+
+    public static void OnLogIn(AccessToken accessToken) {
+        if(!AppState.IsAuthenticated || AccessToken.CurrentToken == null || !AccessToken.CurrentToken.userName.equals(accessToken.userName)) {
+            AppState.IsAuthenticated = true;
             app.stopService(puchService);
             AccessToken.CurrentToken = accessToken;
             app.saveAuthenticationData(accessToken);

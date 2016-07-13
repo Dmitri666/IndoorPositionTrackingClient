@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 
 import org.altbeacon.beacon.Beacon;
@@ -29,7 +29,7 @@ public class MeasurementActivity extends BaseActivity {
     String beaconId2;
     boolean mBound = false;
     IBeaconServiceListener listener;
-    AltBeaconService mService;
+    InDoorPositionService mService;
     int mTxPower;
     List<Integer> mesuaredRssi;
     private final ReentrantLock lock = new ReentrantLock();
@@ -103,7 +103,7 @@ public class MeasurementActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         beaconId2 = (String) getIntent().getExtras().get("id");
-        Intent intent = new Intent(this, AltBeaconService.class);
+        Intent intent = new Intent(this, InDoorPositionService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
     }
@@ -150,7 +150,7 @@ public class MeasurementActivity extends BaseActivity {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
             mService.setBeaconServiceListener(listener);

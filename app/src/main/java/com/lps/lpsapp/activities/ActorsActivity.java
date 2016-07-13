@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -34,7 +35,7 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
-import com.lps.lpsapp.services.AltBeaconService;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.IDevicePositionListener;
@@ -67,7 +68,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mBeaconServiceBound = false;
-    private AltBeaconService mBeaconService;
+    private InDoorPositionService mBeaconService;
     private MyArrayAdapter mActorListAdapter;
     private IChatListener chatListener;
     private ActionMode mActionMode;
@@ -143,7 +144,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             bindService(new Intent(this, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
         }
         if (!mBeaconServiceBound) {
-            bindService(new Intent(this, AltBeaconService.class), mBeaconServiceConnection, Context.BIND_AUTO_CREATE);
+            bindService(new Intent(this, InDoorPositionService.class), mBeaconServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
     }
@@ -247,7 +248,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                 for (int i = 0; i < mActorListAdapter.getCount(); i++) {
                     if (((Actor) mActorListAdapter.getItem(i)).userId.equals(actor.userId)) {
                         mActorListAdapter.remove(mActorListAdapter.getItem(i));
-                        view.removeActor(actor.userId);
+                        view.removeActor(actor.position.deviceId);
                         mActorListAdapter.notifyDataSetInvalidated();
                         break;
                     }
@@ -315,7 +316,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            AltBeaconService.LocalBinder binder = (AltBeaconService.LocalBinder) service;
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mBeaconService = binder.getService();
             mBeaconServiceBound = true;
 
@@ -355,7 +356,9 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
         // Start the CAB using the ActionMode.Callback defined above
         mActionMode = startActionMode(mActionModeCallback);
-        mActionMode.setTag(view);
+        CustomerMapView map = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
+        Actor actor = map.findActorByDeviceId(gDevice.devicePosition.deviceId);
+        mActionMode.setTag(actor);
         view.setSelected(true);
         return true;
 
@@ -385,31 +388,18 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_chat:
-                    GuiDevice actor = (GuiDevice) mode.getTag();
+                    Actor actor = (Actor)mode.getTag();
                     mode.finish();
+                    try {
+                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        String serActor = JsonSerializer.serialize(actor);
+                        intent.putExtra("actor", serActor);
+                        startActivity(intent);
+                    } catch (JsonProcessingException ex) {
+                        Log.e(TAG, ex.getMessage(), ex);
+                    }
 
-                    String path = WebApiActions.GetActorByDevice() + "/" + actor.devicePosition.deviceId;
-                    WebApiService service = new WebApiService(Actor.class, true);
-                    service.performGet(path, new IWebApiResultListener() {
-                        @Override
-                        public void onResult(Object objResult) {
-                            try {
-                                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                String serActor = JsonSerializer.serialize(objResult);
-                                intent.putExtra("actor", serActor);
-                                startActivity(intent);
-                            } catch (JsonProcessingException ex) {
-                                Log.e(TAG, ex.getMessage(), ex);
-                            }
-                        }
-                        @Override
-                        public void onError(Exception err) {
-                            ((LpsApplication)getApplicationContext()).HandleError(err);
-                        }
-
-                    });
-                    mode.finish();
                     return true;
                 case R.id.action_showProfile:
                     Intent intent = new Intent(getApplicationContext(), ActorProfileActivity.class);
@@ -496,7 +486,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                                  Bundle savedInstanceState) {
             final ActorsActivity activity = (ActorsActivity) getActivity();
             int tabNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-            if (tabNumber == 2) {
+            if (tabNumber == 1) {
                 View rootView = inflater.inflate(R.layout.fragment_actors_map, container, false);
 
                 final CustomerMapView view = (CustomerMapView) rootView.findViewById(R.id.CustomerMapView);
@@ -525,6 +515,27 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
                     }
                 });
+                FloatingActionButton btnZoomIn = (FloatingActionButton)rootView.findViewById(R.id.btnZoomPlus);
+                if(btnZoomIn != null) {
+
+                    btnZoomIn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            view.zoomIn();
+                        }
+                    });
+                };
+
+                FloatingActionButton btnZoomOut = (FloatingActionButton)rootView.findViewById(R.id.btnZoomMinus);
+                if(btnZoomOut != null) {
+
+                    btnZoomOut.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            view.zoomOut();
+                        }
+                    });
+                };
                 return rootView;
             } else {
                 View rootView = inflater.inflate(R.layout.fragment_actors_list, container, false);

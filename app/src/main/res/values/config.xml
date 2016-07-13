@@ -24,7 +24,6 @@
     <string name="GetBeaconsInLocale">/api/Chat/Beacons</string>
     <string name="SetPosition">/api/Chat/SetPosition</string>
     <string name="RemovePosition">/api/Chat/RemovePosition</string>
-    <string name="GetActorByDevice">/api/Chat/ActorByDevice</string>
     <string name="PostChatMessage">/api/Chat/SendMessage</string>
     <string name="CreateConversation">/api/Chat/CreateConversation</string>
     <string name="GetConversation">/api/Chat/GetConversation</string>

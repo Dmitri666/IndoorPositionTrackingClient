@@ -30,7 +30,7 @@ android {
     }
 }
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':android-beacon-library')
     compile project(':webapi')
     //compile 'org.altbeacon:android-beacon-library:2.4'
