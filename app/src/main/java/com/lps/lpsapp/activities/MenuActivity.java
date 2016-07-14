@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.lps.lpsapp.ServiceManager;
+import com.lps.lpsapp.management.ServiceManager;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.network.AppState;
-import com.lps.lpsapp.network.IAppStateListener;
+import com.lps.lpsapp.management.AppState;
+import com.lps.lpsapp.management.IAppStateListener;
 
 /**
  * 
@@ -40,20 +40,20 @@ public class MenuActivity extends BaseActivity {
 		super.onResume();
 		Log.d(TAG, "onResume");
 		// Bind to LocalService
-		ServiceManager.CheckSeviceAvalability(new IAppStateListener() {
+		ServiceManager.getInstance().CheckSeviceAvalability(new IAppStateListener() {
 			@Override
 			public void StateChanged(AppState state) {
 				View btn =  MenuActivity.this.findViewById(R.id.btnSearch);
-				btn.setEnabled(state.IsAuthenticated);
+				btn.setEnabled(state.getIsAuthenticated());
 
 				View btn1 =  MenuActivity.this.findViewById(R.id.btnNews);
-				btn1.setEnabled(state.IsAuthenticated);
+				btn1.setEnabled(state.getIsAuthenticated());
 			}
 		});
 
 
 		View btn =  MenuActivity.this.findViewById(R.id.btnChat);
-		btn.setEnabled(ServiceManager.AppState.LocaleId != null);
+		btn.setEnabled(ServiceManager.getInstance().AppState.getCurrentLocaleId() != null);
 
 
 	}

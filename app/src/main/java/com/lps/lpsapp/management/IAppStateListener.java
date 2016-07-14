@@ -1,4 +1,4 @@
-package com.lps.lpsapp.network;
+package com.lps.lpsapp.management;
 
 /**
  * Created by dle on 02.06.2016.

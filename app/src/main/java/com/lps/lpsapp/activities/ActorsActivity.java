@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.ServiceManager;
+import com.lps.lpsapp.management.ServiceManager;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
@@ -155,7 +155,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         Log.d(TAG, "onStop");
         mPushService.removeActorPositionListener(actorPositionListener);
         mPushService.removeChatMessageListener(chatListener);
-        mPushService.leavePositionConsumerGroup(ServiceManager.AppState.LocaleId);
+        mPushService.leavePositionConsumerGroup(ServiceManager.getInstance().AppState.getCurrentLocaleId());
         if (mPushServiceBound) {
             unbindService(mPushServiceConnection);
             mPushServiceBound = false;
@@ -179,7 +179,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     public void setRoomModel(final CustomerMapView view, RoomModel map) {
         view.setmRoomModel(map);
-        String path = WebApiActions.GetActorsInLocale() + "/" + ServiceManager.AppState.LocaleId.toString();
+        String path = WebApiActions.GetActorsInLocale() + "/" + ServiceManager.getInstance().AppState.getCurrentLocaleId().toString();
         WebApiService service = new WebApiService(Actor.class, true);
 
         service.performGetList(path, new IWebApiResultListener<List>() {
@@ -284,7 +284,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
             mPushService.setActorPositionListener(actorPositionListener);
             mPushService.setChatListener(chatListener);
-            mPushService.joinPositionConsumerGroup(ServiceManager.AppState.LocaleId);
+            mPushService.joinPositionConsumerGroup(ServiceManager.getInstance().AppState.getCurrentLocaleId());
             Log.d(TAG, "onServiceConnected");
 
         }
@@ -496,7 +496,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                     public void onGlobalLayout() {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                        String path = WebApiActions.GetTableModel() + "/" + ServiceManager.AppState.LocaleId.toString();
+                        String path = WebApiActions.GetTableModel() + "/" + ServiceManager.getInstance().AppState.getCurrentLocaleId().toString();
                         WebApiService service = new WebApiService(RoomModel.class, true);
                         service.performGet(path, new IWebApiResultListener<RoomModel>() {
                             @Override

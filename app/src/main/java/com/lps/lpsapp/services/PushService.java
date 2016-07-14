@@ -194,17 +194,6 @@ public class PushService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
-        if(AccessToken.CurrentToken != null) {
-            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
-            conn.setCredentials(credentials);
-            Log.d(TAG, "setCredentials");
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
@@ -250,6 +239,17 @@ public class PushService extends Service {
         super.onDestroy();
     }
 
+
+    public void resetCredentials() {
+        this.onDestroy();
+        this.onCreate();
+//        if(AccessToken.CurrentToken != null) {
+//            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
+//            conn.setCredentials(credentials);
+//            conn.disconnect();
+//            this.sf = conn.start();
+//        }
+    }
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.

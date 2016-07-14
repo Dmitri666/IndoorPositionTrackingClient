@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.ServiceManager;
+import com.lps.lpsapp.management.ServiceManager;
 //import com.squareup.leakcanary.RefWatcher;
 
 /**
@@ -97,7 +97,7 @@ public class BaseActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_logout:
-                ServiceManager.LogOut();
+                ServiceManager.getInstance().LogOut();
                 Intent intent1 = new Intent(getApplicationContext(), LoginActivity.class);
                 intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent1);

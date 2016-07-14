@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.ServiceManager;
+import com.lps.lpsapp.management.ServiceManager;
 import com.lps.lpsapp.services.AuthenticationManager;
 import com.lps.webapi.AccessToken;
 
@@ -138,7 +138,7 @@ public class LoginActivity extends BaseActivity {
             LpsApplication app = (LpsApplication)getApplicationContext();
             try {
                 AccessToken token = new AuthenticationManager().Authenticate(email, password,app.getAndroidId());
-                ServiceManager.OnLogIn(token);
+                ServiceManager.getInstance().OnLogIn(token);
                 onLogin();
             }
             catch (Exception e)

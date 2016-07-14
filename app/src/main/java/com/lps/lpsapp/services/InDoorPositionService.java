@@ -14,10 +14,9 @@ import android.widget.Toast;
 
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.lpsapp.ServiceManager;
+import com.lps.lpsapp.management.ServiceManager;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
-import com.lps.lpsapp.network.IAppStateListener;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.Point2D;
 import com.lps.lpsapp.positions.PositionCalculator;
@@ -66,7 +65,6 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
     public IDevicePositionListener devicePositionListener;
     public Region backgroundRegion;
     private Boolean regionBootstrapInitialised = false;
-    private IAppStateListener mIInternetAvalabilityListener;
     private BeaconGroupsModel beaconGroupsModel;
 
 
@@ -227,7 +225,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 }
             });
 
-            ServiceManager.AppState.LocaleId = param.roomId;
+            ServiceManager.getInstance().AppState.setCurrentLocaleId(param.roomId);
 
             Intent intent = new Intent(this, ActorsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -274,7 +272,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                     toast1.show();
                 }
             });
-            ServiceManager.AppState.LocaleId = null;
+            ServiceManager.getInstance().AppState.setCurrentLocaleId(null);
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
                 if(mPositionCalculator != null)
