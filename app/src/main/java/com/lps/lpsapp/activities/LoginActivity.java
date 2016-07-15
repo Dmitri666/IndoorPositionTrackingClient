@@ -1,7 +1,9 @@
 package com.lps.lpsapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,8 +14,11 @@ import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.management.ServiceManager;
-import com.lps.lpsapp.services.AuthenticationManager;
+import com.lps.lpsapp.management.AppState;
+import com.lps.lpsapp.management.IAppStateListener;
+import com.lps.lpsapp.management.AppManager;
+import com.lps.webapi.services.AuthenticationService;
+import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.AccessToken;
 
 /**
@@ -87,7 +92,16 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-
+        AppManager.getInstance().CheckIsAuthenticated(new IAppStateListener() {
+            @Override
+            public void StateChanged(AppState state) {
+                if(state.getIsAuthenticated()) {
+                    Intent intent1 = new Intent(getApplicationContext(), MenuActivity.class);
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent1);
+                }
+            }
+        });
     }
 
 
@@ -137,12 +151,15 @@ public class LoginActivity extends BaseActivity {
 
             LpsApplication app = (LpsApplication)getApplicationContext();
             try {
-                AccessToken token = new AuthenticationManager().Authenticate(email, password,app.getAndroidId());
-                ServiceManager.getInstance().OnLogIn(token);
-                onLogin();
+                AccessToken token = new AuthenticationService().Authenticate(email, password,app.getAndroidId(), WebApiActions.getToken());
+                AppManager.getInstance().OnLogIn(token);
+                Intent intent = new Intent(this, MenuActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                this.startActivity(intent);
             }
             catch (Exception e)
             {
+                Log.e(TAG,e.getMessage(),e);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }

@@ -10,10 +10,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
+import android.util.Log;
 
 import com.lps.lpsapp.LpsApplication;
-import com.lps.lpsapp.activities.LoginActivity;
+import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
@@ -26,7 +26,8 @@ import org.altbeacon.beacon.BleNotAvailableException;
 /**
  * Created by dle on 08.07.2016.
  */
-public class ServiceManager {
+public class AppManager {
+    private static String TAG = "AppManager";
     public AppState AppState;
     private LpsApplication app;
 
@@ -36,103 +37,107 @@ public class ServiceManager {
     private boolean mPositionServiceBound = false;
     private InDoorPositionService mPositionService;
 
-    private static ServiceManager instance;
+    private static AppManager instance;
 
-    protected ServiceManager() {
+    protected AppManager() {
         this.app = (LpsApplication) LpsApplication.getContext();
         this.AppState = new AppState();
 
 
     }
 
-    public static ServiceManager getInstance() {
-        if(instance == null) {
-            instance = new ServiceManager();
+    public static AppManager getInstance() {
+        if (instance == null) {
+            instance = new AppManager();
         }
         return instance;
     }
 
-    public void CheckSeviceAvalability(final IAppStateListener appStateListener) {
+    public void CheckIsAuthenticated(final IAppStateListener appStateListener) {
 
-        Boolean mConnectedToInternet = this.IsConnectedToNetwork();
-        if(!mConnectedToInternet) {
-            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            app.startActivity(intent);
-        } else {
-            String path = WebApiActions.IsAuthenticated();
-            WebApiService service = new WebApiService(Boolean.class,true);
-            service.performGet(path, new IWebApiResultListener() {
-                @Override
-                public void onResult(Object objResult) {
-                    AppState.IsAuthenticated = true;
-                    if(!mPushServiceBound) {
-                        app.bindService(new Intent(app, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
-                    }
-                    if(!mPositionServiceBound) {
-                        app.bindService(new Intent(app, InDoorPositionService.class), mPositionServiceConnection, Context.BIND_AUTO_CREATE);
-                    }
-                    appStateListener.StateChanged(AppState);
+        String path = WebApiActions.IsAuthenticated();
+        WebApiService service = new WebApiService(Boolean.class, true);
+        service.performGet(path, new IWebApiResultListener() {
+            @Override
+            public void onResult(Object objResult) {
+                AppState.IsAuthenticated = true;
+                if (!mPushServiceBound) {
+                    app.bindService(new Intent(app, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
                 }
-
-                @Override
-                public void onError(Exception err) {
-                    AppState.IsAuthenticated = false;
-                    Intent intent = new Intent(app,LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    app.startActivity(intent);
+                if (!mPositionServiceBound) {
+                    app.bindService(new Intent(app, InDoorPositionService.class), mPositionServiceConnection, Context.BIND_AUTO_CREATE);
                 }
-            });
-        }
+                appStateListener.StateChanged(AppState);
+            }
 
+            @Override
+            public void onError(Exception err) {
+                AppState.IsAuthenticated = false;
+                appStateListener.StateChanged(AppState);
+            }
+        });
     }
 
-    public void LogOut(){
+    public void CheckSeviceAvalability() {
+
+        this.AppState.IsConnectedToInternet = this.IsConnectedToNetwork();
+        this.AppState.IsBlootuthOn = this.CheckBleAvailability();
+        if(this.AppState.IsConnectedToInternet && mPositionServiceBound) {
+            this.mPositionService.InitRegionBootstrap();
+        }
+    }
+
+
+    public void LogOut() {
         AppState.IsAuthenticated = false;
         AccessToken.CurrentToken = null;
         app.saveAuthenticationData(null);
+
     }
 
     public void OnLogIn(AccessToken accessToken) {
         AppState.IsAuthenticated = true;
         AccessToken.CurrentToken = accessToken;
         app.saveAuthenticationData(accessToken);
-        if(!mPushServiceBound) {
+        if (!mPushServiceBound) {
             app.bindService(new Intent(app, PushService.class), mPushServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
             this.mPushService.resetCredentials();
         }
-        if(!mPositionServiceBound) {
+        if (!mPositionServiceBound) {
             app.bindService(new Intent(app, InDoorPositionService.class), mPositionServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
 
     }
-    private boolean IsConnectedToNetwork(){
+
+    private boolean IsConnectedToNetwork() {
+        Boolean result = false;
         ConnectivityManager connectivity = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null)
-        {
+        if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
-            if (info != null)
-            {
-                AppState.IsConnectedToInternet =  info.isConnectedOrConnecting();
-                return AppState.IsConnectedToInternet;
+            if (info != null) {
+                result = info.isConnectedOrConnecting();
             }
         }
 
-        AppState.IsConnectedToInternet = false;
-        return AppState.IsConnectedToInternet;
+        return result;
     }
 
 
     @TargetApi(18)
     private boolean CheckBleAvailability() throws BleNotAvailableException {
-        if(Build.VERSION.SDK_INT < 18) {
-            throw new BleNotAvailableException("Bluetooth LE not supported by this device");
-        } else if(!app.getPackageManager().hasSystemFeature("android.hardware.bluetooth_le")) {
-            throw new BleNotAvailableException("Bluetooth LE not supported by this device");
+        if (SettingsActivity.UseBeaconSimulator) {
+            return true;
+        }
+        if (Build.VERSION.SDK_INT < 18) {
+            Log.e(TAG, "Bluetooth LE not supported by this device");
+            return false;
+        } else if (!app.getPackageManager().hasSystemFeature("android.hardware.bluetooth_le")) {
+            Log.e(TAG, "Bluetooth LE not supported by this device");
+            return false;
         } else {
-            return ((BluetoothManager)app.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled();
+            return ((BluetoothManager) app.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled();
         }
     }
 
@@ -164,8 +169,6 @@ public class ServiceManager {
             InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mPositionService = binder.getService();
             mPositionServiceBound = true;
-
-
 
 
         }

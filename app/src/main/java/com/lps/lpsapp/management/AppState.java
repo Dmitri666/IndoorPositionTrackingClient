@@ -29,4 +29,12 @@ public class AppState {
     public Boolean getIsAuthenticated() {
         return this.IsAuthenticated;
     }
+
+    public Boolean getIsConnectedToInternet() {
+        return this.IsConnectedToInternet;
+    }
+
+    public Boolean getIsBlootuthOn() {
+        return this.IsBlootuthOn;
+    }
 }

@@ -3,6 +3,7 @@ package com.lps.lpsapp.activities;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.management.ServiceManager;
+import com.lps.lpsapp.management.AppManager;
 //import com.squareup.leakcanary.RefWatcher;
 
 /**
@@ -58,7 +59,17 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppManager.getInstance().CheckSeviceAvalability();
+        if(!AppManager.getInstance().AppState.getIsConnectedToInternet()) {
+            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(intent);
+        }
 
+    }
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -97,9 +108,9 @@ public class BaseActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_logout:
-                ServiceManager.getInstance().LogOut();
+                AppManager.getInstance().LogOut();
                 Intent intent1 = new Intent(getApplicationContext(), LoginActivity.class);
-                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent1);
                 return true;
 

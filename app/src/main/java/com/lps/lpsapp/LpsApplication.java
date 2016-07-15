@@ -7,7 +7,7 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.management.ServiceManager;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.webapi.AccessToken;
 import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.JsonSerializer;
@@ -123,7 +123,7 @@ public class LpsApplication extends MultiDexApplication {
 
     public void HandleError(Exception ex) {
         if(ex instanceof AuthenticationException || ex instanceof NegotiationException || ex.getCause() instanceof InvalidHttpStatusCodeException) {
-            ServiceManager.getInstance().LogOut();
+            AppManager.getInstance().LogOut();
         } else {
             Log.e(TAG, ex.toString(), ex);
         }

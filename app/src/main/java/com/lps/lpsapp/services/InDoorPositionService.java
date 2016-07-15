@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.lpsapp.management.ServiceManager;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
@@ -114,28 +114,14 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                     setBeaconLayout("m:0-3=a7ae2eb7,i:4-19,i:20-21,i:22-23,p:24-24"));  // easiBeacons
         }
 
-
-
-
-
         //beaconManager.setForegroundBetweenScanPeriod(5000);
         //beaconManager.setBackgroundScanPeriod(BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD);
         //beaconManager.setBackgroundBetweenScanPeriod(10000);
         this.backgroundPowerSaver = new BackgroundPowerSaver(app);
 
         beaconManager.bind(this);
-        this.InitRegionBootstrap();
-
         Log.d(TAG,"Created");
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        beaconManager.bind(this);
-        Log.d(TAG, "Started");
-        return  START_STICKY;//super.onStartCommand(intent, flags, startId);
-    }
-
 
     @Override
     public void onDestroy() {
@@ -225,7 +211,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 }
             });
 
-            ServiceManager.getInstance().AppState.setCurrentLocaleId(param.roomId);
+            AppManager.getInstance().AppState.setCurrentLocaleId(param.roomId);
 
             Intent intent = new Intent(this, ActorsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -272,7 +258,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                     toast1.show();
                 }
             });
-            ServiceManager.getInstance().AppState.setCurrentLocaleId(null);
+            AppManager.getInstance().AppState.setCurrentLocaleId(null);
             try {
                 beaconManager.stopRangingBeaconsInRegion(region);
                 if(mPositionCalculator != null)
@@ -352,7 +338,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
 
     }
 
-    private void InitRegionBootstrap() {
+    public void InitRegionBootstrap() {
         if(!regionBootstrapInitialised) {
             WebApiService service = new WebApiService(com.lps.lpsapp.viewModel.Region.class,false);
             service.performGetList(WebApiActions.GetRegions(), new IWebApiResultListener<List<com.lps.lpsapp.viewModel.Region>>() {

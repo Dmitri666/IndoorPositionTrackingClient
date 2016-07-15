@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.lps.lpsapp.management.ServiceManager;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.JsonSerializer;
@@ -58,7 +58,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStart() {
         super.onStart();
-        if(ServiceManager.getInstance().AppState.getIsAuthenticated()) {
+        if(AppManager.getInstance().AppState.getIsAuthenticated()) {
             this.loadFilterContent();
         }
     }

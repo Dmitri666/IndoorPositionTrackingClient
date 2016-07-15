@@ -1,11 +1,10 @@
-package com.lps.lpsapp.services;
+package com.lps.webapi.services;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.AccessToken;
 
 import java.io.BufferedReader;
@@ -19,15 +18,15 @@ import java.net.URLEncoder;
 /**
  * Created by user on 05.08.2015.
  */
-public class AuthenticationManager {
-    private static String TAG = "AuthenticationManager";
+public class AuthenticationService {
+    private static String TAG = "AuthenticationService";
 
-    public AccessToken Authenticate(String userName, String password,String androidId) throws Exception {
+    public AccessToken Authenticate(String userName, String password,String androidId,String url) throws Exception {
 
         try {
             String data = "grant_type=password&client_id=" + URLEncoder.encode(androidId, "UTF-8") + "&username=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8");
 
-            String accessToken = new GetTokenTask().execute(data).get();
+            String accessToken = new GetTokenTask().execute(url,data).get();
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AccessToken token = mapper.readValue(accessToken, AccessToken.class);
@@ -40,28 +39,27 @@ public class AuthenticationManager {
 
     private boolean running = false;
 
-    public synchronized void RefreshToken(LpsApplication app) {
-        try {
-            Log.d(TAG, "try refresh token");
-            if (running) {
-                return;
-            }
-            running = true;
-            String deviceId = app.getAndroidId();
-            String data = "grant_type=refresh_token&client_id=" + URLEncoder.encode(deviceId, "UTF-8") + "&refresh_token=" + URLEncoder.encode(AccessToken.CurrentToken.refresh_token, "UTF-8");
-
-            String accessToken = new GetTokenTask().execute(data).get();
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            AccessToken authenticationData = mapper.readValue(accessToken, AccessToken.class);
-            //app.saveAuthenticationData(authenticationData);
-            running = false;
-            Log.d(TAG, "refresh token");
-        } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage(), ex);
-        }
-    }
+//    public synchronized void RefreshToken(String deviceId) {
+//        try {
+//            Log.d(TAG, "try refresh token");
+//            if (running) {
+//                return;
+//            }
+//            running = true;
+//            String data = "grant_type=refresh_token&client_id=" + URLEncoder.encode(deviceId, "UTF-8") + "&refresh_token=" + URLEncoder.encode(AccessToken.CurrentToken.refresh_token, "UTF-8");
+//
+//            String accessToken = new GetTokenTask().execute(data).get();
+//
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//            AccessToken authenticationData = mapper.readValue(accessToken, AccessToken.class);
+//            //app.saveAuthenticationData(authenticationData);
+//            running = false;
+//            Log.d(TAG, "refresh token");
+//        } catch (Exception ex) {
+//            Log.e(TAG, ex.getMessage(), ex);
+//        }
+//    }
 
     private class GetTokenTask extends AsyncTask<String, Void, String> {
         private Exception exception;
@@ -69,7 +67,7 @@ public class AuthenticationManager {
 
         protected String doInBackground(String... args) {
             try {
-                URL url = new URL(WebApiActions.getToken());
+                URL url = new URL(args[0]);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlendcoded");
 
@@ -80,7 +78,7 @@ public class AuthenticationManager {
                 //Send request
                 DataOutputStream wr = new DataOutputStream(
                         urlConnection.getOutputStream());
-                wr.writeBytes(args[0]);
+                wr.writeBytes(args[1]);
                 wr.flush();
                 wr.close();
 
