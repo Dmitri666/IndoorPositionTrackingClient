@@ -35,10 +35,9 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
-import com.lps.lpsapp.services.InDoorPositionService;
-import com.lps.lpsapp.services.IBeaconServiceListener;
 import com.lps.lpsapp.services.IChatListener;
 import com.lps.lpsapp.services.IDevicePositionListener;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.chat.Actor;
@@ -50,21 +49,15 @@ import com.lps.webapi.JsonSerializer;
 import com.lps.webapi.services.WebApiService;
 import com.squareup.picasso.Picasso;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.Region;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 
 
 public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
     private static String TAG = "ActorsActivity";
 
-    private IDevicePositionListener actorPositionListener;
-    private IBeaconServiceListener beaconServiceListener;
+    private IDevicePositionListener devicePositionListener;
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mBeaconServiceBound = false;
@@ -79,10 +72,14 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         setContentView(R.layout.activity_chat_actors);
 
         Log.d(TAG, "onCreate");
+        if(AppManager.getInstance().AppState.getCurrentLocaleId() == null) {
+            this.finish();
+            return;
+        }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        actorPositionListener = new IDevicePositionListener() {
+        devicePositionListener = new IDevicePositionListener() {
             @Override
             public void positionChanged(DevicePosition position) {
                 actorPositionChanged(position);
@@ -114,20 +111,6 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
         }
-
-        beaconServiceListener = new IBeaconServiceListener() {
-            @Override
-            public void beaconsInRange(Collection<Beacon> beacon, Region region) {
-
-            }
-
-            @Override
-            public void deviceInLocale(UUID localeId, boolean isInLocale) {
-                if(!isInLocale) {
-                    ActorsActivity.this.finish();
-                }
-            }
-        };
     }
 
     @Override
@@ -153,7 +136,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
-        mPushService.removeActorPositionListener(actorPositionListener);
+        mPushService.removeActorPositionListener(devicePositionListener);
         mPushService.removeChatMessageListener(chatListener);
         mPushService.leavePositionConsumerGroup(AppManager.getInstance().AppState.getCurrentLocaleId());
         if (mPushServiceBound) {
@@ -161,7 +144,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mPushServiceBound = false;
             mPushService = null;
         }
-        mBeaconService.removeBeaconServiceListener(beaconServiceListener);
+
         mBeaconService.devicePositionListener = null;
         if(mBeaconService.mPositionCalculator != null)
         {
@@ -179,7 +162,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     public void setRoomModel(final CustomerMapView view, RoomModel map) {
         view.setmRoomModel(map);
-        String path = WebApiActions.GetActorsInLocale() + "/" + AppManager.getInstance().AppState.getCurrentLocaleId().toString();
+        String path = WebApiActions.GetActorsInLocale() + "/" + map.id.toString();
         WebApiService service = new WebApiService(Actor.class, true);
 
         service.performGetList(path, new IWebApiResultListener<List>() {
@@ -282,7 +265,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mPushService = binder.getService();
             mPushServiceBound = true;
 
-            mPushService.setActorPositionListener(actorPositionListener);
+            mPushService.setActorPositionListener(devicePositionListener);
             mPushService.setChatListener(chatListener);
             mPushService.joinPositionConsumerGroup(AppManager.getInstance().AppState.getCurrentLocaleId());
             Log.d(TAG, "onServiceConnected");
@@ -320,8 +303,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconService = binder.getService();
             mBeaconServiceBound = true;
 
-            mBeaconService.devicePositionListener = actorPositionListener;
-            mBeaconService.setBeaconServiceListener(beaconServiceListener);
+            mBeaconService.devicePositionListener = devicePositionListener;
             if(mBeaconService.mPositionCalculator != null)
             {
                 mBeaconService.mPositionCalculator.positionCalculatorListener = new IPositionCalculatorListener() {

@@ -53,21 +53,22 @@ public class PushService extends Service {
     private HubProxy proxy;
     private HubConnection conn;
     private SignalRFuture<Void> sf;
+    private String deviceId;
 
 
     private final IBinder mBinder = new LocalBinder();
-    private List<IDevicePositionListener> actorPositionConsumers = new ArrayList<IDevicePositionListener>();
+    private List<IDevicePositionListener> positionConsumers = new ArrayList<IDevicePositionListener>();
     private List<IBookingStateChangedListener> bookingStateConsumers = new ArrayList<IBookingStateChangedListener>();
     private List<IChatListener> chatConsumers = new ArrayList<IChatListener>();
 
     public void setActorPositionListener(IDevicePositionListener consumer)
     {
-        this.actorPositionConsumers.add(consumer);
+        this.positionConsumers.add(consumer);
     }
 
     public void removeActorPositionListener(IDevicePositionListener consumer)
     {
-        this.actorPositionConsumers.remove(consumer);
+        this.positionConsumers.remove(consumer);
     }
 
     public void setBookingStateListener(IBookingStateChangedListener consumer)
@@ -95,6 +96,7 @@ public class PushService extends Service {
         super.onCreate();
         // The service is being created
 
+        this.deviceId = ((LpsApplication)getApplication()).getAndroidId();
         // Connect to the server
         conn = new HubConnection(WebApiActions.Subscribe(), "", true, new Logger() {
 
@@ -385,7 +387,7 @@ public class PushService extends Service {
     private Action<JsonElement[]> onJoinChat =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
@@ -413,7 +415,7 @@ public class PushService extends Service {
     private Action<JsonElement[]> onLeaveChat =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
@@ -441,14 +443,17 @@ public class PushService extends Service {
     private Action<JsonElement[]> onPositionChanged =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
 
             try {
                 DevicePosition position = JsonSerializer.deserialize(jsonElements[0].toString(), DevicePosition.class);
-                for (IDevicePositionListener consumer : actorPositionConsumers) {
+                if(position.deviceId.equals(deviceId)) {
+                    return;
+                }
+                for (IDevicePositionListener consumer : positionConsumers) {
                     consumer.positionChanged(position);
                 }
             } catch (Exception e) {

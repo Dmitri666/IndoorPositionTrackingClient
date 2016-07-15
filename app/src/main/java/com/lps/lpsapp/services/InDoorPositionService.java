@@ -438,7 +438,9 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 WebApiService service = new WebApiService(DevicePosition.class, true);
                 service.performPost(path, param);
 
-
+                if(devicePositionListener != null) {
+                    devicePositionListener.positionChanged(param);
+                }
                 path = WebApiActions.SavePositionLog();
                 PositionLogData log = new PositionLogData();
                 log.deviceId = app.getAndroidId();
