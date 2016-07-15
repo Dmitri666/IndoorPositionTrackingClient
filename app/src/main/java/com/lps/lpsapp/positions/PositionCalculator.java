@@ -19,7 +19,7 @@ import java.util.List;
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
     private BeaconGroupsModel beaconModel;
-    public IPositionCalculatorListener positionCalculatorListener;
+    public PositionCalculatorNotifier positionCalculatorListener;
     private PositionData lastPosition;
 
     private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
@@ -134,7 +134,7 @@ public class PositionCalculator {
                 {
                     if(this.positionCalculatorListener != null)
                     {
-                        this.positionCalculatorListener.calculationResult(beaconDatas,bounds);
+                        this.positionCalculatorListener.onCalculationResult(beaconDatas,bounds);
                     }
                     Log.d(TAG,"Iteration count:" + i);
 

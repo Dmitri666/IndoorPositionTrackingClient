@@ -34,7 +34,7 @@ import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
-import com.lps.lpsapp.positions.IPositionCalculatorListener;
+import com.lps.lpsapp.positions.PositionCalculatorNotifier;
 import com.lps.lpsapp.services.ChatNotifier;
 import com.lps.lpsapp.services.DevicePositionNotifier;
 import com.lps.lpsapp.services.InDoorPositionService;
@@ -281,7 +281,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         }
     };
 
-    public void onCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
+    public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
         this.runOnUiThread(new Runnable() {
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
@@ -306,10 +306,10 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             mBeaconService.devicePositionListener = devicePositionListener;
             if(mBeaconService.mPositionCalculator != null)
             {
-                mBeaconService.mPositionCalculator.positionCalculatorListener = new IPositionCalculatorListener() {
+                mBeaconService.mPositionCalculator.positionCalculatorListener = new PositionCalculatorNotifier() {
                     @Override
-                    public void calculationResult(List<BeaconData> beaconDatas, Rect bounds) {
-                        onCalculationResult(beaconDatas, bounds);
+                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
+                        setCalculationResult(beaconDatas, bounds);
                     }
                 };
             }
@@ -483,6 +483,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                         service.performGet(path, new IWebApiResultListener<RoomModel>() {
                             @Override
                             public void onResult(RoomModel objResult) {
+                                objResult.id = AppManager.getInstance().AppState.getCurrentLocaleId();
                                 activity.setRoomModel(view, objResult);
                             }
 
