@@ -6,7 +6,7 @@ import com.lps.lpsapp.viewModel.chat.ChatMessage;
 /**
  * Created by dle on 20.08.2015.
  */
-public interface IChatListener {
+public interface ChatNotifier {
     void messageResived(ChatMessage chatMessage);
     void joinChat(Actor actor);
     void leaveChat(Actor actor);

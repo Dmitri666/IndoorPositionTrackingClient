@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.management.AppState;
-import com.lps.lpsapp.management.IAppStateListener;
+import com.lps.lpsapp.management.AppStateNotifier;
 import com.lps.lpsapp.management.AppManager;
 import com.lps.webapi.services.AuthenticationService;
 import com.lps.lpsapp.services.WebApiActions;
@@ -92,7 +92,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        AppManager.getInstance().CheckIsAuthenticated(new IAppStateListener() {
+        AppManager.getInstance().CheckIsAuthenticated(new AppStateNotifier() {
             @Override
             public void StateChanged(AppState state) {
                 if(state.getIsAuthenticated()) {

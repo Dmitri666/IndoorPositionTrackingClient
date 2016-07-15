@@ -53,7 +53,7 @@ public class AppManager {
         return instance;
     }
 
-    public void CheckIsAuthenticated(final IAppStateListener appStateListener) {
+    public void CheckIsAuthenticated(final AppStateNotifier appStateListener) {
 
         String path = WebApiActions.IsAuthenticated();
         WebApiService service = new WebApiService(Boolean.class, true);

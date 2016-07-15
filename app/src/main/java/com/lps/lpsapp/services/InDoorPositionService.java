@@ -62,7 +62,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
     private BackgroundPowerSaver backgroundPowerSaver;
     private boolean haveDetectedBeaconsSinceBoot = false;
     public PositionCalculator mPositionCalculator;
-    public IDevicePositionListener devicePositionListener;
+    public DevicePositionNotifier devicePositionListener;
     public Region backgroundRegion;
     private Boolean regionBootstrapInitialised = false;
     private BeaconGroupsModel beaconGroupsModel;
@@ -199,10 +199,6 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
             service = new WebApiService(DevicePosition.class,true);
             service.performPost(path,param);
 
-            for (IBeaconServiceListener consumer : consumers) {
-                consumer.deviceInLocale(UUID.fromString(region.getUniqueId()),true);
-            }
-
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
@@ -248,9 +244,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
             service.performPost(path, param);
 
             final Context ctx = this;
-            for (IBeaconServiceListener consumer : consumers) {
-                consumer.deviceInLocale(UUID.fromString(region.getUniqueId()),false);
-            }
+
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {

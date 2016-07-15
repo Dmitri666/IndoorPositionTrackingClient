@@ -35,8 +35,8 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
 import com.lps.lpsapp.positions.BeaconData;
 import com.lps.lpsapp.positions.IPositionCalculatorListener;
-import com.lps.lpsapp.services.IChatListener;
-import com.lps.lpsapp.services.IDevicePositionListener;
+import com.lps.lpsapp.services.ChatNotifier;
+import com.lps.lpsapp.services.DevicePositionNotifier;
 import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
@@ -57,13 +57,13 @@ import java.util.List;
 public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
     private static String TAG = "ActorsActivity";
 
-    private IDevicePositionListener devicePositionListener;
+    private DevicePositionNotifier devicePositionListener;
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mBeaconServiceBound = false;
     private InDoorPositionService mBeaconService;
     private MyArrayAdapter mActorListAdapter;
-    private IChatListener chatListener;
+    private ChatNotifier chatListener;
     private ActionMode mActionMode;
 
     @Override
@@ -79,14 +79,14 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        devicePositionListener = new IDevicePositionListener() {
+        devicePositionListener = new DevicePositionNotifier() {
             @Override
             public void positionChanged(DevicePosition position) {
                 actorPositionChanged(position);
             }
         };
 
-        chatListener = new IChatListener() {
+        chatListener = new ChatNotifier() {
             @Override
             public void messageResived(ChatMessage chatMessage) {
 

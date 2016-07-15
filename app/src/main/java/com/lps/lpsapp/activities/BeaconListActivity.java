@@ -15,11 +15,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
+import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.BeaconData;
+import com.lps.webapi.services.WebApiService;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.Region;
@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 public class BeaconListActivity extends BaseActivity {
     ListView listView;
@@ -70,10 +69,7 @@ public class BeaconListActivity extends BaseActivity {
                     fillList(beacons);
                 }
             }
-            @Override
-            public void deviceInLocale(UUID localeId, boolean isInLocale) {
 
-            }
         };
     }
 

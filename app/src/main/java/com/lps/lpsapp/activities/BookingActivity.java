@@ -24,7 +24,7 @@ import com.lps.lpsapp.dialogs.NumberPickerFragment;
 import com.lps.lpsapp.dialogs.TimePickerFragment;
 import com.lps.lpsapp.helper.DataTimeUtil;
 import com.lps.lpsapp.map.CustomerMapView;
-import com.lps.lpsapp.services.IBookingStateChangedListener;
+import com.lps.lpsapp.services.BookingStateNotofier;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.services.WebApiService;
@@ -46,7 +46,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
     private static String TAG = "BookingActivity";
     protected UUID roomId;
 
-    private IBookingStateChangedListener bookingStateListener;
+    private BookingStateNotofier bookingStateListener;
     private GregorianCalendar mDate;
     private boolean mBound = false;
     protected PushService mPushService;
@@ -84,7 +84,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             }
         });
 
-        bookingStateListener = new IBookingStateChangedListener() {
+        bookingStateListener = new BookingStateNotofier() {
             @Override
             public void bookingStateChanged() {
                 onBookingStateChanged();
