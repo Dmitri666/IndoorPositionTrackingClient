@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.IBookingStateChangedListener;
+import com.lps.lpsapp.services.BookingStateNotofier;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.services.WebApiService;
@@ -34,14 +34,14 @@ public class BookingHistoryActivity extends BaseActivity {
     ListView listView;
     MyArrayAdapter adapter;
     ArrayList<BookingJoinRoomData> listItems=new ArrayList<BookingJoinRoomData>();
-    private IBookingStateChangedListener bookingStateListener;
+    private BookingStateNotofier bookingStateListener;
     private boolean mBound = false;
     protected PushService mPushService;
     private UUID mRoomId;
 
     public BookingHistoryActivity()
     {
-        bookingStateListener = new IBookingStateChangedListener() {
+        bookingStateListener = new BookingStateNotofier() {
             @Override
             public void bookingStateChanged() {
                 onBookingStateChanged();

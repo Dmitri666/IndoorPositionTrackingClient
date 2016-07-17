@@ -31,11 +31,6 @@ public class WebApiActions {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.SaveBackgroundBeacons);
     }
 
-    public static String RegisterDevice()
-    {
-        return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.RegisterDevice);
-    }
-
     public static String PostMeasurement()
     {
         return SettingsActivity.WebApiUrl + LpsApplication.getContext().getResources().getString(R.string.PostMeasurement);

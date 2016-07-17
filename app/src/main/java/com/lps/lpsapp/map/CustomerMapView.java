@@ -281,6 +281,7 @@ public class CustomerMapView extends ScalableView {
         ActorsActivity host = (ActorsActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
         this.actors.put(actor.position.deviceId, actor);
         GuiDevice myButton = new GuiDevice(getContext(), actor.position);
+        myButton.setText(actor.userName);
 
         if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
             myButton.setBackground(getResources().getDrawable(R.drawable.round_button_yellow));
@@ -292,7 +293,8 @@ public class CustomerMapView extends ScalableView {
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
         lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.position.guiElement.height);
         myButton.setOnLongClickListener(host);
-        this.addView(myButton, lp);
+
+        this.addView(myButton);
     }
 
 
@@ -393,7 +395,7 @@ public class CustomerMapView extends ScalableView {
     public void positionChanged(final DevicePosition position) {
         if (this.actors.containsKey(position.deviceId)) {
             final DevicePosition pos = this.actors.get(position.deviceId).position;
-            GuiDevice device = pos.guiElement;
+            View device = pos.guiElement;
             device.animate().x(this.getDrawX((float) position.x)).y(this.getDrawY((float) position.y));
         } else {
             DevicePosition pos = new DevicePosition();

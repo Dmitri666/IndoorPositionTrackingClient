@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.lps.lpsapp.R;
-import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.IBeaconServiceListener;
+import com.lps.lpsapp.services.InDoorPositionService;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.Region;
@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MeasurementActivity extends BaseActivity {
@@ -65,10 +64,7 @@ public class MeasurementActivity extends BaseActivity {
 
             }
 
-            @Override
-            public void deviceInLocale(UUID localeId, boolean isInLocale) {
 
-            }
         };
 
 

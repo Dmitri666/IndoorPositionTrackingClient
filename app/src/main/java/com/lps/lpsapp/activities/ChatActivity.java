@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.helper.ChatAdapter;
-import com.lps.lpsapp.services.IChatListener;
+import com.lps.lpsapp.services.ChatNotifier;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.lpsapp.viewModel.chat.Actor;
@@ -43,7 +43,7 @@ public class ChatActivity extends BaseActivity {
     private Button sendBtn;
     private ChatAdapter adapter;
     private ArrayList<ChatMessage> chatHistory;
-    private IChatListener chatMessageListener;
+    private ChatNotifier chatMessageListener;
     private boolean mBound = false;
     private PushService mPushService;
 
@@ -54,7 +54,7 @@ public class ChatActivity extends BaseActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        chatMessageListener = new IChatListener() {
+        chatMessageListener = new ChatNotifier() {
             @Override
             public void messageResived(ChatMessage chatMessage) {
                 newChatMessageRecived(chatMessage);

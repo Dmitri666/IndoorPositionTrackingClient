@@ -5,17 +5,12 @@ import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.services.WebApiActions;
-import com.lps.lpsapp.viewModel.Device;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.webapi.AccessToken;
 import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.JsonSerializer;
-import com.lps.webapi.services.WebApiService;
-
-import org.altbeacon.beacon.distance.AndroidModel;
 
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.http.InvalidHttpStatusCodeException;
@@ -38,7 +33,6 @@ public class LpsApplication extends MultiDexApplication {
         super.onCreate();
         //refWatcher = LeakCanary.install(this);
         mContext = this;
-        ServiceManager.app = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 
 
@@ -106,7 +100,7 @@ public class LpsApplication extends MultiDexApplication {
         return accesstoken;
     }
 
-    protected void saveAuthenticationData(AccessToken authenticationData) {
+    public void saveAuthenticationData(AccessToken authenticationData) {
         if(authenticationData != null) {
             try {
                 String token = JsonSerializer.serialize(authenticationData);
@@ -129,29 +123,13 @@ public class LpsApplication extends MultiDexApplication {
 
     public void HandleError(Exception ex) {
         if(ex instanceof AuthenticationException || ex instanceof NegotiationException || ex.getCause() instanceof InvalidHttpStatusCodeException) {
-            ServiceManager.LogOut();
+            AppManager.getInstance().LogOut();
         } else {
             Log.e(TAG, ex.toString(), ex);
         }
     }
 
-    public void GoIntoConnectedState() {
-        Toast toast = Toast.makeText(getApplicationContext(), "Connected Internet", Toast.LENGTH_LONG);
-        toast.show();
-        AndroidModel model = AndroidModel.forThisDevice();
-        Device device = new Device(this.getAndroidId(), model.getBuildNumber(), model.getManufacturer(), model.getModel(), model.getVersion());
 
-        WebApiService service = new WebApiService(Device.class,false);
-        service.performPost(WebApiActions.RegisterDevice(),device);
-
-
-    }
-
-    protected void GoIntoDisconnectedState() {
-        Toast toast1 = Toast.makeText(getApplicationContext(), "Not connected Internet", Toast.LENGTH_LONG);
-        toast1.show();
-
-    }
 
 
 

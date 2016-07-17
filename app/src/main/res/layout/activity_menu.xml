@@ -44,7 +44,7 @@
                 android:minHeight="100dp"
                 android:minWidth="100dp"
                 android:onClick="onNewsClicked"
-                android:text="Login" />
+                android:text="News" />
 
 
         </TableRow>
@@ -70,7 +70,7 @@
                 android:enabled="false" />
 
             <Button
-                android:id="@+id/btnFavorit"
+                android:id="@+id/btnBeacon"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_column="2"
@@ -78,7 +78,7 @@
                 android:maxWidth="100dp"
                 android:minHeight="100dp"
                 android:minWidth="100dp"
-                android:onClick="onFavoritButtonClicked"
+                android:onClick="onBeaconButtonClicked"
                 android:text="Beacons" />
         </TableRow>
 

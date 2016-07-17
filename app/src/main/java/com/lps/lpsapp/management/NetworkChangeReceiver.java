@@ -1,4 +1,4 @@
-package com.lps.lpsapp.network;
+package com.lps.lpsapp.management;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

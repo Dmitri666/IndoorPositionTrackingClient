@@ -180,8 +180,11 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
-                BeaconGroupCount = Integer.parseInt(s.toString());
+                if(s.length() == 0) {
+                    BeaconGroupCount = 1;
+                } else {
+                    BeaconGroupCount = Integer.parseInt(s.toString());
+                }
             }
         });
 

@@ -53,39 +53,40 @@ public class PushService extends Service {
     private HubProxy proxy;
     private HubConnection conn;
     private SignalRFuture<Void> sf;
+    private String deviceId;
 
 
     private final IBinder mBinder = new LocalBinder();
-    private List<IDevicePositionListener> actorPositionConsumers = new ArrayList<IDevicePositionListener>();
-    private List<IBookingStateChangedListener> bookingStateConsumers = new ArrayList<IBookingStateChangedListener>();
-    private List<IChatListener> chatConsumers = new ArrayList<IChatListener>();
+    private List<DevicePositionNotifier> positionConsumers = new ArrayList<DevicePositionNotifier>();
+    private List<BookingStateNotofier> bookingStateConsumers = new ArrayList<BookingStateNotofier>();
+    private List<ChatNotifier> chatConsumers = new ArrayList<ChatNotifier>();
 
-    public void setActorPositionListener(IDevicePositionListener consumer)
+    public void setActorPositionListener(DevicePositionNotifier consumer)
     {
-        this.actorPositionConsumers.add(consumer);
+        this.positionConsumers.add(consumer);
     }
 
-    public void removeActorPositionListener(IDevicePositionListener consumer)
+    public void removeActorPositionListener(DevicePositionNotifier consumer)
     {
-        this.actorPositionConsumers.remove(consumer);
+        this.positionConsumers.remove(consumer);
     }
 
-    public void setBookingStateListener(IBookingStateChangedListener consumer)
+    public void setBookingStateListener(BookingStateNotofier consumer)
     {
         this.bookingStateConsumers.add(consumer);
     }
 
-    public void removeBookingStateListener(IBookingStateChangedListener consumer)
+    public void removeBookingStateListener(BookingStateNotofier consumer)
     {
         this.bookingStateConsumers.remove(consumer);
     }
 
-    public void setChatListener(IChatListener consumer)
+    public void setChatListener(ChatNotifier consumer)
     {
         this.chatConsumers.add(consumer);
     }
 
-    public void removeChatMessageListener(IChatListener consumer)
+    public void removeChatMessageListener(ChatNotifier consumer)
     {
         this.chatConsumers.remove(consumer);
     }
@@ -95,6 +96,7 @@ public class PushService extends Service {
         super.onCreate();
         // The service is being created
 
+        this.deviceId = ((LpsApplication)getApplication()).getAndroidId();
         // Connect to the server
         conn = new HubConnection(WebApiActions.Subscribe(), "", true, new Logger() {
 
@@ -194,17 +196,6 @@ public class PushService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
-        if(AccessToken.CurrentToken != null) {
-            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
-            conn.setCredentials(credentials);
-            Log.d(TAG, "setCredentials");
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
@@ -250,6 +241,17 @@ public class PushService extends Service {
         super.onDestroy();
     }
 
+
+    public void resetCredentials() {
+        this.onDestroy();
+        this.onCreate();
+//        if(AccessToken.CurrentToken != null) {
+//            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
+//            conn.setCredentials(credentials);
+//            conn.disconnect();
+//            this.sf = conn.start();
+//        }
+    }
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -385,7 +387,7 @@ public class PushService extends Service {
     private Action<JsonElement[]> onJoinChat =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
@@ -393,7 +395,7 @@ public class PushService extends Service {
             try {
                 Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
                 if(chatConsumers.size() > 0) {
-                    for (IChatListener consumer : chatConsumers) {
+                    for (ChatNotifier consumer : chatConsumers) {
                         consumer.joinChat(actor);
                     }
                 }
@@ -413,7 +415,7 @@ public class PushService extends Service {
     private Action<JsonElement[]> onLeaveChat =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
@@ -421,7 +423,7 @@ public class PushService extends Service {
             try {
                 Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
                 if(chatConsumers.size() > 0) {
-                    for (IChatListener consumer : chatConsumers) {
+                    for (ChatNotifier consumer : chatConsumers) {
                         consumer.leaveChat(actor);
                     }
                 }
@@ -441,14 +443,17 @@ public class PushService extends Service {
     private Action<JsonElement[]> onPositionChanged =  new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
-            if(actorPositionConsumers.isEmpty())
+            if(positionConsumers.isEmpty())
             {
                 return;
             }
 
             try {
                 DevicePosition position = JsonSerializer.deserialize(jsonElements[0].toString(), DevicePosition.class);
-                for (IDevicePositionListener consumer : actorPositionConsumers) {
+                if(position.deviceId.equals(deviceId)) {
+                    return;
+                }
+                for (DevicePositionNotifier consumer : positionConsumers) {
                     consumer.positionChanged(position);
                 }
             } catch (Exception e) {
@@ -489,7 +494,7 @@ public class PushService extends Service {
                     {
                         notifyBookingStateChanged(model);
                     } else {
-                        for (IBookingStateChangedListener consumer : bookingStateConsumers) {
+                        for (BookingStateNotofier consumer : bookingStateConsumers) {
                             consumer.bookingStateChanged();
                         }
                     }
@@ -498,7 +503,7 @@ public class PushService extends Service {
                 else
                 {
                     if(bookingStateConsumers.size() > 0) {
-                        for (IBookingStateChangedListener consumer : bookingStateConsumers) {
+                        for (BookingStateNotofier consumer : bookingStateConsumers) {
                             consumer.bookingStateChanged();
                         }
                     }
@@ -520,7 +525,7 @@ public class PushService extends Service {
             try {
 
                     if(bookingStateConsumers.size() > 0) {
-                        for (IBookingStateChangedListener consumer : bookingStateConsumers) {
+                        for (BookingStateNotofier consumer : bookingStateConsumers) {
                             consumer.bookingStateChanged();
                         }
                     }
@@ -542,7 +547,7 @@ public class PushService extends Service {
             try {
                 ChatMessage msg = JsonSerializer.deserialize(jsonElements[0].toString(), ChatMessage.class);
                 if(chatConsumers.size() > 0) {
-                    for (IChatListener consumer : chatConsumers) {
+                    for (ChatNotifier consumer : chatConsumers) {
                         consumer.messageResived(msg);
                     }
                 }

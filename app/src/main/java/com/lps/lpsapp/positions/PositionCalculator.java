@@ -19,7 +19,7 @@ import java.util.List;
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
     private BeaconGroupsModel beaconModel;
-    public IPositionCalculatorListener positionCalculatorListener;
+    public PositionCalculatorNotifier positionCalculatorListener;
     private PositionData lastPosition;
 
     private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
@@ -55,33 +55,7 @@ public class PositionCalculator {
         }
 
         BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
-       /* if(beaconDatas == null || beaconDatas.size() == 0)
-        {
-            return null;
-        }
 
-        if(beaconDatas.size() < 3)
-        {
-            if(lastPosition != null) {
-                return lastPosition;
-            } else {
-                if(beaconDatas.size() == 0) {
-                    return lastPosition;
-                } else if (beaconDatas.size() == 1) {
-                    BeaconGroupKey key = new BeaconGroupKey();
-                    key.add(beaconDatas.get(0).id3);
-                    return new PositionData(key,new Point2D(beaconDatas.get(0).x, beaconDatas.get(0).y));
-                }  else if (beaconDatas.size() == 2) {
-                    BeaconGroupKey key = new BeaconGroupKey();
-                    key.add(beaconDatas.get(0).id3);
-                    key.add(beaconDatas.get(1).id3);
-                    return new PositionData(key,new Point2D((beaconDatas.get(0).x + beaconDatas.get(1).x) / 2f, (beaconDatas.get(0).y + beaconDatas.get(1).y) / 2f));
-                }
-            }
-
-        }*/
-
-        //calculateDistanceFactor(beaconDatas);
         List<Point2D> results = new ArrayList<>();
         for(List<BeaconData> data:calculationModel.values()) {
             Rect region = calculateRegion(data);
@@ -160,7 +134,7 @@ public class PositionCalculator {
                 {
                     if(this.positionCalculatorListener != null)
                     {
-                        this.positionCalculatorListener.calculationResult(beaconDatas,bounds);
+                        this.positionCalculatorListener.onCalculationResult(beaconDatas,bounds);
                     }
                     Log.d(TAG,"Iteration count:" + i);
 
