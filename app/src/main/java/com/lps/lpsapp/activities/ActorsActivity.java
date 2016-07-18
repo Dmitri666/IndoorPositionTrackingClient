@@ -54,7 +54,7 @@ import java.util.List;
 
 
 
-public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
+public class ActorsActivity extends BaseActivity implements View.OnClickListener {
     private static String TAG = "ActorsActivity";
 
     private DevicePositionNotifier devicePositionListener;
@@ -326,14 +326,14 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     };
 
     @Override
-    public boolean onLongClick(View view) {
+    public void onClick(View view) {
         GuiDevice gDevice = (GuiDevice) view;
         if (gDevice.devicePosition.deviceId.equals(((LpsApplication)getApplication()).getAndroidId())) {
-            return false;
+            //return;
         }
 
         if (mActionMode != null) {
-            return false;
+            return;
         }
 
         // Start the CAB using the ActionMode.Callback defined above
@@ -342,7 +342,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         Actor actor = map.findActorByDeviceId(gDevice.devicePosition.deviceId);
         mActionMode.setTag(actor);
         view.setSelected(true);
-        return true;
+
+
 
     }
 
@@ -397,6 +398,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         // Called when the user exits the action mode
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            Actor actor = (Actor)mode.getTag();
+            actor.position.guiElement.setSelected(false);
             mActionMode.setTag(null);
             mActionMode = null;
         }

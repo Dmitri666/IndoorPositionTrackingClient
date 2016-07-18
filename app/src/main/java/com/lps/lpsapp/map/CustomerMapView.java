@@ -284,15 +284,15 @@ public class CustomerMapView extends ScalableView {
         myButton.setText(actor.userName);
 
         if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
-            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_yellow));
+            myButton.setBackgroundResource(R.drawable.actor_self);
         } else {
-            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_blau));
+            myButton.setBackgroundResource(R.drawable.actor);
         }
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.position.guiElement.wight, (int) actor.position.guiElement.height);
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
         lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.position.guiElement.height);
-        myButton.setOnLongClickListener(host);
+        myButton.setOnClickListener(host);
 
         this.addView(myButton);
     }
