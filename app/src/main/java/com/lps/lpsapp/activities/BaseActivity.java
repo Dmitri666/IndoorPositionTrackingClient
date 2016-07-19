@@ -26,15 +26,12 @@ import com.lps.lpsapp.management.AppManager;
  */
 public class BaseActivity extends AppCompatActivity {
 
-    protected ProgressBar mProgressBar;
-
     public final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
     public final int MY_PERMISSIONS_READ_CONTACTS = 2;
-
+    protected ProgressBar mProgressBar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
 
         // Create a progress bar to display while the list loads
@@ -44,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.INVISIBLE);
 
         RelativeLayout.LayoutParams params = new
-                RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT);
+                RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
 
         RelativeLayout rl = new RelativeLayout(this);
         rl.setGravity(Gravity.CENTER);
@@ -63,7 +60,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         AppManager.getInstance().CheckSeviceAvalability();
-        if(!AppManager.getInstance().AppState.getIsConnectedToInternet()) {
+        if (!AppManager.getInstance().AppState.getIsConnectedToInternet()) {
             Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(intent);
@@ -76,9 +73,9 @@ public class BaseActivity extends AppCompatActivity {
         super.setContentView(layoutResID);
 
         Object toolbar = findViewById(R.id.toolbar);
-        if(toolbar != null) {
-            Toolbar myToolbar = (Toolbar)toolbar;
-                    setSupportActionBar(myToolbar);
+        if (toolbar != null) {
+            Toolbar myToolbar = (Toolbar) toolbar;
+            setSupportActionBar(myToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
@@ -124,22 +121,21 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    public void grantSelfPermission(String permisions,int response)
-    {
-        int permissionCheck = ContextCompat.checkSelfPermission(this,permisions);
+    public void grantSelfPermission(String permisions, int response) {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, permisions);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,permisions)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permisions)) {
 
                 // Show an expanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-                ActivityCompat.requestPermissions(this,new String[]{permisions},response);
+                ActivityCompat.requestPermissions(this, new String[]{permisions}, response);
 
             } else {
 
                 // No explanation needed, we can request the permission.
 
-                ActivityCompat.requestPermissions(this,new String[]{permisions},response);
+                ActivityCompat.requestPermissions(this, new String[]{permisions}, response);
 
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
@@ -148,9 +144,6 @@ public class BaseActivity extends AppCompatActivity {
 
         }
     }
-
-
-
 
 
 }

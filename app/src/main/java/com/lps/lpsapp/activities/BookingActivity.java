@@ -17,7 +17,6 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.dialogs.DatePickerFragment;
 import com.lps.lpsapp.dialogs.NumberPickerFragment;
@@ -27,13 +26,14 @@ import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.services.BookingStateNotofier;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.booking.BookingRequest;
 import com.lps.lpsapp.viewModel.booking.TableReservationModelRequest;
 import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 import com.lps.lpsapp.viewModel.rooms.RoomModel;
 import com.lps.lpsapp.viewModel.rooms.Table;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.services.WebApiService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,14 +42,35 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
-public class BookingActivity extends BaseActivity  implements DatePickerFragment.TheListener,TimePickerFragment.TheListener ,NumberPickerFragment.TheListener {
+public class BookingActivity extends BaseActivity implements DatePickerFragment.TheListener, TimePickerFragment.TheListener, NumberPickerFragment.TheListener {
     private static String TAG = "BookingActivity";
     protected UUID roomId;
-
+    protected PushService mPushService;
     private BookingStateNotofier bookingStateListener;
     private GregorianCalendar mDate;
     private boolean mBound = false;
-    protected PushService mPushService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PushService.LocalBinder binder = (PushService.LocalBinder) service;
+            mPushService = binder.getService();
+            mBound = true;
+
+            mPushService.setBookingStateListener(bookingStateListener);
+            mPushService.joinReservationModelGroup(roomId);
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +99,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
                     @Override
                     public void onError(Exception err) {
-                        ((LpsApplication)getApplicationContext()).HandleError(err);
+                        ((LpsApplication) getApplicationContext()).HandleError(err);
                     }
                 });
             }
@@ -92,7 +113,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
         };
 
         EditText tv = (EditText) findViewById(R.id.txtDate);
-        if(tv != null) {
+        if (tv != null) {
             tv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -103,10 +124,11 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                     picker.show(getSupportFragmentManager(), "datePicker");
                 }
             });
-        };
+        }
+        ;
 
-        EditText tvTime= (EditText) findViewById(R.id.txtTime);
-        if(tvTime != null) {
+        EditText tvTime = (EditText) findViewById(R.id.txtTime);
+        if (tvTime != null) {
             tvTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -117,9 +139,10 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                     timePicker.show(getSupportFragmentManager(), "timePicker");
                 }
             });
-        };
+        }
+        ;
 
-        EditText tvCount= (EditText) findViewById(R.id.txtCount);
+        EditText tvCount = (EditText) findViewById(R.id.txtCount);
 
         /*tvCount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,8 +152,8 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
             }
         });*/
 
-        FloatingActionButton btn = (FloatingActionButton)this.findViewById(R.id.btnBooking);
-        if(btn != null) {
+        FloatingActionButton btn = (FloatingActionButton) this.findViewById(R.id.btnBooking);
+        if (btn != null) {
             btn.setVisibility(View.INVISIBLE);
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -140,10 +163,11 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                             .setAction("Action", null).show();
                 }
             });
-        };
+        }
+        ;
 
-        FloatingActionButton btnZoomIn = (FloatingActionButton)this.findViewById(R.id.btnZoomPlus);
-        if(btnZoomIn != null) {
+        FloatingActionButton btnZoomIn = (FloatingActionButton) this.findViewById(R.id.btnZoomPlus);
+        if (btnZoomIn != null) {
 
             btnZoomIn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -151,10 +175,11 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                     view.zoomIn();
                 }
             });
-        };
+        }
+        ;
 
-        FloatingActionButton btnZoomOut = (FloatingActionButton)this.findViewById(R.id.btnZoomMinus);
-        if(btnZoomOut != null) {
+        FloatingActionButton btnZoomOut = (FloatingActionButton) this.findViewById(R.id.btnZoomMinus);
+        if (btnZoomOut != null) {
 
             btnZoomOut.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -162,7 +187,8 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
                     view.zoomOut();
                 }
             });
-        };
+        }
+        ;
 
     }
 
@@ -176,7 +202,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
     protected void onResume() {
         super.onResume();
         CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
-        if(view.hasRoomModel()) {
+        if (view.hasRoomModel()) {
             this.getReservationModel();
         }
         bindService(new Intent(this, PushService.class), mConnection, Context.BIND_AUTO_CREATE);
@@ -215,96 +241,63 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
     @Override
     public void returnNumber(int number) {
-        EditText tv= (EditText) findViewById(R.id.txtCount);
+        EditText tv = (EditText) findViewById(R.id.txtCount);
         tv.setText(number);
 
     }
 
-    private void setDate()
-    {
+    private void setDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = sdf.format(this.mDate.getTime());
-        EditText tv= (EditText) findViewById(R.id.txtDate);
+        EditText tv = (EditText) findViewById(R.id.txtDate);
         tv.setText(formattedDate);
 
         sdf = new SimpleDateFormat("HH:mm");
         String formattedTime = sdf.format(this.mDate.getTime());
-        tv= (EditText) findViewById(R.id.txtTime);
+        tv = (EditText) findViewById(R.id.txtTime);
         tv.setText(formattedTime);
 
         this.getReservationModel();
     }
-    public void validateBooking()
-    {
+
+    public void validateBooking() {
         CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
-        FloatingActionButton btn = (FloatingActionButton)this.findViewById(R.id.btnBooking);
-        if(!view.getSelectedTables().isEmpty())
-        {
+        FloatingActionButton btn = (FloatingActionButton) this.findViewById(R.id.btnBooking);
+        if (!view.getSelectedTables().isEmpty()) {
             btn.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             btn.setVisibility(View.INVISIBLE);
         }
     }
 
-
-    private void getReservationModel()
-    {
+    private void getReservationModel() {
         try {
             TableReservationModelRequest request = new TableReservationModelRequest();
             request.roomId = roomId;
             Calendar bookingTime = DataTimeUtil.convertToGTM(mDate);
             request.time = bookingTime.getTime();
 
-            WebApiService service = new WebApiService(TableState.class,true);
+            WebApiService service = new WebApiService(TableState.class, true);
             service.performPostList(WebApiActions.GetBookingState(), request, new IWebApiResultListener<List>() {
                 @Override
                 public void onResult(List objResult) {
                     CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
                     view.setBooking(objResult);
                 }
+
                 @Override
                 public void onError(Exception err) {
-                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                    ((LpsApplication) getApplicationContext()).HandleError(err);
                 }
             });
-        }
-        catch (Exception ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage(), ex);
         }
     }
-
-
 
     public void onBookingStateChanged() {
         this.getReservationModel();
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PushService.LocalBinder binder = (PushService.LocalBinder) service;
-            mPushService = binder.getService();
-            mBound = true;
-
-            mPushService.setBookingStateListener(bookingStateListener);
-            mPushService.joinReservationModelGroup(roomId);
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-
-
-        }
-    };
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -330,23 +323,22 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
     }
 
-    private void sendBookingRequest()
-    {
+    private void sendBookingRequest() {
         CustomerMapView view = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
 
         List<Table> selected = new ArrayList<>(view.getSelectedTables());
-        String path =  WebApiActions.SendBookingRequest();
+        String path = WebApiActions.SendBookingRequest();
         BookingRequest request = new BookingRequest();
-        for(Table table:selected) {
+        for (Table table : selected) {
             request.tables.add(table.id);
         }
 
         request.time = DataTimeUtil.convertToGTM(this.mDate).getTime();
-        WebApiService service = new WebApiService(BookingRequest.class,true);
+        WebApiService service = new WebApiService(BookingRequest.class, true);
         service.performPost(path, request);
 
         view.clearSelectedTables();
-        for(Table table:selected) {
+        for (Table table : selected) {
             TableState state = table.getBookingState();
             state.setTableState(TableStateEnum.Waiting);
             table.setBookingState(state);
@@ -355,7 +347,7 @@ public class BookingActivity extends BaseActivity  implements DatePickerFragment
 
         view.invalidate();
 
-        FloatingActionButton btn = (FloatingActionButton)this.findViewById(R.id.btnBooking);
+        FloatingActionButton btn = (FloatingActionButton) this.findViewById(R.id.btnBooking);
         btn.setVisibility(View.INVISIBLE);
     }
 }

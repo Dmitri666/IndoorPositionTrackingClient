@@ -8,13 +8,11 @@ public class Point {
     public float y;
     public int index;
 
-    public Point()
-    {
+    public Point() {
 
     }
 
-    public Point(float x,float y)
-    {
+    public Point(float x, float y) {
         this.x = x;
         this.y = y;
     }

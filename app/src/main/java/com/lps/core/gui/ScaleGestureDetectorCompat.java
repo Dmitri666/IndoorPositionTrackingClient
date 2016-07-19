@@ -5,11 +5,12 @@ import android.os.Build;
 import android.view.ScaleGestureDetector;
 
 /**
-        * A utility class for using {@link android.view.ScaleGestureDetector} in a backward-compatible
-        * fashion.
-        */
+ * A utility class for using {@link android.view.ScaleGestureDetector} in a backward-compatible
+ * fashion.
+ */
 public class ScaleGestureDetectorCompat {
     public static boolean synchronizeScale = false;
+
     /**
      * Disallow instantiation.
      */

@@ -16,8 +16,7 @@ public class RequestLocationData {
 
     public String locationCity;
 
-    public RequestLocationData()
-    {
+    public RequestLocationData() {
         this.kitchenTypes = new ArrayList<>();
     }
 }

@@ -2,10 +2,7 @@ package com.lps.lpsapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -33,13 +30,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
-import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.rooms.RequestLocationData;
 import com.lps.lpsapp.viewModel.rooms.RoomInfo;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -48,21 +45,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class SearchLocaleResultActivity extends BaseActivity  implements GoogleMap.OnInfoWindowClickListener {
+public class SearchLocaleResultActivity extends BaseActivity implements GoogleMap.OnInfoWindowClickListener {
     private static String TAG = "SearchLocaleResultActivity";
-
+    private static SupportMapFragment myMapFragment;
     // Activity Parameters
     private RequestLocationData mParameters;
-
     private Menu menu;
-
-
     private GoogleMap mMap;
     private List<RoomInfo> mRooms;
     private Map<String, RoomInfo> mRoomsMap;
     private MyArrayAdapter adapter;
-
-    private static SupportMapFragment myMapFragment;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -86,7 +78,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
 
         mRoomsMap = new HashMap<>();
         String params = getIntent().getStringExtra("parameters");
-        if(params != null) {
+        if (params != null) {
             try {
                 this.mParameters = JsonSerializer.deserialize(params, RequestLocationData.class);
 //                SharedPreferences settings = getSharedPreferences("parameters", 0);
@@ -143,7 +135,6 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -178,8 +169,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         startActivity(intent);
     }
 
-    private void setGoogleMap(GoogleMap map)
-    {
+    private void setGoogleMap(GoogleMap map) {
         this.mMap = map;
         this.mMap.setOnInfoWindowClickListener(this);
         this.mMap.setInfoWindowAdapter(new MyInfoWindowAdapter());
@@ -194,7 +184,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar_black_24dp));
             mRoomsMap.put(marker.getId(), roomInfo);
         }
-        if(this.mParameters != null) {
+        if (this.mParameters != null) {
             LatLng position = new LatLng(this.mParameters.latitude, this.mParameters.longitude);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 13));
         }
@@ -203,7 +193,7 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
 
     private void loadLocales() {
         if (this.mParameters != null) {
-            WebApiService service = new WebApiService(RoomInfo.class,true);
+            WebApiService service = new WebApiService(RoomInfo.class, true);
             service.performPostList(WebApiActions.GetRooms(), this.mParameters, new IWebApiResultListener<List>() {
                 @Override
                 public void onResult(List objResult) {
@@ -212,11 +202,11 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
 
                 @Override
                 public void onError(Exception err) {
-                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                    ((LpsApplication) getApplicationContext()).HandleError(err);
                 }
             });
         } else {
-            WebApiService service = new WebApiService(RoomInfo.class,true);
+            WebApiService service = new WebApiService(RoomInfo.class, true);
             service.performGetList(WebApiActions.GetRooms(), new IWebApiResultListener<List>() {
                 @Override
                 public void onResult(List objResult) {
@@ -225,14 +215,13 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
 
                 @Override
                 public void onError(Exception err) {
-                    ((LpsApplication)getApplicationContext()).HandleError(err);
+                    ((LpsApplication) getApplicationContext()).HandleError(err);
                 }
             });
         }
     }
 
-    private void loadingFinished(List<RoomInfo> rooms)
-    {
+    private void loadingFinished(List<RoomInfo> rooms) {
         this.mRooms = rooms;
 
         // Create the adapter that will return a fragment for each of the three
@@ -260,7 +249,151 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         });
     }
 
-     /**
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public PlaceholderFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final SearchLocaleResultActivity activity = (SearchLocaleResultActivity) getActivity();
+            int tabNumber = getArguments().getInt(ARG_SECTION_NUMBER);
+            if (tabNumber == 2) {
+                View rootView = inflater.inflate(R.layout.fragment_search_locale_result_map, container, false);
+
+                myMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
+                myMapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap googleMap) {
+                        activity.setGoogleMap(googleMap);
+                    }
+                });
+                return rootView;
+            } else {
+                View rootView = inflater.inflate(R.layout.fragment_search_locale_result_list, container, false);
+                ListView listView = (ListView) rootView.findViewById(R.id.lvLocales);
+
+                activity.adapter = new MyArrayAdapter(getContext().getApplicationContext(), R.layout.list_item_locale, activity.mRooms);
+                listView.setAdapter(activity.adapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        final RoomInfo item = (RoomInfo) adapterView.getItemAtPosition(i);
+                        Intent intent = new Intent(getContext().getApplicationContext(), BookingActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("id", item.id);
+                        startActivity(intent);
+                    }
+                });
+                return rootView;
+            }
+
+        }
+    }
+
+    private static class MyArrayAdapter extends ArrayAdapter {
+        public static boolean isFavoritMode = false;
+        private LayoutInflater inflater = null;
+
+        public MyArrayAdapter(Context context, int resource, List<RoomInfo> objects) {
+            super(context, resource, objects);
+            inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.list_item_locale, null);
+            }
+
+            final RoomInfo info = (RoomInfo) this.getItem(position);
+
+            CheckBox chb = (CheckBox) convertView.findViewById(R.id.localecheck);
+            if (isFavoritMode) {
+                chb.setVisibility(View.VISIBLE);
+            } else {
+                chb.setVisibility(View.GONE);
+            }
+
+            final ImageView ivFavorit = (ImageView) convertView.findViewById(R.id.favorit);
+            ivFavorit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    info.isFavorite = !info.isFavorite;
+                    if (info.isFavorite) {
+                        ivFavorit.setImageResource(R.drawable.ic_favorite_black_24dp);
+                        new WebApiService(UUID.class, true).performGet(WebApiActions.InsertFavorite() + "/" + info.id.toString(), null);
+                    } else {
+                        ivFavorit.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                        new WebApiService(UUID.class, true).performGet(WebApiActions.DeleteFavorite() + "/" + info.id.toString(), null);
+                    }
+
+                }
+            });
+            if (info.isFavorite) {
+                ivFavorit.setImageResource(R.drawable.ic_favorite_black_24dp);
+            }
+
+            ImageView ivChat = (ImageView) convertView.findViewById(R.id.chatIcon);
+            if (info.isChatExist) {
+
+                ivChat.setVisibility(View.VISIBLE);
+            } else {
+                ivChat.setVisibility(View.INVISIBLE);
+            }
+
+            TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
+            tvTitle.setText(info.name);
+
+            LinearLayout ratings = (LinearLayout) convertView.findViewById(R.id.ratings);
+            ratings.removeAllViews();
+            for (int i = 0; i < info.rating; i++) {
+                ImageView iv = (ImageView) inflater.inflate(R.layout.imageview_rating_full, null);
+                ratings.addView(iv);
+            }
+
+            TextView tvText = (TextView) convertView.findViewById(R.id.text);
+            tvText.setText(info.city);
+
+
+            final ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView);
+            String iPath = info.imageFileName;
+            if (iPath != null && !iPath.isEmpty()) {
+                String path = WebApiActions.GetImage() + "/" + iPath;
+                Picasso.with(getContext()).load(path).resize(200, 200).into(imageView);
+            }
+
+
+            return convertView;
+        }
+    }
+
+    /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -296,177 +429,13 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         }
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            final SearchLocaleResultActivity activity = (SearchLocaleResultActivity)getActivity();
-            int tabNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-            if(tabNumber == 2)
-            {
-                View rootView = inflater.inflate(R.layout.fragment_search_locale_result_map, container, false);
-
-                myMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_fragment);
-                myMapFragment.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap googleMap) {
-                        activity.setGoogleMap(googleMap);
-                    }
-                });
-                return rootView;
-            }
-            else
-            {
-                View rootView = inflater.inflate(R.layout.fragment_search_locale_result_list, container, false);
-                ListView listView = (ListView)rootView.findViewById(R.id.lvLocales);
-
-                activity.adapter = new MyArrayAdapter(getContext().getApplicationContext(),R.layout.list_item_locale,activity.mRooms);
-                listView.setAdapter(activity.adapter);
-
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        final RoomInfo item = (RoomInfo) adapterView.getItemAtPosition(i);
-                        Intent intent = new Intent(getContext().getApplicationContext(), BookingActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("id", item.id);
-                        startActivity(intent);
-                    }
-                });
-                return rootView;
-            }
-
-        }
-    }
-
-
-
-    private static class MyArrayAdapter extends ArrayAdapter
-    {
-        public static boolean isFavoritMode = false;
-        private LayoutInflater inflater = null;
-        public MyArrayAdapter(Context context, int resource, List<RoomInfo> objects) {
-            super(context, resource,objects);
-            inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null)
-            {
-                convertView = inflater.inflate(R.layout.list_item_locale, null);
-            }
-
-            final RoomInfo info =  (RoomInfo)this.getItem(position);
-
-            CheckBox chb = (CheckBox) convertView.findViewById(R.id.localecheck);
-            if(isFavoritMode)
-            {
-                chb.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                chb.setVisibility(View.GONE);
-            }
-
-            final ImageView ivFavorit = (ImageView) convertView.findViewById(R.id.favorit);
-            ivFavorit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    info.isFavorite = !info.isFavorite;
-                    if(info.isFavorite)
-                    {
-                        ivFavorit.setImageResource(R.drawable.ic_favorite_black_24dp);
-                        new WebApiService(UUID.class,true).performGet(WebApiActions.InsertFavorite() + "/" + info.id.toString(), null);
-                    }
-                    else
-                    {
-                        ivFavorit.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                        new WebApiService(UUID.class,true).performGet(WebApiActions.DeleteFavorite() + "/" + info.id.toString(), null);
-                    }
-
-                }
-            });
-            if(info.isFavorite) {
-               ivFavorit.setImageResource(R.drawable.ic_favorite_black_24dp);
-            }
-
-            ImageView ivChat = (ImageView) convertView.findViewById(R.id.chatIcon);
-            if(info.isChatExist) {
-
-                ivChat.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                ivChat.setVisibility(View.INVISIBLE);
-            }
-
-            TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
-            tvTitle.setText(info.name);
-
-            LinearLayout ratings = (LinearLayout) convertView.findViewById(R.id.ratings);
-            ratings.removeAllViews();
-            for(int i = 0; i < info.rating; i++)
-            {
-                ImageView iv = (ImageView)inflater.inflate(R.layout.imageview_rating_full,null);
-                ratings.addView(iv);
-            }
-
-            TextView tvText = (TextView) convertView.findViewById(R.id.text);
-            tvText.setText(info.city);
-
-
-            final ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView);
-            String iPath = info.imageFileName;
-            if(iPath != null && !iPath.isEmpty())
-            {
-                String path = WebApiActions.GetImage() + "/" + iPath;
-                Picasso.with(getContext()).load(path).resize(200,200).into(imageView);
-            }
-
-
-
-
-
-
-           return convertView;
-        }
-    }
-
     class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-        private LayoutInflater inflater = null;
-        private final View myContentsView;
         final TextView tvTitle;
         final TextView tvSnippet;
         final ImageView imageView;
         final LinearLayout ratings;
+        private final View myContentsView;
+        private LayoutInflater inflater = null;
 
         MyInfoWindowAdapter() {
             inflater = getLayoutInflater();
@@ -481,19 +450,17 @@ public class SearchLocaleResultActivity extends BaseActivity  implements GoogleM
         public View getInfoContents(final Marker marker) {
             final RoomInfo info = mRoomsMap.get(marker.getId());
             String iPath = info.imageFileName;
-            if(iPath != null && !iPath.isEmpty())
-            {
+            if (iPath != null && !iPath.isEmpty()) {
                 String path = WebApiActions.GetImage() + "/" + iPath;
-                Picasso.with(SearchLocaleResultActivity.this.getApplicationContext()).load(path).resize(200,200).into(imageView);
+                Picasso.with(SearchLocaleResultActivity.this.getApplicationContext()).load(path).resize(200, 200).into(imageView);
             }
             tvTitle.setText(info.name);
             tvSnippet.setText(info.name);
 
 
             ratings.removeAllViews();
-            for(int i = 0; i < info.rating; i++)
-            {
-                ImageView iv = (ImageView)inflater.inflate(R.layout.imageview_rating_full,null);
+            for (int i = 0; i < info.rating; i++) {
+                ImageView iv = (ImageView) inflater.inflate(R.layout.imageview_rating_full, null);
                 ratings.addView(iv);
             }
             return myContentsView;

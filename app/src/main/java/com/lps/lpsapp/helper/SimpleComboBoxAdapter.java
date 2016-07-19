@@ -11,25 +11,24 @@ import java.util.List;
 /**
  * Created by dle on 03.12.2015.
  */
-public class SimpleComboBoxAdapter extends ArrayAdapter<ComboBoxItem>
-{
+public class SimpleComboBoxAdapter extends ArrayAdapter<ComboBoxItem> {
     // Your custom values for the spinner (User)
     private List<ComboBoxItem> values;
 
     public SimpleComboBoxAdapter(Context context, List<ComboBoxItem> values) {
-        super(context, android.R.layout.simple_spinner_item,values);
+        super(context, android.R.layout.simple_spinner_item, values);
         this.values = values;
     }
 
-    public int getCount(){
+    public int getCount() {
         return values.size();
     }
 
-    public ComboBoxItem getItem(int position){
+    public ComboBoxItem getItem(int position) {
         return values.get(position);
     }
 
-    public long getItemId(int position){
+    public long getItemId(int position) {
         return position;
     }
 
@@ -37,8 +36,8 @@ public class SimpleComboBoxAdapter extends ArrayAdapter<ComboBoxItem>
     // This is for the "passive" state of the spinner
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = super.getView(position,convertView,parent);
-        ((TextView)convertView).setText(values.get(position).text);
+        convertView = super.getView(position, convertView, parent);
+        ((TextView) convertView).setText(values.get(position).text);
 
         // And finally return your dynamic (or custom) view for each spinner item
         return convertView;
@@ -50,7 +49,7 @@ public class SimpleComboBoxAdapter extends ArrayAdapter<ComboBoxItem>
     public View getDropDownView(int position, View convertView,
                                 ViewGroup parent) {
         convertView = super.getDropDownView(position, convertView, parent);
-        ((TextView)convertView).setText(values.get(position).text);
+        ((TextView) convertView).setText(values.get(position).text);
 
         // And finally return your dynamic (or custom) view for each spinner item
         return convertView;

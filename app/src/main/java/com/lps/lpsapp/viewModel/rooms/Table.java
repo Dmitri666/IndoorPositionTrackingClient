@@ -15,35 +15,25 @@ import java.util.UUID;
 /**
  * Created by dle on 27.07.2015.
  */
-public class Table  {
-    @JsonIgnore
-    private TableState bookingState;
-
-    @JsonIgnore
-    private Boolean selected;
-
-    @JsonIgnore
-    public ImageView guiElement;
-
+public class Table {
     @JsonIgnore
     public final Animation animation = new AlphaAnimation(1, 0);
-
-
+    @JsonIgnore
+    public ImageView guiElement;
     public double wight;
-
-
     public double height;
-
-
     public UUID id;
     public double x;
     public double y;
     public String description;
     public double angle;
     public String type;
+    @JsonIgnore
+    private TableState bookingState;
+    @JsonIgnore
+    private Boolean selected;
 
-    public Table()
-    {
+    public Table() {
         this.selected = false;
         this.bookingState = new TableState();
         this.bookingState.state = 0;
@@ -55,14 +45,16 @@ public class Table  {
         animation.setRepeatMode(Animation.REVERSE);
     }
 
-    public void setBookingState(TableState state)
-    {
+    public TableState getBookingState() {
+        return this.bookingState;
+    }
+
+    public void setBookingState(TableState state) {
         bookingState = state;
-        if(state.getTableState() == TableStateEnum.Waiting) {
+        if (state.getTableState() == TableStateEnum.Waiting) {
             this.guiElement.startAnimation(this.animation);
             this.guiElement.setColorFilter(Color.BLUE);
-        }
-        else {
+        } else {
             this.guiElement.clearAnimation();
             if (state.getTableState() == TableStateEnum.Free) {
                 this.guiElement.setColorFilter(Color.GREEN);
@@ -76,24 +68,15 @@ public class Table  {
         }
     }
 
-    public TableState getBookingState()
-    {
-        return this.bookingState;
-    }
-
-    public Boolean getSelected()
-    {
+    public Boolean getSelected() {
         return this.selected;
     }
 
-    public void setSelected(Boolean selected)
-    {
+    public void setSelected(Boolean selected) {
         this.selected = selected;
-        if(selected) {
+        if (selected) {
             this.guiElement.setColorFilter(Color.YELLOW);
-        }
-        else
-        {
+        } else {
             this.setBookingState(this.bookingState);
         }
     }

@@ -46,6 +46,28 @@ public class ChatActivity extends BaseActivity {
     private ChatNotifier chatMessageListener;
     private boolean mBound = false;
     private PushService mPushService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PushService.LocalBinder binder = (PushService.LocalBinder) service;
+            mPushService = binder.getService();
+            mBound = true;
+
+            mPushService.setChatListener(chatMessageListener);
+
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +83,12 @@ public class ChatActivity extends BaseActivity {
             }
 
             @Override
-            public void joinChat(Actor actor)
-            {
+            public void joinChat(Actor actor) {
 
             }
 
             @Override
-            public void leaveChat(Actor actor)
-            {
+            public void leaveChat(Actor actor) {
 
             }
         };
@@ -76,10 +96,8 @@ public class ChatActivity extends BaseActivity {
         try {
             String serActor = getIntent().getExtras().getString("actor");
             this.actor = JsonSerializer.deserialize(serActor, Actor.class);
-        }
-        catch (Exception ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage(), ex);
             this.finish();
         }
         initControls();
@@ -134,29 +152,6 @@ public class ChatActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PushService.LocalBinder binder = (PushService.LocalBinder) service;
-            mPushService = binder.getService();
-            mBound = true;
-
-            mPushService.setChatListener(chatMessageListener);
-
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-
-
-        }
-    };
-
     private void initControls() {
         messagesContainer = (ListView) findViewById(R.id.messagesContainer);
         messageET = (EditText) findViewById(R.id.messageEdit);
@@ -187,8 +182,8 @@ public class ChatActivity extends BaseActivity {
                 messageET.setText("");
 
                 displayMessage(chatMessage);
-                WebApiService service = new WebApiService(ChatMessage.class,true);
-                service.performPost(WebApiActions.PostChatMessage(),chatMessage);
+                WebApiService service = new WebApiService(ChatMessage.class, true);
+                service.performPost(WebApiActions.PostChatMessage(), chatMessage);
 
 
             }
@@ -213,30 +208,28 @@ public class ChatActivity extends BaseActivity {
     }
 
 
-
-    private void loadConversation(){
+    private void loadConversation() {
 
         chatHistory = new ArrayList<ChatMessage>();
-        String path =  WebApiActions.GetConversation() + "/" + this.actor.userId.toString();
-        WebApiService service = new WebApiService(ConversationsData.class,true);
+        String path = WebApiActions.GetConversation() + "/" + this.actor.userId.toString();
+        WebApiService service = new WebApiService(ConversationsData.class, true);
         service.performGet(path, new IWebApiResultListener<ConversationsData>() {
             @Override
             public void onResult(ConversationsData objResult) {
                 setConversation(objResult);
             }
+
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
         });
     }
 
-    private void setConversation(ConversationsData data)
-    {
-        if(data != null)
-        {
+    private void setConversation(ConversationsData data) {
+        if (data != null) {
             this.conversationId = data.conversationId;
-            for (ChatMessage msg:data.messages) {
+            for (ChatMessage msg : data.messages) {
                 chatHistory.add(msg);
             }
         }
@@ -245,15 +238,14 @@ public class ChatActivity extends BaseActivity {
         adapter = new ChatAdapter(ChatActivity.this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
 
-        for(int i=0; i<chatHistory.size(); i++) {
+        for (int i = 0; i < chatHistory.size(); i++) {
             ChatMessage message = chatHistory.get(i);
             displayMessage(message);
         }
         this.mProgressBar.setVisibility(View.GONE);
     }
 
-    private void newChatMessageRecived(ChatMessage chatMessage)
-    {
+    private void newChatMessageRecived(ChatMessage chatMessage) {
         displayMessage(chatMessage);
     }
 }

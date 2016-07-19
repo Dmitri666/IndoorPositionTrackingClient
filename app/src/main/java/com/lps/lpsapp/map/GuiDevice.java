@@ -3,23 +3,19 @@ package com.lps.lpsapp.map;
 import android.content.Context;
 import android.widget.Button;
 
-import com.lps.lpsapp.viewModel.chat.DevicePosition;
-
 /**
  * Created by user on 28.07.2015.
  */
 public class GuiDevice extends Button {
-    public DevicePosition devicePosition;
+    public String deviceId;
     public float wight;
     public float height;
 
 
-    public GuiDevice(Context context, DevicePosition position) {
+    public GuiDevice(Context context, String deviceId) {
         super(context, null);
         this.wight = 40f;
         this.height = 40f;
-        this.devicePosition = position;
-        this.devicePosition.guiElement = this;
-
+        this.deviceId = deviceId;
     }
 }

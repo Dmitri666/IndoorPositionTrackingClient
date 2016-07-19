@@ -25,14 +25,34 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MeasurementActivity extends BaseActivity {
+    private final ReentrantLock lock = new ReentrantLock();
     String beaconId2;
     boolean mBound = false;
     IBeaconServiceListener listener;
     InDoorPositionService mService;
     int mTxPower;
     List<Integer> mesuaredRssi;
-    private final ReentrantLock lock = new ReentrantLock();
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            mService.setBeaconServiceListener(listener);
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     public MeasurementActivity() {
         this.mesuaredRssi = new ArrayList<>();
@@ -45,10 +65,9 @@ public class MeasurementActivity extends BaseActivity {
         mProgressBar.setVisibility(View.GONE);
         listener = new IBeaconServiceListener() {
             @Override
-            public void beaconsInRange(Collection<Beacon> beacons,Region region) {
+            public void beaconsInRange(Collection<Beacon> beacons, Region region) {
                 lock.lock();
-                try
-                {
+                try {
                     for (Beacon beacon : beacons) {
                         if (beacon.getId3().toString().equals(beaconId2)) {
                             mTxPower = beacon.getTxPower();
@@ -137,38 +156,16 @@ public class MeasurementActivity extends BaseActivity {
         });
     }
 
-    /**
-     * Defines callbacks for service binding, passed to bindService()
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            mService.setBeaconServiceListener(listener);
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
-
     private void submitMesurement() {
         final Button mStartButton = (Button) findViewById(R.id.btnStartMessungen);
         EditText tbDistance = (EditText) findViewById(R.id.txtDistance);
         double distance = Double.parseDouble(tbDistance.getText().toString());
         double sumRssi = 0.0;
-        for (int rssi:this.mesuaredRssi){
+        for (int rssi : this.mesuaredRssi) {
             sumRssi += rssi;
-        };
-        mService.submitMeasurement(distance, mTxPower,sumRssi / this.mesuaredRssi.size() );
+        }
+        ;
+        mService.submitMeasurement(distance, mTxPower, sumRssi / this.mesuaredRssi.size());
         this.mesuaredRssi.clear();
         this.runOnUiThread(new Runnable() {
             public void run() {

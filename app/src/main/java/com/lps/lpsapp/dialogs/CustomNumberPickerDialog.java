@@ -13,7 +13,7 @@ import com.lps.lpsapp.R;
 /**
  * Created by dle on 01.12.2015.
  */
-public class CustomNumberPickerDialog extends AlertDialog implements DialogInterface.OnClickListener{
+public class CustomNumberPickerDialog extends AlertDialog implements DialogInterface.OnClickListener {
     private final NumberPicker mNumberPicker;
 
     protected CustomNumberPickerDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {

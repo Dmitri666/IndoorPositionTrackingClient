@@ -49,45 +49,197 @@ import microsoft.aspnet.signalr.client.transport.NegotiationException;
  */
 public class PushService extends Service {
     private static String TAG = "PushService";
-
+    private final IBinder mBinder = new LocalBinder();
     private HubProxy proxy;
     private HubConnection conn;
     private SignalRFuture<Void> sf;
     private String deviceId;
-
-
-    private final IBinder mBinder = new LocalBinder();
     private List<DevicePositionNotifier> positionConsumers = new ArrayList<DevicePositionNotifier>();
     private List<BookingStateNotofier> bookingStateConsumers = new ArrayList<BookingStateNotofier>();
     private List<ChatNotifier> chatConsumers = new ArrayList<ChatNotifier>();
+    private Action<JsonElement[]> onJoinChat = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+            if (positionConsumers.isEmpty()) {
+                return;
+            }
 
-    public void setActorPositionListener(DevicePositionNotifier consumer)
-    {
+            try {
+                Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
+                if (chatConsumers.size() > 0) {
+                    for (ChatNotifier consumer : chatConsumers) {
+                        consumer.joinChat(actor);
+                    }
+                } else {
+                    //notifyNewChatMessage(msg);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+    private Action<JsonElement[]> onLeaveChat = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+            if (positionConsumers.isEmpty()) {
+                return;
+            }
+
+            try {
+                Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
+                if (chatConsumers.size() > 0) {
+                    for (ChatNotifier consumer : chatConsumers) {
+                        consumer.leaveChat(actor);
+                    }
+                } else {
+                    //notifyNewChatMessage(msg);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+    private Action<JsonElement[]> onPositionChanged = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+            if (positionConsumers.isEmpty()) {
+                return;
+            }
+
+            try {
+                DevicePosition position = JsonSerializer.deserialize(jsonElements[0].toString(), DevicePosition.class);
+                if (position.deviceId.equals(deviceId)) {
+                    return;
+                }
+                for (DevicePositionNotifier consumer : positionConsumers) {
+                    consumer.positionChanged(position);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+    private Action<JsonElement[]> onBookingStateChanged = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+
+            try {
+                if (jsonElements.length > 0) {
+                    BookingJoinRoomData model = JsonSerializer.deserialize(jsonElements[0].toString(), BookingJoinRoomData.class);
+                    if (model.getBookingState() == BookingStateEnum.Accepted) {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast toast = Toast.makeText(PushService.this, "Ваш заказ принят. Вы можете отправить план помещения с выбранным Вами столиком Вашим друзьям.", Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+                        });
+                    } else if (model.getBookingState() == BookingStateEnum.Rejected) {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast toast = Toast.makeText(PushService.this, "Ваш заказ rejected.", Toast.LENGTH_LONG);
+                                toast.show();
+                            }
+                        });
+                    }
+                    if (bookingStateConsumers.size() == 0) {
+                        notifyBookingStateChanged(model);
+                    } else {
+                        for (BookingStateNotofier consumer : bookingStateConsumers) {
+                            consumer.bookingStateChanged();
+                        }
+                    }
+
+                } else {
+                    if (bookingStateConsumers.size() > 0) {
+                        for (BookingStateNotofier consumer : bookingStateConsumers) {
+                            consumer.bookingStateChanged();
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+    private Action<JsonElement[]> onReservationModelChanged = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+
+            try {
+
+                if (bookingStateConsumers.size() > 0) {
+                    for (BookingStateNotofier consumer : bookingStateConsumers) {
+                        consumer.bookingStateChanged();
+                    }
+                }
+
+
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+    private Action<JsonElement[]> onNewChatMessage = new Action<JsonElement[]>() {
+        @Override
+        public void run(JsonElement[] jsonElements) throws Exception {
+
+            try {
+                ChatMessage msg = JsonSerializer.deserialize(jsonElements[0].toString(), ChatMessage.class);
+                if (chatConsumers.size() > 0) {
+                    for (ChatNotifier consumer : chatConsumers) {
+                        consumer.messageResived(msg);
+                    }
+                } else {
+                    //notifyNewChatMessage(msg);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+
+        }
+
+
+    };
+
+    public void setActorPositionListener(DevicePositionNotifier consumer) {
         this.positionConsumers.add(consumer);
     }
 
-    public void removeActorPositionListener(DevicePositionNotifier consumer)
-    {
+    public void removeActorPositionListener(DevicePositionNotifier consumer) {
         this.positionConsumers.remove(consumer);
     }
 
-    public void setBookingStateListener(BookingStateNotofier consumer)
-    {
+    public void setBookingStateListener(BookingStateNotofier consumer) {
         this.bookingStateConsumers.add(consumer);
     }
 
-    public void removeBookingStateListener(BookingStateNotofier consumer)
-    {
+    public void removeBookingStateListener(BookingStateNotofier consumer) {
         this.bookingStateConsumers.remove(consumer);
     }
 
-    public void setChatListener(ChatNotifier consumer)
-    {
+    public void setChatListener(ChatNotifier consumer) {
         this.chatConsumers.add(consumer);
     }
 
-    public void removeChatMessageListener(ChatNotifier consumer)
-    {
+    public void removeChatMessageListener(ChatNotifier consumer) {
         this.chatConsumers.remove(consumer);
     }
 
@@ -96,7 +248,7 @@ public class PushService extends Service {
         super.onCreate();
         // The service is being created
 
-        this.deviceId = ((LpsApplication)getApplication()).getAndroidId();
+        this.deviceId = ((LpsApplication) getApplication()).getAndroidId();
         // Connect to the server
         conn = new HubConnection(WebApiActions.Subscribe(), "", true, new Logger() {
 
@@ -105,7 +257,7 @@ public class PushService extends Service {
                 Log.d(TAG, message);
             }
         });
-        if(AccessToken.CurrentToken != null) {
+        if (AccessToken.CurrentToken != null) {
             OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
             conn.setCredentials(credentials);
         }
@@ -118,7 +270,7 @@ public class PushService extends Service {
 
             @Override
             public void onError(Throwable error) {
-                ((LpsApplication)getApplication()).HandleError(new Exception(error));
+                ((LpsApplication) getApplication()).HandleError(new Exception(error));
             }
         });
 
@@ -143,7 +295,7 @@ public class PushService extends Service {
         conn.stateChanged(new StateChangedCallback() {
             @Override
             public void stateChanged(ConnectionState connectionState, ConnectionState connectionState1) {
-                Log.d(TAG, "oldState:" + connectionState + " newState: "  + connectionState1);
+                Log.d(TAG, "oldState:" + connectionState + " newState: " + connectionState1);
             }
         });
 
@@ -175,21 +327,18 @@ public class PushService extends Service {
         Subscription leaveChatSubscription = proxy.subscribe("leavechat");
         leaveChatSubscription.addReceivedHandler(onLeaveChat);
 
-        sf =  conn.start();
+        sf = conn.start();
 
         sf.onError(new ErrorCallback() {
             @Override
             public void onError(Throwable throwable) {
-                if(throwable instanceof NegotiationException)
-                {
+                if (throwable instanceof NegotiationException) {
                     sf.cancel(true);
-                    ((LpsApplication)getApplication()).HandleError(new Exception(throwable));
+                    ((LpsApplication) getApplication()).HandleError(new Exception(throwable));
 
-                }
-                else
-                {
-                    Log.e(TAG,"sf: " + throwable.toString(),throwable);
-                    ((LpsApplication)getApplication()).HandleError(new Exception(throwable));
+                } else {
+                    Log.e(TAG, "sf: " + throwable.toString(), throwable);
+                    ((LpsApplication) getApplication()).HandleError(new Exception(throwable));
                 }
             }
         });
@@ -230,17 +379,16 @@ public class PushService extends Service {
         proxy.removeSubscription("joinchat");
         proxy.removeSubscription("leavechat");
         proxy.removeSubscription("changetablereservationmodel");
-        if(conn.getState() != ConnectionState.Disconnected) {
+        if (conn.getState() != ConnectionState.Disconnected) {
             try {
                 conn.stop();
             } catch (Exception ex) {
-                Log.e(TAG,ex.getMessage(),ex);
+                Log.e(TAG, ex.getMessage(), ex);
             }
 
         }
         super.onDestroy();
     }
-
 
     public void resetCredentials() {
         this.onDestroy();
@@ -252,26 +400,13 @@ public class PushService extends Service {
 //            this.sf = conn.start();
 //        }
     }
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
-    public class LocalBinder extends Binder {
-        public PushService getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return PushService.this;
-        }
-    }
 
-    public void joinPositionConsumerGroup(final UUID mapId)
-    {
+    public void joinPositionConsumerGroup(final UUID mapId) {
         try {
-            if(this.sf.isDone())
-            {
+            if (this.sf.isDone()) {
                 String groupName = "PositionConsumer" + ":" + mapId.toString();
                 proxy.invoke("joinGroup", groupName);
-            }
-            else {
+            } else {
                 this.sf.done(new Action<Void>() {
 
                     @Override
@@ -283,22 +418,17 @@ public class PushService extends Service {
                 });
             }
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, ex.getMessage(), ex);
         }
     }
 
-
-    public void leavePositionConsumerGroup(final UUID mapId)
-    {
+    public void leavePositionConsumerGroup(final UUID mapId) {
         try {
-            if(this.sf.isDone())
-            {
+            if (this.sf.isDone()) {
                 String groupName = "PositionConsumer" + ":" + mapId.toString();
                 proxy.invoke("leaveGroup", groupName);
-            }
-            else {
+            } else {
                 this.sf.done(new Action<Void>() {
 
                     @Override
@@ -309,29 +439,22 @@ public class PushService extends Service {
                 });
             }
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, ex.getMessage(), ex);
         }
     }
 
-    public void joinReservationModelGroup(final UUID mapId)
-    {
+    public void joinReservationModelGroup(final UUID mapId) {
         try {
-            if(this.sf.isDone())
-            {
-                if(conn.getState() == ConnectionState.Disconnected) {
+            if (this.sf.isDone()) {
+                if (conn.getState() == ConnectionState.Disconnected) {
                     conn.start();
                 }
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("joinGroup", groupName);
-            }
-            else if(sf.isCancelled())
-            {
+            } else if (sf.isCancelled()) {
                 return;
-            }
-            else
-            {
+            } else {
                 this.sf.done(new Action<Void>() {
 
                     @Override
@@ -343,30 +466,22 @@ public class PushService extends Service {
             }
 
 
-
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, ex.getMessage(), ex);
         }
     }
 
-    public void leaveReservationModelGroup(final UUID mapId)
-    {
+    public void leaveReservationModelGroup(final UUID mapId) {
         try {
-            if(sf.isDone())
-            {
-                if(conn.getState() == ConnectionState.Disconnected) {
+            if (sf.isDone()) {
+                if (conn.getState() == ConnectionState.Disconnected) {
                     conn.start();
                 }
                 String groupName = "ReservationModel" + ":" + mapId.toString();
                 proxy.invoke("leaveGroup", groupName);
-            }
-            else if(sf.isCancelled())
-            {
+            } else if (sf.isCancelled()) {
                 return;
-            }
-            else
-            {
+            } else {
                 this.sf.done(new Action<Void>() {
 
                     @Override
@@ -378,194 +493,12 @@ public class PushService extends Service {
             }
 
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, ex.getMessage(), ex);
         }
     }
 
-    private Action<JsonElement[]> onJoinChat =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-            if(positionConsumers.isEmpty())
-            {
-                return;
-            }
-
-            try {
-                Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
-                if(chatConsumers.size() > 0) {
-                    for (ChatNotifier consumer : chatConsumers) {
-                        consumer.joinChat(actor);
-                    }
-                }
-                else
-                {
-                    //notifyNewChatMessage(msg);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-    private Action<JsonElement[]> onLeaveChat =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-            if(positionConsumers.isEmpty())
-            {
-                return;
-            }
-
-            try {
-                Actor actor = JsonSerializer.deserialize(jsonElements[0].toString(), Actor.class);
-                if(chatConsumers.size() > 0) {
-                    for (ChatNotifier consumer : chatConsumers) {
-                        consumer.leaveChat(actor);
-                    }
-                }
-                else
-                {
-                    //notifyNewChatMessage(msg);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-    private Action<JsonElement[]> onPositionChanged =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-            if(positionConsumers.isEmpty())
-            {
-                return;
-            }
-
-            try {
-                DevicePosition position = JsonSerializer.deserialize(jsonElements[0].toString(), DevicePosition.class);
-                if(position.deviceId.equals(deviceId)) {
-                    return;
-                }
-                for (DevicePositionNotifier consumer : positionConsumers) {
-                    consumer.positionChanged(position);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-
-    private Action<JsonElement[]> onBookingStateChanged =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-
-            try {
-                if(jsonElements.length > 0) {
-                    BookingJoinRoomData model = JsonSerializer.deserialize(jsonElements[0].toString(), BookingJoinRoomData.class);
-                    if(model.getBookingState() == BookingStateEnum.Accepted) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast toast = Toast.makeText(PushService.this, "Ваш заказ принят. Вы можете отправить план помещения с выбранным Вами столиком Вашим друзьям.", Toast.LENGTH_LONG);
-                                toast.show();
-                            }
-                        });
-                    } else if(model.getBookingState() == BookingStateEnum.Rejected) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast toast = Toast.makeText(PushService.this, "Ваш заказ rejected.", Toast.LENGTH_LONG);
-                                toast.show();
-                            }
-                        });
-                    }
-                    if(bookingStateConsumers.size() == 0)
-                    {
-                        notifyBookingStateChanged(model);
-                    } else {
-                        for (BookingStateNotofier consumer : bookingStateConsumers) {
-                            consumer.bookingStateChanged();
-                        }
-                    }
-
-                }
-                else
-                {
-                    if(bookingStateConsumers.size() > 0) {
-                        for (BookingStateNotofier consumer : bookingStateConsumers) {
-                            consumer.bookingStateChanged();
-                        }
-                    }
-                }
-
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-    private Action<JsonElement[]> onReservationModelChanged =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-
-            try {
-
-                    if(bookingStateConsumers.size() > 0) {
-                        for (BookingStateNotofier consumer : bookingStateConsumers) {
-                            consumer.bookingStateChanged();
-                        }
-                    }
-
-
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-    private Action<JsonElement[]> onNewChatMessage =  new Action<JsonElement[]>() {
-        @Override
-        public void run(JsonElement[] jsonElements) throws Exception {
-
-            try {
-                ChatMessage msg = JsonSerializer.deserialize(jsonElements[0].toString(), ChatMessage.class);
-                if(chatConsumers.size() > 0) {
-                    for (ChatNotifier consumer : chatConsumers) {
-                        consumer.messageResived(msg);
-                    }
-                }
-                else
-                {
-                    //notifyNewChatMessage(msg);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-        }
-
-
-    };
-
-    private void notifyNewChatMessage(final ChatMessage msg)
-    {
+    private void notifyNewChatMessage(final ChatMessage msg) {
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -658,5 +591,16 @@ public class PushService extends Service {
         }
 
 
+    }
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        public PushService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return PushService.this;
+        }
     }
 }

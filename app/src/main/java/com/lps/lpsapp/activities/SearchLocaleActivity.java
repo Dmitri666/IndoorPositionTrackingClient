@@ -20,23 +20,23 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
-import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.helper.ComboBoxItem;
 import com.lps.lpsapp.helper.SimpleComboBoxAdapter;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.rooms.RequestLocationData;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class SearchLocaleActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks ,GoogleApiClient.OnConnectionFailedListener{
+public class SearchLocaleActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static String TAG = "SearchLocaleActivity";
 
     private RequestLocationData mSearchParameters;
@@ -58,7 +58,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStart() {
         super.onStart();
-        if(AppManager.getInstance().AppState.getIsAuthenticated()) {
+        if (AppManager.getInstance().AppState.getIsAuthenticated()) {
             this.loadFilterContent();
         }
     }
@@ -66,7 +66,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     @Override
     protected void onStop() {
         super.onStop();
-        if(mGoogleApiClient != null) {
+        if (mGoogleApiClient != null) {
             this.mGoogleApiClient.disconnect();
             this.mGoogleApiClient.unregisterConnectionCallbacks(this);
             this.mGoogleApiClient.unregisterConnectionFailedListener(this);
@@ -93,26 +93,26 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        if(!super.onOptionsItemSelected(item)) {
+        if (!super.onOptionsItemSelected(item)) {
             switch (item.getItemId()) {
                 case R.id.search:
 
 
-                    Spinner spinner = (Spinner)this.findViewById(R.id.spnRadius);
-                    String strDistance =  (String)spinner.getSelectedItem();
+                    Spinner spinner = (Spinner) this.findViewById(R.id.spnRadius);
+                    String strDistance = (String) spinner.getSelectedItem();
                     int distance = Integer.parseInt(strDistance);
                     this.mSearchParameters.radius = distance;
 
-                    spinner = (Spinner)this.findViewById(R.id.spnLocaleName);
-                    ComboBoxItem name =  (ComboBoxItem)spinner.getSelectedItem();
-                    if(!name.equals("All")) {
+                    spinner = (Spinner) this.findViewById(R.id.spnLocaleName);
+                    ComboBoxItem name = (ComboBoxItem) spinner.getSelectedItem();
+                    if (!name.equals("All")) {
                         mSearchParameters.locationName = name.text;
                     }
 
-                    spinner = (Spinner)this.findViewById(R.id.spnCity);
-                    String city =  (String)spinner.getSelectedItem();
+                    spinner = (Spinner) this.findViewById(R.id.spnCity);
+                    String city = (String) spinner.getSelectedItem();
                     mSearchParameters.locationCity = city;
-                    if(!city.equals("All")) {
+                    if (!city.equals("All")) {
                         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
                         try {
                             List<Address> adresses = geocoder.getFromLocationName(city, 1);
@@ -125,9 +125,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                         } catch (IOException ex) {
                             Log.e(TAG, ex.getMessage(), ex);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         this.GetMyLocation();
                     }
 
@@ -139,23 +137,20 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
         return true;
     }
 
-    private void StartResultActivity()
-    {
+    private void StartResultActivity() {
         Intent intent = new Intent(getApplicationContext(), SearchLocaleResultActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             intent.putExtra("parameters", JsonSerializer.serialize(this.mSearchParameters));
             startActivity(intent);
-        }
-        catch (IOException ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
+        } catch (IOException ex) {
+            Log.e(TAG, ex.getMessage(), ex);
         }
 
     }
 
     private void GetMyLocation() {
-        if(this.mGoogleApiClient == null) {
+        if (this.mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
@@ -165,30 +160,26 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                     .build();
         }
 
-        if(!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
+        if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
         }
 
     }
 
-    private void loadFilterContent()
-    {
-        WebApiService service = new WebApiService(ComboBoxItem.class,true);
+    private void loadFilterContent() {
+        WebApiService service = new WebApiService(ComboBoxItem.class, true);
         service.performGetList(WebApiActions.GetLocaleNames(), new IWebApiResultListener<List<ComboBoxItem>>() {
             @Override
             public void onResult(List<ComboBoxItem> items) {
-                items.add(0,new ComboBoxItem(new UUID(0L,0L),"All"));
+                items.add(0, new ComboBoxItem(new UUID(0L, 0L), "All"));
 
                 Spinner spinner = (Spinner) SearchLocaleActivity.this.findViewById(R.id.spnLocaleName);
                 ArrayAdapter adapter = new SimpleComboBoxAdapter(SearchLocaleActivity.this, items);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
-                if(mSearchParameters.locationName != null)
-                {
-                    for(int i = 0; i < adapter.getCount();i++)
-                    {
-                        if(((ComboBoxItem)adapter.getItem(i)).text.equals(mSearchParameters.locationName))
-                        {
+                if (mSearchParameters.locationName != null) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        if (((ComboBoxItem) adapter.getItem(i)).text.equals(mSearchParameters.locationName)) {
                             spinner.setSelection(i);
                             break;
                         }
@@ -200,26 +191,23 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
 
         });
 
-        service = new WebApiService(String.class,true);
+        service = new WebApiService(String.class, true);
         service.performGetList(WebApiActions.GetCities(), new IWebApiResultListener<List<String>>() {
             @Override
             public void onResult(List<String> cities) {
-                cities.add(0,"All");
+                cities.add(0, "All");
                 Spinner spinner = (Spinner) SearchLocaleActivity.this.findViewById(R.id.spnCity);
-                ArrayAdapter<String> adapter = new ArrayAdapter(SearchLocaleActivity.this,android.R.layout.simple_spinner_item, cities);
+                ArrayAdapter<String> adapter = new ArrayAdapter(SearchLocaleActivity.this, android.R.layout.simple_spinner_item, cities);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
-                if(mSearchParameters.locationCity != null)
-                {
-                    for(int i = 0; i < adapter.getCount();i++)
-                    {
-                        if((adapter.getItem(i)).equals(mSearchParameters.locationCity))
-                        {
+                if (mSearchParameters.locationCity != null) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        if ((adapter.getItem(i)).equals(mSearchParameters.locationCity)) {
                             spinner.setSelection(i);
                             break;
                         }
@@ -230,22 +218,19 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
 
         });
 
-        Spinner spinner = (Spinner)SearchLocaleActivity.this.findViewById(R.id.spnRadius);
+        Spinner spinner = (Spinner) SearchLocaleActivity.this.findViewById(R.id.spnRadius);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(
                 this, R.array.radius_count_arrays, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        if(mSearchParameters.radius != 0)
-        {
-            for(int i = 0; i < adapter.getCount();i++)
-            {
-                if(Integer.parseInt((String)adapter.getItem(i)) == mSearchParameters.radius)
-                {
+        if (mSearchParameters.radius != 0) {
+            for (int i = 0; i < adapter.getCount(); i++) {
+                if (Integer.parseInt((String) adapter.getItem(i)) == mSearchParameters.radius) {
                     spinner.setSelection(i);
                     break;
                 }
@@ -253,7 +238,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
         }
 
-        service = new WebApiService(ComboBoxItem.class,true);
+        service = new WebApiService(ComboBoxItem.class, true);
         service.performGetList(WebApiActions.GetLocaleTypes(), new IWebApiResultListener<List<ComboBoxItem>>() {
             @Override
             public void onResult(List<ComboBoxItem> items) {
@@ -267,7 +252,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
 
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
 
         });
@@ -277,8 +262,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     public void onConnected(Bundle bundle) {
         Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(myLocation == null)
-        {
+        if (myLocation == null) {
             Log.d(TAG, "My Location not found");
             myLocation = new Location(LocationManager.GPS_PROVIDER);
             myLocation.setLatitude(51.23469);
@@ -309,7 +293,7 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 
         switch (requestCode) {
             case MY_PERMISSIONS_ACCESS_COARSE_LOCATION: {
@@ -335,11 +319,6 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
     }
 
 
-
-
-
-
-
     private void getLocationByCity() {
         try {
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -352,10 +331,8 @@ public class SearchLocaleActivity extends BaseActivity implements GoogleApiClien
                 mLastLocation.setLongitude(adresses.get(0).getLongitude());
                 this.startMapsActivity();
             }*/
-        }
-        catch (Exception ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage(), ex);
         }
 
         mProgressBar.setVisibility(View.GONE);

@@ -2,7 +2,6 @@ package com.lps.lpsapp.viewModel.chat;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +12,10 @@ public class BeaconModel {
     public float wight;
     public float height;
     public float realScaleFactor;
-
-    public BeaconModel()
-    {
-       this.beacons = new ArrayList<BeaconInRoom>();
-    }
-
-    @JsonDeserialize(as=ArrayList.class, contentAs= BeaconInRoom.class)
+    @JsonDeserialize(as = ArrayList.class, contentAs = BeaconInRoom.class)
     public List<BeaconInRoom> beacons;
+
+    public BeaconModel() {
+        this.beacons = new ArrayList<BeaconInRoom>();
+    }
 }

@@ -10,13 +10,11 @@ import java.util.UUID;
  */
 public class TableReservationModelRequest {
 
-    public TableReservationModelRequest()
-    {
+    public UUID roomId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy'-'MM'-'dd'T'HH':'mm", timezone = "GMT")
+    public Date time;
+
+    public TableReservationModelRequest() {
 
     }
-
-    public UUID roomId;
-
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy'-'MM'-'dd'T'HH':'mm", timezone="GMT")
-    public Date time;
 }

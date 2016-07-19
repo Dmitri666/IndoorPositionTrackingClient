@@ -12,11 +12,10 @@ public class RoomModel extends RoomInfo {
     public float wight;
     public float height;
     public String backgroungImage;
+    @JsonDeserialize(as = ArrayList.class, contentAs = Table.class)
+    public List<Table> tables;
 
     public RoomModel() {
         this.tables = new ArrayList<Table>();
     }
-
-    @JsonDeserialize(as = ArrayList.class, contentAs = Table.class)
-    public List<Table> tables;
 }

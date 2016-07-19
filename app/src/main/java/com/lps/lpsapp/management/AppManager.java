@@ -28,16 +28,49 @@ import org.altbeacon.beacon.BleNotAvailableException;
  */
 public class AppManager {
     private static String TAG = "AppManager";
+    private static AppManager instance;
     public AppState AppState;
     private LpsApplication app;
-
-
     private boolean mPushServiceBound = false;
     private PushService mPushService;
     private boolean mPositionServiceBound = false;
     private InDoorPositionService mPositionService;
+    private ServiceConnection mPushServiceConnection = new ServiceConnection() {
 
-    private static AppManager instance;
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PushService.LocalBinder binder = (PushService.LocalBinder) service;
+            mPushService = binder.getService();
+            mPushServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mPushServiceBound = false;
+        }
+    };
+    private ServiceConnection mPositionServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
+            mPositionService = binder.getService();
+            mPositionServiceBound = true;
+
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mPositionServiceBound = false;
+
+
+        }
+    };
 
     protected AppManager() {
         this.app = (LpsApplication) LpsApplication.getContext();
@@ -82,11 +115,10 @@ public class AppManager {
 
         this.AppState.IsConnectedToInternet = this.IsConnectedToNetwork();
         this.AppState.IsBlootuthOn = this.CheckBleAvailability();
-        if(this.AppState.IsConnectedToInternet && mPositionServiceBound) {
+        if (this.AppState.IsConnectedToInternet && mPositionServiceBound) {
             this.mPositionService.InitRegionBootstrap();
         }
     }
-
 
     public void LogOut() {
         AppState.IsAuthenticated = false;
@@ -124,7 +156,6 @@ public class AppManager {
         return result;
     }
 
-
     @TargetApi(18)
     private boolean CheckBleAvailability() throws BleNotAvailableException {
         if (SettingsActivity.UseBeaconSimulator) {
@@ -140,45 +171,5 @@ public class AppManager {
             return ((BluetoothManager) app.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter().isEnabled();
         }
     }
-
-
-    private ServiceConnection mPushServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PushService.LocalBinder binder = (PushService.LocalBinder) service;
-            mPushService = binder.getService();
-            mPushServiceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mPushServiceBound = false;
-        }
-    };
-
-
-    private ServiceConnection mPositionServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
-            mPositionService = binder.getService();
-            mPositionServiceBound = true;
-
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mPositionServiceBound = false;
-
-
-        }
-    };
 
 }

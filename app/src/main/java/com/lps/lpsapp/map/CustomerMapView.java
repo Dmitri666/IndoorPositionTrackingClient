@@ -262,7 +262,7 @@ public class CustomerMapView extends ScalableView {
 
     public void clearActors() {
         for (Actor actor : this.actors.values()) {
-            this.removeView(actor.position.guiElement);
+            this.removeView(actor.guiElement);
         }
         this.actors.clear();
         this.invalidate();
@@ -271,7 +271,7 @@ public class CustomerMapView extends ScalableView {
     public void removeActor(String deviceId) {
         if (this.actors.containsKey(deviceId)) {
             Actor actor = this.actors.get(deviceId);
-            this.removeView(actor.position.guiElement);
+            this.removeView(actor.guiElement);
             this.actors.remove(deviceId);
             this.invalidate();
         }
@@ -280,18 +280,18 @@ public class CustomerMapView extends ScalableView {
     public void addActor(Actor actor) {
         ActorsActivity host = (ActorsActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
         this.actors.put(actor.position.deviceId, actor);
-        GuiDevice myButton = new GuiDevice(getContext(), actor.position);
+        GuiDevice myButton = new GuiDevice(getContext(), actor.position.deviceId);
         myButton.setText(actor.userName);
-
+        actor.guiElement = myButton;
         if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
             myButton.setBackgroundResource(R.drawable.actor_self);
         } else {
             myButton.setBackgroundResource(R.drawable.actor);
         }
 
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.position.guiElement.wight, (int) actor.position.guiElement.height);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.guiElement.wight, (int) actor.guiElement.height);
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
-        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.position.guiElement.height);
+        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.guiElement.height);
         myButton.setOnClickListener(host);
 
         this.addView(myButton);
@@ -304,12 +304,12 @@ public class CustomerMapView extends ScalableView {
         }
 
         for (Actor actor : this.actors.values()) {
-            float width = this.getDrawX((float) (actor.position.x + actor.position.guiElement.wight)) - this.getDrawX((float) actor.position.x);
-            float hight = this.getDrawY((float) (actor.position.y + actor.position.guiElement.height)) - this.getDrawY((float) actor.position.y);
+            float width = this.getDrawX((float) (actor.position.x + actor.guiElement.wight)) - this.getDrawX((float) actor.position.x);
+            float hight = this.getDrawY((float) (actor.position.y + actor.guiElement.height)) - this.getDrawY((float) actor.position.y);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) width, (int) hight);
             lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
             lp.topMargin = Math.round(this.getDrawY((float) actor.position.y));
-            actor.position.guiElement.setLayoutParams(lp);
+            actor.guiElement.setLayoutParams(lp);
             //Log.d(TAG, "Actor Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
     }
@@ -394,7 +394,7 @@ public class CustomerMapView extends ScalableView {
 
     public void positionChanged(final DevicePosition position) {
         if (this.actors.containsKey(position.deviceId)) {
-            final DevicePosition pos = this.actors.get(position.deviceId).position;
+            final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
             device.animate().x(this.getDrawX((float) position.x)).y(this.getDrawY((float) position.y));
         } else {

@@ -1,9 +1,5 @@
 package com.lps.lpsapp.viewModel.rooms;
 
-import android.graphics.Bitmap;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.UUID;
 
 /**

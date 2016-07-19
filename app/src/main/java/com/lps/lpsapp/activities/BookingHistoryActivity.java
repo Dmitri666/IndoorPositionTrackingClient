@@ -16,14 +16,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.BookingStateNotofier;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.booking.BookingJoinRoomData;
 import com.lps.lpsapp.viewModel.booking.BookingStateEnum;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.services.WebApiService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,16 +31,36 @@ import java.util.List;
 import java.util.UUID;
 
 public class BookingHistoryActivity extends BaseActivity {
+    protected PushService mPushService;
     ListView listView;
     MyArrayAdapter adapter;
-    ArrayList<BookingJoinRoomData> listItems=new ArrayList<BookingJoinRoomData>();
+    ArrayList<BookingJoinRoomData> listItems = new ArrayList<BookingJoinRoomData>();
     private BookingStateNotofier bookingStateListener;
     private boolean mBound = false;
-    protected PushService mPushService;
     private UUID mRoomId;
+    private ServiceConnection mConnection = new ServiceConnection() {
 
-    public BookingHistoryActivity()
-    {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PushService.LocalBinder binder = (PushService.LocalBinder) service;
+            mPushService = binder.getService();
+            mPushService.setBookingStateListener(bookingStateListener);
+            mBound = true;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+
+
+        }
+    };
+
+
+    public BookingHistoryActivity() {
         bookingStateListener = new BookingStateNotofier() {
             @Override
             public void bookingStateChanged() {
@@ -49,7 +69,6 @@ public class BookingHistoryActivity extends BaseActivity {
         };
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,9 +76,9 @@ public class BookingHistoryActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         this.mRoomId = (UUID) getIntent().getExtras().get("id");
-        listView = (ListView)this.findViewById(R.id.bookingListView);
+        listView = (ListView) this.findViewById(R.id.bookingListView);
 
-        adapter=new MyArrayAdapter(this,
+        adapter = new MyArrayAdapter(this,
                 R.layout.list_item_booking_history,
                 listItems);
         listView.setAdapter(adapter);
@@ -91,8 +110,7 @@ public class BookingHistoryActivity extends BaseActivity {
         bindService(new Intent(this, PushService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private void refeshBookingHistory()
-    {
+    private void refeshBookingHistory() {
         String path = WebApiActions.GetBookingHistory() + "/" + this.mRoomId.toString();
         WebApiService service = new WebApiService(BookingJoinRoomData.class, true);
         service.performGetList(path, new IWebApiResultListener<List<BookingJoinRoomData>>() {
@@ -103,9 +121,10 @@ public class BookingHistoryActivity extends BaseActivity {
                     adapter.add(info);
                 }
             }
+
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
         });
     }
@@ -126,31 +145,9 @@ public class BookingHistoryActivity extends BaseActivity {
         this.refeshBookingHistory();
     }
 
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PushService.LocalBinder binder = (PushService.LocalBinder) service;
-            mPushService = binder.getService();
-            mPushService.setBookingStateListener(bookingStateListener);
-            mBound = true;
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-
-
-        }
-    };
-
-    private class MyArrayAdapter extends ArrayAdapter
-    {
+    private class MyArrayAdapter extends ArrayAdapter {
         private LayoutInflater inflater = null;
+
         public MyArrayAdapter(Context context, int resource, List<BookingJoinRoomData> objects) {
             super(context, resource, objects);
             inflater = (LayoutInflater) context
@@ -166,19 +163,18 @@ public class BookingHistoryActivity extends BaseActivity {
             TextView textView2 = (TextView) convertView.findViewById(R.id.secondLine);
             ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
             View loadingPanel = convertView.findViewById(R.id.loadingPanel);
-            BookingJoinRoomData info =  (BookingJoinRoomData)this.getItem(position);
+            BookingJoinRoomData info = (BookingJoinRoomData) this.getItem(position);
             textView1.setText(info.name);
             String timeString = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(info.time);
             textView2.setText(timeString);
             if (info.getBookingState() == BookingStateEnum.Waiting) {
                 imageView.setVisibility(View.INVISIBLE);
                 loadingPanel.setVisibility(View.VISIBLE);
-            } else if (info.getBookingState() == BookingStateEnum.Accepted){
+            } else if (info.getBookingState() == BookingStateEnum.Accepted) {
                 loadingPanel.setVisibility(View.GONE);
                 imageView.setVisibility(View.VISIBLE);
                 imageView.setImageResource(R.drawable.ic_mood_black_24dp);
-            }
-            else if (info.getBookingState() == BookingStateEnum.Rejected || info.getBookingState() == BookingStateEnum.Canceled){
+            } else if (info.getBookingState() == BookingStateEnum.Rejected || info.getBookingState() == BookingStateEnum.Canceled) {
                 loadingPanel.setVisibility(View.GONE);
                 imageView.setVisibility(View.VISIBLE);
                 imageView.setImageResource(R.drawable.ic_mood_bad_black_24dp);
@@ -187,7 +183,7 @@ public class BookingHistoryActivity extends BaseActivity {
             return convertView;
         }
 
-        public void updateList(){
+        public void updateList() {
             notifyDataSetChanged();
         }
 
