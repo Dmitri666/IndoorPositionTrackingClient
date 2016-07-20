@@ -13,6 +13,7 @@ public class BeaconData {
     public double averageDistance;
     public double averageRssiLevel;
     public int txPower;
+
     public BeaconData() {
 
     }

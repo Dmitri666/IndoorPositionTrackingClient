@@ -20,7 +20,6 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.lps.core.gui.ScalableView;
 import com.lps.core.gui.ScaleGestureDetectorCompat;
@@ -178,13 +177,12 @@ public class CustomerMapView extends ScalableView {
         for (TableState state : model) {
             for (final Table table : this.mRoomModel.tables) {
                 if (table.id.equals(state.tableId)) {
-                    table.setBookingState(state);
+                    table.guiElement.setState(state);
                     if (state.getTableState() == TableStateEnum.Free || state.getTableState() == TableStateEnum.BookedForMe || state.getTableState() == TableStateEnum.Waiting) {
                         table.guiElement.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Boolean selected = table.getSelected();
-                                table.setSelected(!selected);
+                                table.guiElement.setSelected(!table.guiElement.isSelected());
                                 activity.validateBooking();
                             }
                         });
@@ -200,7 +198,7 @@ public class CustomerMapView extends ScalableView {
     public List<Table> getSelectedTables() {
         List<Table> selected = new ArrayList<>();
         for (Table table : this.mRoomModel.tables) {
-            if (table.getSelected()) {
+            if (table.guiElement.isSelected()) {
                 selected.add(table);
             }
         }
@@ -209,7 +207,7 @@ public class CustomerMapView extends ScalableView {
 
     public void clearSelectedTables() {
         for (Table table : this.mRoomModel.tables) {
-            table.setSelected(false);
+            table.guiElement.setSelected(false);
         }
     }
 
@@ -218,45 +216,29 @@ public class CustomerMapView extends ScalableView {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (Table table : mRoomModel.tables) {
-            View view = null;
+            GuiTable view = null;
             if (table.type.equals("Table1")) {
-                view = inflater.inflate(R.layout.layout_table1, null);
+                view = new GuiTable(getContext(), 1);
             } else if (table.type.equals("Table2")) {
-                view = inflater.inflate(R.layout.layout_table2, null);
+                view = new GuiTable(getContext(), 2);
             } else if (table.type.equals("Table3")) {
-                view = inflater.inflate(R.layout.layout_table3, null);
+                view = new GuiTable(getContext(), 3);
             } else if (table.type.equals("Table4")) {
-                view = inflater.inflate(R.layout.layout_table4, null);
+                view = new GuiTable(getContext(), 4);
             } else {
-                view = inflater.inflate(R.layout.layout_table4, null);
+                view = new GuiTable(getContext(), 1);
             }
 
-            table.guiElement = (ImageView) view;
+            table.guiElement = view;
             this.addView(view);
 
             if (table.angle != 0.0) {
-                if (table.type.equals("Table1")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table2")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table3")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table4")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                }
-
+                view.setPivotY(0);
+                view.setPivotX(0);
                 view.setRotation(Math.round(table.angle));
             }
 
             view.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams) view.getLayoutParams(), table));
-
-            //TextView text = new TextView(getContext());
-            //text.setText(table.description);
-
         }
     }
 

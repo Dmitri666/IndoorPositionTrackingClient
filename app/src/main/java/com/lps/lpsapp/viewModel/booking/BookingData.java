@@ -20,6 +20,7 @@ public class BookingData {
     public List<RoomTableData> roomTableDataList;
     public int peopleCount;
     public int state;
+    public String userName;
     @JsonIgnore
     public Date createTime;
 

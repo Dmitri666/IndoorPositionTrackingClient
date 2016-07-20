@@ -339,9 +339,8 @@ public class BookingActivity extends BaseActivity implements DatePickerFragment.
 
         view.clearSelectedTables();
         for (Table table : selected) {
-            TableState state = table.getBookingState();
-            state.setTableState(TableStateEnum.Waiting);
-            table.setBookingState(state);
+            table.guiElement.setState(TableStateEnum.Waiting);
+
         }
 
 

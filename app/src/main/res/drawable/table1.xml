@@ -2,11 +2,12 @@
     android:viewportHeight="70"
     android:viewportWidth="60"
     android:width="256dp"
+    android:tint="@color/table_color"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="@color/table"
+    <path android:fillColor="#ffffff"
         android:pathData="M0,10h60v60h-60z"
         android:strokeColor="#55ccdd" android:strokeWidth="1"/>
-    <path android:fillColor="@color/table"
+    <path android:fillColor="#ffffff"
         android:pathData="M6,0h48v6h-48z"
         android:strokeColor="#55ccdd"
         android:strokeWidth="1"/>

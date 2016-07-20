@@ -12,6 +12,7 @@ public class ComboBoxItem {
     public ComboBoxItem() {
 
     }
+
     public ComboBoxItem(UUID value, String text) {
         this.text = text;
         this.value = value;

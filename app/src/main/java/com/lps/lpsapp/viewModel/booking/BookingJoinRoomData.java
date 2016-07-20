@@ -9,6 +9,7 @@ public class BookingJoinRoomData extends BookingData {
     public String name;
     public UUID roomId;
     public String mainPhoto;
+
     public BookingJoinRoomData() {
 
     }

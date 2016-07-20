@@ -12,6 +12,7 @@ public class TableState {
     public UUID bookingId;
     public UUID tableId;
     public int state;
+
     public TableState() {
 
     }
