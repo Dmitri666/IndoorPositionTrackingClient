@@ -262,14 +262,15 @@ public class CustomerMapView extends ScalableView {
     public void addActor(Actor actor) {
         ActorsActivity host = (ActorsActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
         this.actors.put(actor.position.deviceId, actor);
-        GuiDevice myButton = new GuiDevice(getContext(), actor.position.deviceId);
+        GuiDevice myButton;
+        if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
+            myButton = new GuiDevice(getContext(), actor.position.deviceId,true);
+        } else {
+            myButton = new GuiDevice(getContext(), actor.position.deviceId,false);
+        }
         myButton.setText(actor.userName);
         actor.guiElement = myButton;
-        if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
-            myButton.setBackgroundResource(R.drawable.actor_self);
-        } else {
-            myButton.setBackgroundResource(R.drawable.actor);
-        }
+
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.guiElement.wight, (int) actor.guiElement.height);
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
