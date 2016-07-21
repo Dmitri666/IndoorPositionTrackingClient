@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <CheckBox
         android:id="@+id/localecheck"
         android:layout_width="wrap_content"
@@ -10,14 +11,15 @@
         android:visibility="visible"
 
         />
+
     <ImageView
         android:id="@+id/favorit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:layout_toRightOf="@id/localecheck"
         android:adjustViewBounds="true"
         android:backgroundTintMode="src_in"
-        android:layout_toRightOf="@id/localecheck"
         android:contentDescription="image"
         android:src="@drawable/ic_favorite_border_black_24dp"
         android:tint="#e61616"
@@ -28,12 +30,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="false"
+        android:layout_below="@id/favorit"
         android:layout_margin="5dp"
+        android:layout_toRightOf="@id/localecheck"
         android:adjustViewBounds="true"
         android:backgroundTintMode="src_in"
-        android:layout_below="@id/favorit"
-        android:layout_toRightOf="@id/localecheck"
-        android:layout_alignParentLeft="false"
         android:contentDescription="image"
         android:src="@drawable/ic_chat_black_24dp"
         android:tint="#e61616"
@@ -45,22 +47,24 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/favorit"
         android:text="title"
+        android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
 
-       />
+        />
 
     <LinearLayout
         android:id="@+id/ratings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@+id/title"
-        android:layout_toRightOf="@+id/favorit">
+        android:layout_toRightOf="@+id/favorit"
+        android:orientation="horizontal">
+
         <ImageView
             android:id="@+id/rating"
             style="@style/RatingHalf" />
+
         <ImageView
             android:id="@+id/rating1"
             style="@style/RatingHalf" />
@@ -70,13 +74,12 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="gfdgdfgdfg"
-        android:textSize="10sp"
-        android:layout_toRightOf="@+id/favorit"
         android:layout_below="@id/ratings"
+        android:layout_toRightOf="@+id/favorit"
         android:background="@color/light_white"
+        android:text="gfdgdfgdfg"
         android:textColor="@android:color/black"
-        />
+        android:textSize="10sp" />
 
 
     <!--Button
@@ -89,9 +92,9 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="5dp"
         android:adjustViewBounds="true"
         android:contentDescription="image"
-        android:src="@drawable/ic_launcher"
-        android:layout_alignParentRight="true" />
+        android:src="@drawable/ic_launcher" />
 </RelativeLayout>

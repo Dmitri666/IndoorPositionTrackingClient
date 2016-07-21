@@ -1,13 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.lps.lpsapp.activities.BookingActivity">
-    <item android:id="@+id/menu"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lps.lpsapp.activities.BookingActivity">
+    <item
+        android:id="@+id/menu"
         android:icon="@drawable/ic_restaurant_menu_white_24dp"
+        android:orderInCategory="0"
         android:title="@string/menu"
-        android:orderInCategory="0" app:showAsAction="ifRoom" />
-    <item android:id="@+id/home"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/home"
         android:icon="@drawable/ic_home_white_24dp"
+        android:orderInCategory="0"
         android:title="@string/home"
-        android:orderInCategory="0" app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />
 
 </menu>

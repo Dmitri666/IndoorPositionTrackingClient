@@ -264,9 +264,9 @@ public class CustomerMapView extends ScalableView {
         this.actors.put(actor.position.deviceId, actor);
         GuiDevice myButton;
         if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
-            myButton = new GuiDevice(getContext(), actor.position.deviceId,true);
+            myButton = new GuiDevice(getContext(), actor.position.deviceId, true);
         } else {
-            myButton = new GuiDevice(getContext(), actor.position.deviceId,false);
+            myButton = new GuiDevice(getContext(), actor.position.deviceId, false);
         }
         myButton.setText(actor.userName);
         actor.guiElement = myButton;

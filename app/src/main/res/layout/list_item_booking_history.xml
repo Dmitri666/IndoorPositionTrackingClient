@@ -16,6 +16,7 @@
 
     <TextView
         android:id="@+id/secondLine"
+        style="@style/TextAppearance.AppCompat.Title.Inverse"
         android:layout_width="fill_parent"
         android:layout_height="26dip"
         android:layout_alignParentBottom="true"
@@ -25,11 +26,11 @@
         android:singleLine="true"
         android:text="Description"
         android:textColor="@android:color/background_dark"
-        android:textSize="12sp"
-        style="@style/TextAppearance.AppCompat.Title.Inverse"/>
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/firstLine"
+        style="@style/TextAppearance.AppCompat.Title.Inverse"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/secondLine"
@@ -40,8 +41,7 @@
         android:gravity="center_vertical"
         android:text="Example application"
         android:textColor="@android:color/background_dark"
-        android:textSize="16sp"
-        style="@style/TextAppearance.AppCompat.Title.Inverse"/>
+        android:textSize="16sp" />
 
     <RelativeLayout
         android:id="@+id/loadingPanel"

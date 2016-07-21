@@ -18,7 +18,7 @@ public class GuiDevice extends Button {
 
     private boolean isSelf;
 
-    public GuiDevice(Context context, String deviceId,boolean isSelf) {
+    public GuiDevice(Context context, String deviceId, boolean isSelf) {
         super(context);
         this.setBackgroundResource(R.drawable.actor);
         this.isSelf = isSelf;

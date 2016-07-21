@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item app:state_isSelf="true"
-        android:color="#9F2200"/>
-    <item app:state_notSelf="true"
-        android:color="#00289f"/>
-    <item android:state_selected="true"
-        android:color="#9f9c00"/>
-    <item android:color="#00289f"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:color="#9F2200" app:state_isSelf="true" />
+    <item android:color="#00289f" app:state_notSelf="true" />
+    <item android:color="#9f9c00" android:state_selected="true" />
+    <item android:color="#00289f" />
 </selector>
