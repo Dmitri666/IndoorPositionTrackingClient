@@ -27,6 +27,7 @@ public class SettingsActivity extends BaseActivity {
     public static String WebApiUrl;
     public static Point TestPosition;
     public static Integer BeaconGroupCount;
+    public static Integer ScanPeriod;
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
@@ -186,6 +187,34 @@ public class SettingsActivity extends BaseActivity {
                 }
             }
         });
+
+
+        EditText scanPeriod = (EditText) this.findViewById(R.id.txtScanPeriod);
+        LpsApplication app = (LpsApplication) this.getApplicationContext();
+        final BeaconManager beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(app);
+        scanPeriod.setText(Long.toString(BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD));
+        scanPeriod.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    long period = Long.parseLong(s.toString());
+                    beaconManager.setForegroundBetweenScanPeriod(period);
+                }
+            }
+        });
+
+
+
 
     }
 

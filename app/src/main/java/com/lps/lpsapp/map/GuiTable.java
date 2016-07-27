@@ -1,10 +1,13 @@
 package com.lps.lpsapp.map;
 
 import android.content.Context;
+import android.graphics.Outline;
+import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageView;
+import android.widget.Button;
 
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.viewModel.booking.TableState;
@@ -13,7 +16,7 @@ import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 /**
  * Created by dle on 20.07.2016.
  */
-public class GuiTable extends ImageView {
+public class GuiTable extends Button {
     protected static int[] STATE_FREE = {R.attr.state_free};
     protected static int[] STATE_BOOKED = {R.attr.state_booked};
     protected static int[] STATE_BOOKEDFORME = {R.attr.state_bookedForMe};
@@ -27,18 +30,29 @@ public class GuiTable extends ImageView {
     public GuiTable(Context ctx, int tableType) {
         super(ctx);
         if (tableType == 1) {
-            this.setImageResource(R.drawable.table1);
+            this.setBackgroundResource(R.drawable.table1);
         } else if (tableType == 2) {
-            this.setImageResource(R.drawable.table2);
+            this.setBackgroundResource(R.drawable.table2);
         } else if (tableType == 3) {
-            this.setImageResource(R.drawable.table3);
+            this.setBackgroundResource(R.drawable.table3);
         } else if (tableType == 4) {
-            this.setImageResource(R.drawable.table4);
+            this.setBackgroundResource(R.drawable.table4);
         }
         animation.setDuration(500); // duration - half a second
         animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
         animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
         animation.setRepeatMode(Animation.REVERSE);
+
+        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                // Or read size directly from the view's width/height
+                int size = 150;
+                outline.setRect(0, 0, size, size);
+            }
+        };
+        //this.setOutlineProvider(viewOutlineProvider);
+
     }
 
     @Override

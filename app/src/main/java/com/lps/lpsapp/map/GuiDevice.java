@@ -1,6 +1,9 @@
 package com.lps.lpsapp.map;
 
 import android.content.Context;
+import android.graphics.Outline;
+import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.widget.Button;
 
 import com.lps.lpsapp.R;
@@ -25,6 +28,16 @@ public class GuiDevice extends Button {
         this.wight = 40f;
         this.height = 40f;
         this.deviceId = deviceId;
+        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View view, Outline outline) {
+                // Or read size directly from the view's width/height
+                int size = 100;
+                outline.setOval(0, 0, size, size);
+            }
+        };
+        //this.setOutlineProvider(viewOutlineProvider);
+        //this.setShadowLayer(24, 24, 24, Color.RED);
     }
 
     @Override

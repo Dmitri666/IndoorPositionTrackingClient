@@ -15,6 +15,7 @@ public class RoomModel extends RoomInfo {
     @JsonDeserialize(as = ArrayList.class, contentAs = Table.class)
     public List<Table> tables;
 
+
     public RoomModel() {
         this.tables = new ArrayList<Table>();
     }

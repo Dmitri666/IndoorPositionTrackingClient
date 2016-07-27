@@ -17,7 +17,6 @@ import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -94,16 +93,6 @@ public class CustomerMapView extends ScalableView {
         }
 
         return true;
-    }
-
-    @Override
-    public void DrawOnScaledCanvas(Canvas canvas) {
-        super.DrawOnScaledCanvas(canvas);
-
-        if (mBackground != null) {
-            //mBackground.setBounds(this.mContentRect.left, this.mContentRect.top, this.mContentRect.right, this.mContentRect.bottom);
-            //mBackground.draw(canvas);
-        }
     }
 
     @Override
@@ -213,8 +202,6 @@ public class CustomerMapView extends ScalableView {
 
 
     private void CreateMapObjects() {
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (Table table : mRoomModel.tables) {
             GuiTable view = null;
             if (table.type.equals("Table1")) {
@@ -230,12 +217,14 @@ public class CustomerMapView extends ScalableView {
             }
 
             table.guiElement = view;
+            view.setText(table.description);
             this.addView(view);
 
             if (table.angle != 0.0) {
                 view.setPivotY(0);
                 view.setPivotX(0);
                 view.setRotation(Math.round(table.angle));
+
             }
 
             view.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams) view.getLayoutParams(), table));
@@ -325,12 +314,12 @@ public class CustomerMapView extends ScalableView {
                 R.styleable.CustomerMapView_mapViewDimension,
                 mExampleDimension);
 
-        if (a.hasValue(R.styleable.CustomerMapView_mapViewDrawable)) {
-            mBackground = a.getDrawable(
-                    R.styleable.CustomerMapView_mapViewDrawable);
-            mBackground.setCallback(this);
-        }
-        mBackground = this.getBackground();
+//        if (a.hasValue(R.styleable.CustomerMapView_mapViewDrawable)) {
+//            mBackground = a.getDrawable(
+//                    R.styleable.CustomerMapView_mapViewDrawable);
+//            mBackground.setCallback(this);
+//        }
+//        mBackground = this.getBackground();
 
         mPaintStrokeWidth = a.getFloat(R.styleable.CustomerMapView_wandWidth, mPaintStrokeWidth);
 
