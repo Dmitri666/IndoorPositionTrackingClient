@@ -37,6 +37,28 @@ public class BeaconListActivity extends BaseActivity {
     boolean mBound = false;
     IBeaconServiceListener listener;
     InDoorPositionService mService;
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+            mService.setBeaconServiceListener(listener);
+            mService.monitoreBackgroundRegion(true);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +66,8 @@ public class BeaconListActivity extends BaseActivity {
         setContentView(R.layout.activity_beacon_list);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        listView = (ListView)this.findViewById(R.id.beaconListView);
-        adapter=new MyArrayAdapter(this,
+        listView = (ListView) this.findViewById(R.id.beaconListView);
+        adapter = new MyArrayAdapter(this,
                 android.R.layout.simple_list_item_1,
                 listItems);
         listView.setAdapter(adapter);
@@ -64,8 +86,8 @@ public class BeaconListActivity extends BaseActivity {
 
         listener = new IBeaconServiceListener() {
             @Override
-            public void beaconsInRange(Collection<Beacon> beacons,Region region) {
-                if(region.getUniqueId().equals(mService.backgroundRegion.getUniqueId())) {
+            public void beaconsInRange(Collection<Beacon> beacons, Region region) {
+                if (region.getUniqueId().equals(mService.backgroundRegion.getUniqueId())) {
                     fillList(beacons);
                 }
             }
@@ -119,8 +141,7 @@ public class BeaconListActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 List<BeaconData> result = new ArrayList<>();
-                for(Beacon beacon:this.listItems)
-                {
+                for (Beacon beacon : this.listItems) {
                     BeaconData data = new BeaconData();
                     data.id1 = beacon.getId1().toUuid();
                     data.id2 = beacon.getId2().toInt();
@@ -128,9 +149,8 @@ public class BeaconListActivity extends BaseActivity {
                     result.add(data);
                 }
 
-                if(result.size() > 0)
-                {
-                    WebApiService service = new WebApiService(BeaconData.class,false);
+                if (result.size() > 0) {
+                    WebApiService service = new WebApiService(BeaconData.class, false);
                     service.performPost(WebApiActions.SaveBackgroundBeacons(), result);
                 }
 
@@ -140,27 +160,6 @@ public class BeaconListActivity extends BaseActivity {
         }
 
     }
-
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            mService.setBeaconServiceListener(listener);
-            mService.monitoreBackgroundRegion(true);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-
-        }
-    };
 
     private void fillList(final Collection<Beacon> beacon) {
         this.runOnUiThread(new Runnable() {
@@ -175,8 +174,7 @@ public class BeaconListActivity extends BaseActivity {
                     }
                 });
 
-                for(Beacon b:array)
-                {
+                for (Beacon b : array) {
                     adapter.add(b);
 
                 }
@@ -186,16 +184,15 @@ public class BeaconListActivity extends BaseActivity {
 
     }
 
-    private class MyArrayAdapter extends ArrayAdapter
-    {
+    private class MyArrayAdapter extends ArrayAdapter {
         public MyArrayAdapter(Context context, int resource, List<Beacon> objects) {
-            super(context, resource,objects);
+            super(context, resource, objects);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            TextView v = (TextView)super.getView(position, convertView, parent);
-            Beacon beacon =  (Beacon)this.getItem(position);
+            TextView v = (TextView) super.getView(position, convertView, parent);
+            Beacon beacon = (Beacon) this.getItem(position);
             //double  avaregeRssi = new BeaconAccessor(beacon).getRunningAverageRssi();
             String txt = beacon.getId3().toString() + "\nDistance " + beacon.getDistance() +
                     "\nP " + beacon.getTxPower() + "\nRssi " + beacon.getRssi() + "\nId1 " + beacon.getId1() +

@@ -25,14 +25,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_column="1"
+                android:enabled="false"
                 android:maxHeight="100dp"
                 android:maxWidth="100dp"
                 android:minHeight="100dp"
                 android:minWidth="100dp"
                 android:nestedScrollingEnabled="false"
                 android:onClick="onSearchButtonClicked"
-                android:text="@string/search_room"
-                android:enabled="false" />
+                android:text="@string/search_room" />
 
             <Button
                 android:id="@+id/btnNews"
@@ -61,13 +61,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_column="1"
+                android:enabled="false"
                 android:maxHeight="100dp"
                 android:maxWidth="100dp"
                 android:minHeight="100dp"
                 android:minWidth="100dp"
                 android:onClick="onChatClicked"
-                android:text="@string/chat"
-                android:enabled="false" />
+                android:text="@string/chat" />
 
             <Button
                 android:id="@+id/btnBeacon"

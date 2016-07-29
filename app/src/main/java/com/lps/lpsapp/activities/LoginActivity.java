@@ -14,12 +14,12 @@ import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
+import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.management.AppState;
 import com.lps.lpsapp.management.AppStateNotifier;
-import com.lps.lpsapp.management.AppManager;
-import com.lps.webapi.services.AuthenticationService;
 import com.lps.lpsapp.services.WebApiActions;
 import com.lps.webapi.AccessToken;
+import com.lps.webapi.services.AuthenticationService;
 
 /**
  * A login screen that offers login via email/password and via Google+ sign in.
@@ -45,7 +45,7 @@ public class LoginActivity extends BaseActivity {
         // Set up the login form.
         mUserNameView = (EditText) findViewById(R.id.userName);
 
-        if(AccessToken.CurrentToken != null) {
+        if (AccessToken.CurrentToken != null) {
             mUserNameView.setText(AccessToken.CurrentToken.userName);
         }
 
@@ -71,10 +71,7 @@ public class LoginActivity extends BaseActivity {
         });
 
 
-
-
     }
-
 
 
     @Override
@@ -95,7 +92,7 @@ public class LoginActivity extends BaseActivity {
         AppManager.getInstance().CheckIsAuthenticated(new AppStateNotifier() {
             @Override
             public void StateChanged(AppState state) {
-                if(state.getIsAuthenticated()) {
+                if (state.getIsAuthenticated()) {
                     Intent intent1 = new Intent(getApplicationContext(), MenuActivity.class);
                     intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent1);
@@ -103,8 +100,6 @@ public class LoginActivity extends BaseActivity {
             }
         });
     }
-
-
 
 
     /**
@@ -149,17 +144,15 @@ public class LoginActivity extends BaseActivity {
             focusView.requestFocus();
         } else {
 
-            LpsApplication app = (LpsApplication)getApplicationContext();
+            LpsApplication app = (LpsApplication) getApplicationContext();
             try {
-                AccessToken token = new AuthenticationService().Authenticate(email, password,app.getAndroidId(), WebApiActions.getToken());
+                AccessToken token = new AuthenticationService().Authenticate(email, password, app.getAndroidId(), WebApiActions.getToken());
                 AppManager.getInstance().OnLogIn(token);
                 Intent intent = new Intent(this, MenuActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 this.startActivity(intent);
-            }
-            catch (Exception e)
-            {
-                Log.e(TAG,e.getMessage(),e);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
@@ -177,12 +170,9 @@ public class LoginActivity extends BaseActivity {
     }
 
 
-    public void onLogin()
-    {
+    public void onLogin() {
         this.finish();
     }
-
-
 
 
 }

@@ -9,13 +9,11 @@ import java.util.List;
  * Created by dle on 21.09.2015.
  */
 public class RangingData {
-    public RangingData()
-    {
+    public String deviceId;
+    @JsonDeserialize(as = ArrayList.class, contentAs = BeaconData.class)
+    public List<BeaconData> beaconDataList;
+
+    public RangingData() {
         this.beaconDataList = new ArrayList<>();
     }
-
-    public String deviceId;
-
-    @JsonDeserialize(as=ArrayList.class, contentAs= BeaconData.class)
-    public List<BeaconData> beaconDataList;
 }

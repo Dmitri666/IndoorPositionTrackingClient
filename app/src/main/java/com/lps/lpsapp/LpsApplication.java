@@ -28,6 +28,15 @@ public class LpsApplication extends MultiDexApplication {
     private static Context mContext;
     private String mAndroidId;
 
+    public static Context getContext() {
+        return mContext;
+    }
+
+    //public static RefWatcher getRefWatcher(Context context) {
+    //    return refWatcher;
+    //}
+
+    //private static RefWatcher refWatcher;
 
     public void onCreate() {
         super.onCreate();
@@ -37,8 +46,8 @@ public class LpsApplication extends MultiDexApplication {
 
 
         SharedPreferences settings = getSharedPreferences("settings", 0);
-        String url = settings.getString("url",null);
-        if(url == null) {
+        String url = settings.getString("url", null);
+        if (url == null) {
             SharedPreferences.Editor editor = settings.edit();
             String defaultUrl = this.getResources().getString(R.string.serverUrl);
             editor.putString("url", defaultUrl);
@@ -49,23 +58,11 @@ public class LpsApplication extends MultiDexApplication {
         }
 
 
-
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         AccessToken.CurrentToken = this.getAuthenticationData();
 
 
-
-    }
-
-    //public static RefWatcher getRefWatcher(Context context) {
-    //    return refWatcher;
-    //}
-
-    //private static RefWatcher refWatcher;
-
-    public static Context getContext() {
-        return mContext;
     }
 
     public String getAndroidId() {
@@ -81,7 +78,6 @@ public class LpsApplication extends MultiDexApplication {
 
 
     }
-
 
 
     private AccessToken getAuthenticationData() {
@@ -101,7 +97,7 @@ public class LpsApplication extends MultiDexApplication {
     }
 
     public void saveAuthenticationData(AccessToken authenticationData) {
-        if(authenticationData != null) {
+        if (authenticationData != null) {
             try {
                 String token = JsonSerializer.serialize(authenticationData);
                 SharedPreferences settings = getSharedPreferences("token", 0);
@@ -122,15 +118,12 @@ public class LpsApplication extends MultiDexApplication {
 
 
     public void HandleError(Exception ex) {
-        if(ex instanceof AuthenticationException || ex instanceof NegotiationException || ex.getCause() instanceof InvalidHttpStatusCodeException) {
+        if (ex instanceof AuthenticationException || ex instanceof NegotiationException || ex.getCause() instanceof InvalidHttpStatusCodeException) {
             AppManager.getInstance().LogOut();
         } else {
             Log.e(TAG, ex.toString(), ex);
         }
     }
-
-
-
 
 
 }

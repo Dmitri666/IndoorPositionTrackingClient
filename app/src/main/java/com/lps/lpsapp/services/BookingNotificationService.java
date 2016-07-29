@@ -41,106 +41,7 @@ public class BookingNotificationService extends Service {
     private HubConnection conn;
     private Logger logger;
     private int startId;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        // The service is being created
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        this.startId = startId;
-        // If we get killed, after returning from here, restart
-        logger = new Logger() {
-
-            @Override
-            public void log(String message, LogLevel level) {
-                Log.d(TAG, message);
-            }
-        };
-
-        ErrorCallback errorCallback = new ErrorCallback() {
-
-            @Override
-            public void onError(Throwable error) {
-                if(error instanceof NegotiationException)
-                {
-                    try {
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.e(TAG, ex.getMessage(), ex);
-                    }
-                }
-                Log.e(TAG, error.getMessage(), error);
-            }
-        };
-        // Connect to the server
-        conn = new HubConnection(WebApiActions.Subscribe(), "", true, logger);
-        if(AccessToken.CurrentToken != null) {
-            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
-            conn.setCredentials(credentials);
-        }
-        // Create the hub proxy
-        proxy = conn.createHubProxy("LpsHub");
-
-
-        // Subscribe to the error event
-        conn.error(errorCallback);
-
-        // Subscribe to the connected event
-        conn.connected(new Runnable() {
-
-            @Override
-            public void run() {
-                Log.d(TAG, "CONNECTED");
-            }
-        });
-
-        // Subscribe to the closed event
-        conn.closed(new Runnable() {
-
-            @Override
-            public void run() {
-                Log.d(TAG, "DISCONNECTED");
-            }
-        });
-
-
-
-        // Subscribe to the received event
-        conn.received(new MessageReceivedHandler() {
-            @Override
-            public void onMessageReceived(JsonElement json) {
-                //Log.d(TAG, "RAW received message: " + json.toString());
-            }
-        });
-
-
-
-        Subscription bookingSubscription = proxy.subscribe("bookingStateChanged");
-        bookingSubscription.addReceivedHandler(onBookingStateChanged);
-
-        return START_STICKY;
-    }
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        this.conn.disconnect();
-    }
-
-    private Action<JsonElement[]> onBookingStateChanged =  new Action<JsonElement[]>() {
+    private Action<JsonElement[]> onBookingStateChanged = new Action<JsonElement[]>() {
         @Override
         public void run(JsonElement[] jsonElements) throws Exception {
 
@@ -158,7 +59,7 @@ public class BookingNotificationService extends Service {
                                         .setContentText(model.getBookingState().toString());
                         // Creates an explicit intent for an Activity in your app
                         Intent resultIntent = new Intent(getApplicationContext(), BookingHistoryActivity.class);
-                        resultIntent.putExtra("id",model.roomId);
+                        resultIntent.putExtra("id", model.roomId);
 // The stack builder object will contain an artificial back stack for the
 // started Activity.
 // This ensures that navigating backward from the Activity leads out of
@@ -191,4 +92,96 @@ public class BookingNotificationService extends Service {
 
 
     };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // The service is being created
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        this.startId = startId;
+        // If we get killed, after returning from here, restart
+        logger = new Logger() {
+
+            @Override
+            public void log(String message, LogLevel level) {
+                Log.d(TAG, message);
+            }
+        };
+
+        ErrorCallback errorCallback = new ErrorCallback() {
+
+            @Override
+            public void onError(Throwable error) {
+                if (error instanceof NegotiationException) {
+                    try {
+
+                    } catch (Exception ex) {
+                        Log.e(TAG, ex.getMessage(), ex);
+                    }
+                }
+                Log.e(TAG, error.getMessage(), error);
+            }
+        };
+        // Connect to the server
+        conn = new HubConnection(WebApiActions.Subscribe(), "", true, logger);
+        if (AccessToken.CurrentToken != null) {
+            OAuth2Credentials credentials = new OAuth2Credentials(AccessToken.CurrentToken.access_token);
+            conn.setCredentials(credentials);
+        }
+        // Create the hub proxy
+        proxy = conn.createHubProxy("LpsHub");
+
+
+        // Subscribe to the error event
+        conn.error(errorCallback);
+
+        // Subscribe to the connected event
+        conn.connected(new Runnable() {
+
+            @Override
+            public void run() {
+                Log.d(TAG, "CONNECTED");
+            }
+        });
+
+        // Subscribe to the closed event
+        conn.closed(new Runnable() {
+
+            @Override
+            public void run() {
+                Log.d(TAG, "DISCONNECTED");
+            }
+        });
+
+
+        // Subscribe to the received event
+        conn.received(new MessageReceivedHandler() {
+            @Override
+            public void onMessageReceived(JsonElement json) {
+                //Log.d(TAG, "RAW received message: " + json.toString());
+            }
+        });
+
+
+        Subscription bookingSubscription = proxy.subscribe("bookingStateChanged");
+        bookingSubscription.addReceivedHandler(onBookingStateChanged);
+
+        return START_STICKY;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.conn.disconnect();
+    }
 }

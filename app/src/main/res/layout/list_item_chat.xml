@@ -11,9 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_launcher"
-        app:civ_border_width="2dp"
         app:civ_border_color="#FF000000"
-         />
+        app:civ_border_width="2dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -25,17 +24,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="title"
+            android:textColor="@android:color/black"
             android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="nnn"
-            android:textSize="10sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            android:textSize="10sp" />
     </LinearLayout>
 
 

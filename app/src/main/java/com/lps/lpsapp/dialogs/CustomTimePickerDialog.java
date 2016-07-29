@@ -16,8 +16,8 @@ import java.util.List;
 public class CustomTimePickerDialog extends TimePickerDialog {
 
     private final static int TIME_PICKER_INTERVAL = 15;
-    private TimePicker timePicker;
     private final OnTimeSetListener callback;
+    private TimePicker timePicker;
 
     public CustomTimePickerDialog(Context context, OnTimeSetListener callBack,
                                   int hourOfDay, int minute, boolean is24HourView) {

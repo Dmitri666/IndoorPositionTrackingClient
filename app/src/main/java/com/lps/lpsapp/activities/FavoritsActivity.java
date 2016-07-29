@@ -14,11 +14,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.rooms.RoomInfo;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.services.WebApiService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class FavoritsActivity extends BaseActivity {
     private static String TAG = "FavoritsActivity";
     ListView listView;
     MyArrayAdapter adapter;
-    ArrayList<RoomInfo> listItems=new ArrayList<RoomInfo>();
+    ArrayList<RoomInfo> listItems = new ArrayList<RoomInfo>();
 
 
     @Override
@@ -35,9 +35,9 @@ public class FavoritsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorits);
 
-        listView = (ListView)this.findViewById(R.id.lvLocales);
+        listView = (ListView) this.findViewById(R.id.lvLocales);
 
-        adapter=new MyArrayAdapter(this,
+        adapter = new MyArrayAdapter(this,
                 R.layout.list_item_locale,
                 listItems);
         listView.setAdapter(adapter);
@@ -63,11 +63,9 @@ public class FavoritsActivity extends BaseActivity {
     }
 
 
-
     @Override
     protected void onPause() {
         super.onPause();
-
 
 
     }
@@ -75,15 +73,16 @@ public class FavoritsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        WebApiService service = new WebApiService(RoomInfo.class,true);
+        WebApiService service = new WebApiService(RoomInfo.class, true);
         service.performGetList(WebApiActions.GetRooms(), new IWebApiResultListener<List>() {
             @Override
             public void onResult(List objResult) {
                 setRooms(objResult);
             }
+
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
         });
     }
@@ -105,11 +104,19 @@ public class FavoritsActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class MyArrayAdapter extends ArrayAdapter
-    {
+    private void setRooms(List<RoomInfo> rooms) {
+        adapter.clear();
+        for (RoomInfo info : rooms) {
+            adapter.add(info);
+        }
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    private class MyArrayAdapter extends ArrayAdapter {
         private LayoutInflater inflater = null;
+
         public MyArrayAdapter(Context context, int resource, List<RoomInfo> objects) {
-            super(context, resource,objects);
+            super(context, resource, objects);
             inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -121,21 +128,12 @@ public class FavoritsActivity extends BaseActivity {
             TextView tvText = (TextView) convertView.findViewById(R.id.text);
             TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
 
-            RoomInfo info =  (RoomInfo)this.getItem(position);
+            RoomInfo info = (RoomInfo) this.getItem(position);
             tvTitle.setText(info.name);
             tvText.setText(info.name);
 
             return convertView;
         }
 
-    }
-
-    private void setRooms(List<RoomInfo> rooms)
-    {
-        adapter.clear();
-        for (RoomInfo info : rooms) {
-            adapter.add(info);
-        }
-        mProgressBar.setVisibility(View.GONE);
     }
 }

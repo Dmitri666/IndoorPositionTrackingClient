@@ -40,7 +40,7 @@ public class PositionLogData {
     /// </summary>
     public double y;
 
-    public PositionLogData(){
+    public PositionLogData() {
 
     }
 }

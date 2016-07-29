@@ -9,15 +9,16 @@ import org.altbeacon.beacon.distance.DistanceCalculator;
  */
 public class AvarageDistanceCalculator implements DistanceCalculator {
     private static String TAG = "DefaultDistanceCalculator";
+
     @Override
     public double calculateDistance(int txPower, double rssi) {
-        double distance = rssi * 1.0 /txPower;
+        double distance = rssi * 1.0 / txPower;
         Log.d(TAG, "avg mRssi: " + rssi + " distance: " + distance);
         return distance;
     }
 
     public int calculateRssi(int txPower, double distance) {
-        int rssi = (int)distance * txPower;
+        int rssi = (int) distance * txPower;
         return rssi;
     }
 }

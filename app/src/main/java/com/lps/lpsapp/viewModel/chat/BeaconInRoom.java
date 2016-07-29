@@ -28,8 +28,7 @@ public class BeaconInRoom {
     /// </summary>
     public float y;
 
-    public BeaconInRoom()
-    {
+    public BeaconInRoom() {
 
     }
 }

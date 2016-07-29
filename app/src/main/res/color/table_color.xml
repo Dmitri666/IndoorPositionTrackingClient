@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:color="@color/table" app:state_free="true" />
+    <item android:color="#ea260c" app:state_booked="true" />
+    <item android:color="#00ffbb" app:state_bookedForMe="true" />
+    <item android:color="#d000ff" app:state_rejected="true" />
+    <item android:color="#4e8054" app:state_waiting="true" />
+    <item android:color="#ffe100" android:state_selected="true" />
+    <item android:color="@color/table" />
+</selector>

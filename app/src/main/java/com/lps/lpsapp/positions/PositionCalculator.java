@@ -18,11 +18,11 @@ import java.util.List;
  */
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
-    private BeaconGroupsModel beaconModel;
     public PositionCalculatorNotifier positionCalculatorListener;
+    private BeaconGroupsModel beaconModel;
     private PositionData lastPosition;
 
-    private Comparator<Beacon> comparator  = new Comparator<Beacon>() {
+    private Comparator<Beacon> comparator = new Comparator<Beacon>() {
         @Override
         public int compare(Beacon lhs, Beacon rhs) {
             if (lhs.getDistance() < rhs.getDistance()) {
@@ -34,43 +34,41 @@ public class PositionCalculator {
         }
     };
 
-    public PositionCalculator(BeaconGroupsModel model)
-    {
+    public PositionCalculator(BeaconGroupsModel model) {
         beaconModel = model;
         lastPosition = null;
     }
 
 
-    public Point2D calculatePosition(Collection<Beacon> beacons)
-    {
+    public Point2D calculatePosition(Collection<Beacon> beacons) {
         List<Beacon> list = new ArrayList<>(beacons);
-        Collections.sort(list,comparator);
+        Collections.sort(list, comparator);
 
-        if(list.size() > 3) {
-            list = list.subList(0,3);
+        if (list.size() > 3) {
+            list = list.subList(0, 3);
         }
 
-        for(int i = 0; i < list.size();i++) {
-            Log.d(TAG," min :" + list.get(i).getId3().toString());
+        for (int i = 0; i < list.size(); i++) {
+            Log.d(TAG, " min :" + list.get(i).getId3().toString());
         }
 
         BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
 
         List<Point2D> results = new ArrayList<>();
-        for(List<BeaconData> data:calculationModel.values()) {
+        for (List<BeaconData> data : calculationModel.values()) {
             Rect region = calculateRegion(data);
-            if(region != null) {
+            if (region != null) {
                 Point2D result = new Point2D(region.exactCenterX(), region.exactCenterY());
                 results.add(result);
             }
         }
 
-        Point2D result = new Point2D(0,0);
-        if(results.size() == 0) {
+        Point2D result = new Point2D(0, 0);
+        if (results.size() == 0) {
             return result;
         }
 
-        for(Point2D point:results) {
+        for (Point2D point : results) {
             result.x += point.x;
             result.y += point.y;
         }
@@ -81,72 +79,62 @@ public class PositionCalculator {
         return result;
     }
 
-    private void calculateDistanceFactor(List<BeaconData> beaconDatas)
-    {
+    private void calculateDistanceFactor(List<BeaconData> beaconDatas) {
         List<Double> factors = new ArrayList<>();
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x,2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y,2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(1).getFactoredDistance()));
+        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(1).getFactoredDistance()));
         factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
         factors.add(Math.sqrt(Math.pow(beaconDatas.get(1).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(1).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(1).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
 
         double factor = Collections.max(factors);
-        Log.d(TAG," factor=" + factor);
+        Log.d(TAG, " factor=" + factor);
 
-        for (BeaconData beaconData:beaconDatas) {
-            beaconData.setDistanceFactor((float)factor);
+        for (BeaconData beaconData : beaconDatas) {
+            beaconData.setDistanceFactor((float) factor);
         }
 
     }
 
-    private Rect calculateRegion(List<BeaconData> beaconDatas)
-    {
-        try
-        {
+    private Rect calculateRegion(List<BeaconData> beaconDatas) {
+        try {
             Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
 
-            for(int i = 0;i < 1000;i++) {
+            for (int i = 0; i < 1000; i++) {
 
                 Region firstRegion = null;
-                for(BeaconData beaconData:beaconDatas) {
+                for (BeaconData beaconData : beaconDatas) {
                     Path path = new Path();
                     path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getFactoredDistance(), Path.Direction.CW);
                     path.close();
                     Region region = new Region();
                     region.setPath(path, clip);
 
-                    if(firstRegion == null)
-                    {
+                    if (firstRegion == null) {
                         firstRegion = region;
-                    }
-                    else
-                    {
-                        firstRegion.op(region,Region.Op.INTERSECT);
+                    } else {
+                        firstRegion.op(region, Region.Op.INTERSECT);
                     }
                 }
 
                 Rect bounds = new Rect();
                 firstRegion.getBounds(bounds);
-                if(bounds.isEmpty()) {
-                    for(BeaconData beaconData:beaconDatas) {
+                if (bounds.isEmpty()) {
+                    for (BeaconData beaconData : beaconDatas) {
                         beaconData.increaseDistanceFactor();
                     }
-                }
-                else
-                {
-                    if(this.positionCalculatorListener != null)
-                    {
-                        this.positionCalculatorListener.onCalculationResult(beaconDatas,bounds);
+                } else {
+                    if (this.positionCalculatorListener != null) {
+                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds);
                     }
-                    Log.d(TAG,"Iteration count:" + i);
+                    Log.d(TAG, "Iteration count:" + i);
 
                     return bounds;
                 }
             }
 
-        } catch (Exception ex)
-        {
-            Log.e(TAG,ex.getMessage(),ex);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage(), ex);
         }
-        Log.d(TAG,"Position not found beacon count:" + beaconDatas.size());
+        Log.d(TAG, "Position not found beacon count:" + beaconDatas.size());
         return null;
     }
 }

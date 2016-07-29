@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="table_state">
+        <attr name="state_free" format="boolean" />
+        <attr name="state_booked" format="boolean" />
+        <attr name="state_bookedForMe" format="boolean" />
+        <attr name="state_rejected" format="boolean" />
+        <attr name="state_waiting" format="boolean" />
+    </declare-styleable>
+</resources>

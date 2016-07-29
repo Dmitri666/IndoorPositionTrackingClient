@@ -18,16 +18,11 @@ public class TimePickerFragment extends DialogFragment
 
     TheListener listener;
 
-    public interface TheListener{
-        void returnTime(GregorianCalendar date);
-    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-    // Use the current date as the default date in the picker
+        // Use the current date as the default date in the picker
         final Calendar c = Calendar.getInstance();
-        if(this.getArguments() != null && this.getArguments().containsKey("time"))
-        {
+        if (this.getArguments() != null && this.getArguments().containsKey("time")) {
             long time = this.getArguments().getLong("time");
             Date date = new Date();
             date.setTime(time);
@@ -39,13 +34,10 @@ public class TimePickerFragment extends DialogFragment
 
         listener = (TheListener) getActivity();
 
-    // Create a new instance of DatePickerDialog and return it
+        // Create a new instance of DatePickerDialog and return it
         TimePickerDialog dialog = new CustomTimePickerDialog(getActivity(), this, hour, minute, true);
         return dialog;
     }
-
-
-
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -53,11 +45,15 @@ public class TimePickerFragment extends DialogFragment
         c.set(Calendar.HOUR_OF_DAY, hourOfDay);
         c.set(Calendar.MINUTE, minute);
 
-        if (listener != null)
-        {
-            listener.returnTime(new GregorianCalendar(0,0,0,hourOfDay,minute));
+        if (listener != null) {
+            listener.returnTime(new GregorianCalendar(0, 0, 0, hourOfDay, minute));
 
         }
 
+    }
+
+
+    public interface TheListener {
+        void returnTime(GregorianCalendar date);
     }
 }

@@ -25,8 +25,9 @@ public class SettingsActivity extends BaseActivity {
     public static Boolean ShowCircles = false;
     public static Boolean UseBeaconSimulator = false;
     public static String WebApiUrl;
-    public static Point  TestPosition;
+    public static Point TestPosition;
     public static Integer BeaconGroupCount;
+    public static Integer ScanPeriod;
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
@@ -44,14 +45,13 @@ public class SettingsActivity extends BaseActivity {
                 UseBeaconSimulator = isChecked;
                 if (isChecked) {
                     String path = WebApiActions.GetRooms();
-                    WebApiService service = new WebApiService(RoomInfo.class,true);
+                    WebApiService service = new WebApiService(RoomInfo.class, true);
                     service.performGetList(path, new IWebApiResultListener<List<RoomInfo>>() {
                         @Override
                         public void onResult(List<RoomInfo> objResult) {
-                            if(!objResult.isEmpty())
-                            {
+                            if (!objResult.isEmpty()) {
                                 String path = WebApiActions.GetBeaconsInLocale() + "/" + objResult.get(0).id;
-                                WebApiService service = new WebApiService(BeaconModel.class,true);
+                                WebApiService service = new WebApiService(BeaconModel.class, true);
                                 service.performGet(path, new IWebApiResultListener<BeaconModel>() {
                                     @Override
                                     public void onResult(BeaconModel objResult) {
@@ -62,7 +62,7 @@ public class SettingsActivity extends BaseActivity {
 
                                     @Override
                                     public void onError(Exception err) {
-                                        ((LpsApplication)getApplicationContext()).HandleError(err);
+                                        ((LpsApplication) getApplicationContext()).HandleError(err);
                                     }
                                 });
                             }
@@ -70,7 +70,7 @@ public class SettingsActivity extends BaseActivity {
 
                         @Override
                         public void onError(Exception err) {
-                            ((LpsApplication)getApplicationContext()).HandleError(err);
+                            ((LpsApplication) getApplicationContext()).HandleError(err);
                         }
                     });
 
@@ -81,7 +81,7 @@ public class SettingsActivity extends BaseActivity {
             }
         };
 
-        Switch swUseSimulator =  (Switch)this.findViewById(R.id.switch_use_beacon_simulator);
+        Switch swUseSimulator = (Switch) this.findViewById(R.id.switch_use_beacon_simulator);
         swUseSimulator.setChecked(UseBeaconSimulator);
         swUseSimulator.setOnCheckedChangeListener(mUseBeaconSimulatorChangeListener);
 
@@ -93,11 +93,11 @@ public class SettingsActivity extends BaseActivity {
 
             }
         };
-        Switch swShowCircles =  (Switch)this.findViewById(R.id.switch_show_circles);
+        Switch swShowCircles = (Switch) this.findViewById(R.id.switch_show_circles);
         swShowCircles.setOnCheckedChangeListener(mShowCirclesChangeListener);
 
 
-        EditText url =  (EditText)this.findViewById(R.id.tbWebapiurl);
+        EditText url = (EditText) this.findViewById(R.id.tbWebapiurl);
         url.setText(WebApiUrl);
         url.addTextChangedListener(new TextWatcher() {
             @Override
@@ -117,10 +117,10 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
-        EditText testX =  (EditText)this.findViewById(R.id.txtX);
-        EditText testY =  (EditText)this.findViewById(R.id.txtY);
+        EditText testX = (EditText) this.findViewById(R.id.txtX);
+        EditText testY = (EditText) this.findViewById(R.id.txtY);
 
-        if(TestPosition != null) {
+        if (TestPosition != null) {
             testX.setText(Float.toString(TestPosition.x));
             testY.setText(Float.toString(TestPosition.y));
         }
@@ -161,8 +161,8 @@ public class SettingsActivity extends BaseActivity {
         });
 
 
-        EditText bgc =  (EditText)this.findViewById(R.id.txtBeaconGroupCount);
-        if(BeaconGroupCount != null) {
+        EditText bgc = (EditText) this.findViewById(R.id.txtBeaconGroupCount);
+        if (BeaconGroupCount != null) {
             bgc.setText(Integer.toString(BeaconGroupCount));
 
         }
@@ -180,7 +180,7 @@ public class SettingsActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) {
+                if (s.length() == 0) {
                     BeaconGroupCount = 1;
                 } else {
                     BeaconGroupCount = Integer.parseInt(s.toString());
@@ -188,14 +188,42 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
+
+        EditText scanPeriod = (EditText) this.findViewById(R.id.txtScanPeriod);
+        LpsApplication app = (LpsApplication) this.getApplicationContext();
+        final BeaconManager beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(app);
+        scanPeriod.setText(Long.toString(BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD));
+        scanPeriod.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    long period = Long.parseLong(s.toString());
+                    beaconManager.setForegroundBetweenScanPeriod(period);
+                }
+            }
+        });
+
+
+
+
     }
 
 
     private void setTestPosition() {
-        EditText testX =  (EditText)this.findViewById(R.id.txtX);
-        EditText testY =  (EditText)this.findViewById(R.id.txtY);
+        EditText testX = (EditText) this.findViewById(R.id.txtX);
+        EditText testY = (EditText) this.findViewById(R.id.txtY);
 
-        if(testX.getText().toString().length() == 0 || testY.getText().toString().length() == 0) {
+        if (testX.getText().toString().length() == 0 || testY.getText().toString().length() == 0) {
             TestPosition = null;
             return;
         }
@@ -203,17 +231,17 @@ public class SettingsActivity extends BaseActivity {
         float x = Float.parseFloat(testX.getText().toString());
         float y = Float.parseFloat(testY.getText().toString());
 
-        TestPosition = new Point(x,y);
+        TestPosition = new Point(x, y);
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Switch swSendToServer =  (Switch)this.findViewById(R.id.switch_show_circles);
+        Switch swSendToServer = (Switch) this.findViewById(R.id.switch_show_circles);
         swSendToServer.setOnCheckedChangeListener(null);
 
-        Switch swUseSimulator =  (Switch)this.findViewById(R.id.switch_use_beacon_simulator);
+        Switch swUseSimulator = (Switch) this.findViewById(R.id.switch_use_beacon_simulator);
         swUseSimulator.setOnCheckedChangeListener(null);
 
     }

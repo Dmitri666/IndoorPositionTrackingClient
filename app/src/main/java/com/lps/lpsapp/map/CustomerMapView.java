@@ -17,10 +17,8 @@ import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.lps.core.gui.ScalableView;
 import com.lps.core.gui.ScaleGestureDetectorCompat;
@@ -98,16 +96,6 @@ public class CustomerMapView extends ScalableView {
     }
 
     @Override
-    public void DrawOnScaledCanvas(Canvas canvas) {
-        super.DrawOnScaledCanvas(canvas);
-
-        if (mBackground != null) {
-            //mBackground.setBounds(this.mContentRect.left, this.mContentRect.top, this.mContentRect.right, this.mContentRect.bottom);
-            //mBackground.draw(canvas);
-        }
-    }
-
-    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
@@ -178,13 +166,12 @@ public class CustomerMapView extends ScalableView {
         for (TableState state : model) {
             for (final Table table : this.mRoomModel.tables) {
                 if (table.id.equals(state.tableId)) {
-                    table.setBookingState(state);
+                    table.guiElement.setState(state);
                     if (state.getTableState() == TableStateEnum.Free || state.getTableState() == TableStateEnum.BookedForMe || state.getTableState() == TableStateEnum.Waiting) {
                         table.guiElement.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Boolean selected = table.getSelected();
-                                table.setSelected(!selected);
+                                table.guiElement.setSelected(!table.guiElement.isSelected());
                                 activity.validateBooking();
                             }
                         });
@@ -200,7 +187,7 @@ public class CustomerMapView extends ScalableView {
     public List<Table> getSelectedTables() {
         List<Table> selected = new ArrayList<>();
         for (Table table : this.mRoomModel.tables) {
-            if (table.getSelected()) {
+            if (table.guiElement.isSelected()) {
                 selected.add(table);
             }
         }
@@ -209,60 +196,44 @@ public class CustomerMapView extends ScalableView {
 
     public void clearSelectedTables() {
         for (Table table : this.mRoomModel.tables) {
-            table.setSelected(false);
+            table.guiElement.setSelected(false);
         }
     }
 
 
     private void CreateMapObjects() {
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (Table table : mRoomModel.tables) {
-            View view = null;
+            GuiTable view = null;
             if (table.type.equals("Table1")) {
-                view = inflater.inflate(R.layout.layout_table1, null);
+                view = new GuiTable(getContext(), 1);
             } else if (table.type.equals("Table2")) {
-                view = inflater.inflate(R.layout.layout_table2, null);
+                view = new GuiTable(getContext(), 2);
             } else if (table.type.equals("Table3")) {
-                view = inflater.inflate(R.layout.layout_table3, null);
+                view = new GuiTable(getContext(), 3);
             } else if (table.type.equals("Table4")) {
-                view = inflater.inflate(R.layout.layout_table4, null);
+                view = new GuiTable(getContext(), 4);
             } else {
-                view = inflater.inflate(R.layout.layout_table4, null);
+                view = new GuiTable(getContext(), 1);
             }
 
-            table.guiElement = (ImageView) view;
+            table.guiElement = view;
+            view.setText(table.description);
             this.addView(view);
 
             if (table.angle != 0.0) {
-                if (table.type.equals("Table1")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table2")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table3")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                } else if (table.type.equals("Table4")) {
-                    view.setPivotY(0);
-                    view.setPivotX(0);
-                }
-
+                view.setPivotY(0);
+                view.setPivotX(0);
                 view.setRotation(Math.round(table.angle));
+
             }
 
             view.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams) view.getLayoutParams(), table));
-
-            //TextView text = new TextView(getContext());
-            //text.setText(table.description);
-
         }
     }
 
     public void clearActors() {
         for (Actor actor : this.actors.values()) {
-            this.removeView(actor.position.guiElement);
+            this.removeView(actor.guiElement);
         }
         this.actors.clear();
         this.invalidate();
@@ -271,7 +242,7 @@ public class CustomerMapView extends ScalableView {
     public void removeActor(String deviceId) {
         if (this.actors.containsKey(deviceId)) {
             Actor actor = this.actors.get(deviceId);
-            this.removeView(actor.position.guiElement);
+            this.removeView(actor.guiElement);
             this.actors.remove(deviceId);
             this.invalidate();
         }
@@ -280,19 +251,20 @@ public class CustomerMapView extends ScalableView {
     public void addActor(Actor actor) {
         ActorsActivity host = (ActorsActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
         this.actors.put(actor.position.deviceId, actor);
-        GuiDevice myButton = new GuiDevice(getContext(), actor.position);
-        myButton.setText(actor.userName);
-
+        GuiDevice myButton;
         if (actor.position.deviceId.equals(((LpsApplication) this.getContext().getApplicationContext()).getAndroidId())) {
-            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_yellow));
+            myButton = new GuiDevice(getContext(), actor.position.deviceId, true);
         } else {
-            myButton.setBackground(getResources().getDrawable(R.drawable.round_button_blau));
+            myButton = new GuiDevice(getContext(), actor.position.deviceId, false);
         }
+        myButton.setText(actor.userName);
+        actor.guiElement = myButton;
 
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.position.guiElement.wight, (int) actor.position.guiElement.height);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.guiElement.wight, (int) actor.guiElement.height);
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
-        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.position.guiElement.height);
-        myButton.setOnLongClickListener(host);
+        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.guiElement.height);
+        myButton.setOnClickListener(host);
 
         this.addView(myButton);
     }
@@ -304,12 +276,12 @@ public class CustomerMapView extends ScalableView {
         }
 
         for (Actor actor : this.actors.values()) {
-            float width = this.getDrawX((float) (actor.position.x + actor.position.guiElement.wight)) - this.getDrawX((float) actor.position.x);
-            float hight = this.getDrawY((float) (actor.position.y + actor.position.guiElement.height)) - this.getDrawY((float) actor.position.y);
+            float width = this.getDrawX((float) (actor.position.x + actor.guiElement.wight)) - this.getDrawX((float) actor.position.x);
+            float hight = this.getDrawY((float) (actor.position.y + actor.guiElement.height)) - this.getDrawY((float) actor.position.y);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) width, (int) hight);
             lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
             lp.topMargin = Math.round(this.getDrawY((float) actor.position.y));
-            actor.position.guiElement.setLayoutParams(lp);
+            actor.guiElement.setLayoutParams(lp);
             //Log.d(TAG, "Actor Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
     }
@@ -342,12 +314,12 @@ public class CustomerMapView extends ScalableView {
                 R.styleable.CustomerMapView_mapViewDimension,
                 mExampleDimension);
 
-        if (a.hasValue(R.styleable.CustomerMapView_mapViewDrawable)) {
-            mBackground = a.getDrawable(
-                    R.styleable.CustomerMapView_mapViewDrawable);
-            mBackground.setCallback(this);
-        }
-        mBackground = this.getBackground();
+//        if (a.hasValue(R.styleable.CustomerMapView_mapViewDrawable)) {
+//            mBackground = a.getDrawable(
+//                    R.styleable.CustomerMapView_mapViewDrawable);
+//            mBackground.setCallback(this);
+//        }
+//        mBackground = this.getBackground();
 
         mPaintStrokeWidth = a.getFloat(R.styleable.CustomerMapView_wandWidth, mPaintStrokeWidth);
 
@@ -394,7 +366,7 @@ public class CustomerMapView extends ScalableView {
 
     public void positionChanged(final DevicePosition position) {
         if (this.actors.containsKey(position.deviceId)) {
-            final DevicePosition pos = this.actors.get(position.deviceId).position;
+            final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
             device.animate().x(this.getDrawX((float) position.x)).y(this.getDrawY((float) position.y));
         } else {

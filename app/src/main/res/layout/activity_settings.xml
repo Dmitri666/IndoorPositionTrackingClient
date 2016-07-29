@@ -9,58 +9,67 @@
     <include layout="@xml/app_bar" />
 
     <Switch
+        android:id="@+id/switch_use_beacon_simulator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="use beacon simulator"
-        android:id="@+id/switch_use_beacon_simulator"
-        />
+        android:text="use beacon simulator" />
 
     <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="show circles"
         android:id="@+id/switch_show_circles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/switch_use_beacon_simulator"
-        />
+        android:text="show circles" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Test Coordinate"
-        android:id="@+id/textView2" />
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
+        android:id="@+id/txtX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
         android:ems="10"
-        android:id="@+id/txtX" />
+        android:inputType="numberDecimal" />
 
     <EditText
+        android:id="@+id/txtY"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
         android:ems="10"
-        android:id="@+id/txtY" />
+        android:inputType="numberDecimal" />
 
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Beacon Group Count"
-        android:id="@+id/textView3" />
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
+        android:id="@+id/txtBeaconGroupCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
         android:ems="10"
-        android:id="@+id/txtBeaconGroupCount" />
+        android:inputType="number" />
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/tbWebapiurl"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan Period"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <EditText
+        android:id="@+id/txtScanPeriod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number" />
 </LinearLayout>

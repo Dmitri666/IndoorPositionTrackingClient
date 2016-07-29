@@ -53,8 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-public class ActorsActivity extends BaseActivity implements View.OnLongClickListener {
+public class ActorsActivity extends BaseActivity implements View.OnClickListener {
     private static String TAG = "ActorsActivity";
 
     private DevicePositionNotifier devicePositionListener;
@@ -65,6 +64,118 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
     private MyArrayAdapter mActorListAdapter;
     private ChatNotifier chatListener;
     private ActionMode mActionMode;
+    private ServiceConnection mPushServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PushService.LocalBinder binder = (PushService.LocalBinder) service;
+            mPushService = binder.getService();
+            mPushServiceBound = true;
+
+            mPushService.setActorPositionListener(devicePositionListener);
+            mPushService.setChatListener(chatListener);
+            mPushService.joinPositionConsumerGroup(AppManager.getInstance().AppState.getCurrentLocaleId());
+            Log.d(TAG, "onServiceConnected");
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mPushServiceBound = false;
+            Log.d(TAG, "onServiceDisconnected");
+
+
+        }
+    };
+    private ServiceConnection mBeaconServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
+            mBeaconService = binder.getService();
+            mBeaconServiceBound = true;
+
+            mBeaconService.devicePositionListener = devicePositionListener;
+            if (mBeaconService.mPositionCalculator != null) {
+                mBeaconService.mPositionCalculator.positionCalculatorListener = new PositionCalculatorNotifier() {
+                    @Override
+                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
+                        setCalculationResult(beaconDatas, bounds);
+                    }
+                };
+            }
+
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBeaconServiceBound = false;
+
+
+        }
+    };
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.menu_context_actors, menu);
+            mActionMode = mode;
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_chat:
+                    Actor actor = (Actor) mode.getTag();
+                    mode.finish();
+                    try {
+                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        String serActor = JsonSerializer.serialize(actor);
+                        intent.putExtra("actor", serActor);
+                        startActivity(intent);
+                    } catch (JsonProcessingException ex) {
+                        Log.e(TAG, ex.getMessage(), ex);
+                    }
+
+                    return true;
+                case R.id.action_showProfile:
+                    Intent intent = new Intent(getApplicationContext(), ActorProfileActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            Actor actor = (Actor) mode.getTag();
+            actor.guiElement.setSelected(false);
+            mActionMode.setTag(null);
+            mActionMode = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +183,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         setContentView(R.layout.activity_chat_actors);
 
         Log.d(TAG, "onCreate");
-        if(AppManager.getInstance().AppState.getCurrentLocaleId() == null) {
+        if (AppManager.getInstance().AppState.getCurrentLocaleId() == null) {
             this.finish();
             return;
         }
@@ -146,8 +257,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         }
 
         mBeaconService.devicePositionListener = null;
-        if(mBeaconService.mPositionCalculator != null)
-        {
+        if (mBeaconService.mPositionCalculator != null) {
             mBeaconService.mPositionCalculator.positionCalculatorListener = null;
         }
 
@@ -173,7 +283,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
 
 
@@ -185,7 +295,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         view.clearActors();
         for (Actor actor : model) {
             view.addActor(actor);
-            if(!actor.position.deviceId.equals(((LpsApplication)getApplicationContext()).getAndroidId())) {
+            if (!actor.position.deviceId.equals(((LpsApplication) getApplicationContext()).getAndroidId())) {
                 this.mActorListAdapter.add(actor);
             }
         }
@@ -241,7 +351,6 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         });
     }
 
-
     public void actorPositionChanged(final DevicePosition position) {
         this.runOnUiThread(new Runnable() {
             public void run() {
@@ -253,33 +362,6 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
         });
 
     }
-
-
-    private ServiceConnection mPushServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            PushService.LocalBinder binder = (PushService.LocalBinder) service;
-            mPushService = binder.getService();
-            mPushServiceBound = true;
-
-            mPushService.setActorPositionListener(devicePositionListener);
-            mPushService.setChatListener(chatListener);
-            mPushService.joinPositionConsumerGroup(AppManager.getInstance().AppState.getCurrentLocaleId());
-            Log.d(TAG, "onServiceConnected");
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mPushServiceBound = false;
-            Log.d(TAG, "onServiceDisconnected");
-
-
-        }
-    };
 
     public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
         this.runOnUiThread(new Runnable() {
@@ -293,149 +375,25 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
     }
 
-    private ServiceConnection mBeaconServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
-            mBeaconService = binder.getService();
-            mBeaconServiceBound = true;
-
-            mBeaconService.devicePositionListener = devicePositionListener;
-            if(mBeaconService.mPositionCalculator != null)
-            {
-                mBeaconService.mPositionCalculator.positionCalculatorListener = new PositionCalculatorNotifier() {
-                    @Override
-                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
-                        setCalculationResult(beaconDatas, bounds);
-                    }
-                };
-            }
-
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBeaconServiceBound = false;
-
-
-        }
-    };
-
     @Override
-    public boolean onLongClick(View view) {
+    public void onClick(View view) {
         GuiDevice gDevice = (GuiDevice) view;
-        if (gDevice.devicePosition.deviceId.equals(((LpsApplication)getApplication()).getAndroidId())) {
-            return false;
+        if (gDevice.deviceId.equals(((LpsApplication) getApplication()).getAndroidId())) {
+            //return;
         }
 
         if (mActionMode != null) {
-            return false;
+            return;
         }
 
         // Start the CAB using the ActionMode.Callback defined above
         mActionMode = startActionMode(mActionModeCallback);
         CustomerMapView map = (CustomerMapView) this.findViewById(R.id.CustomerMapView);
-        Actor actor = map.findActorByDeviceId(gDevice.devicePosition.deviceId);
+        Actor actor = map.findActorByDeviceId(gDevice.deviceId);
         mActionMode.setTag(actor);
         view.setSelected(true);
-        return true;
 
-    }
 
-    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-
-        // Called when the action mode is created; startActionMode() was called
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_context_actors, menu);
-            mActionMode = mode;
-            return true;
-        }
-
-        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false; // Return false if nothing is done
-        }
-
-        // Called when the user selects a contextual menu item
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_chat:
-                    Actor actor = (Actor)mode.getTag();
-                    mode.finish();
-                    try {
-                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        String serActor = JsonSerializer.serialize(actor);
-                        intent.putExtra("actor", serActor);
-                        startActivity(intent);
-                    } catch (JsonProcessingException ex) {
-                        Log.e(TAG, ex.getMessage(), ex);
-                    }
-
-                    return true;
-                case R.id.action_showProfile:
-                    Intent intent = new Intent(getApplicationContext(), ActorProfileActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    mode.finish(); // Action picked, so close the CAB
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        // Called when the user exits the action mode
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mActionMode.setTag(null);
-            mActionMode = null;
-        }
-    };
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "LIST";
-                case 1:
-                    return "MAP";
-
-            }
-            return null;
-        }
     }
 
     /**
@@ -448,6 +406,9 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
+        public PlaceholderFragment() {
+        }
+
         /**
          * Returns a new instance of this fragment for the given section
          * number.
@@ -458,9 +419,6 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
-        }
-
-        public PlaceholderFragment() {
         }
 
         @Override
@@ -489,7 +447,7 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
                             @Override
                             public void onError(Exception err) {
-                                ((LpsApplication)getContext().getApplicationContext()).HandleError(err);
+                                ((LpsApplication) getContext().getApplicationContext()).HandleError(err);
                             }
 
 
@@ -498,8 +456,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
 
                     }
                 });
-                FloatingActionButton btnZoomIn = (FloatingActionButton)rootView.findViewById(R.id.btnZoomPlus);
-                if(btnZoomIn != null) {
+                FloatingActionButton btnZoomIn = (FloatingActionButton) rootView.findViewById(R.id.btnZoomPlus);
+                if (btnZoomIn != null) {
 
                     btnZoomIn.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -507,10 +465,11 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                             view.zoomIn();
                         }
                     });
-                };
+                }
+                ;
 
-                FloatingActionButton btnZoomOut = (FloatingActionButton)rootView.findViewById(R.id.btnZoomMinus);
-                if(btnZoomOut != null) {
+                FloatingActionButton btnZoomOut = (FloatingActionButton) rootView.findViewById(R.id.btnZoomMinus);
+                if (btnZoomOut != null) {
 
                     btnZoomOut.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -518,7 +477,8 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
                             view.zoomOut();
                         }
                     });
-                };
+                }
+                ;
                 return rootView;
             } else {
                 View rootView = inflater.inflate(R.layout.fragment_actors_list, container, false);
@@ -579,5 +539,41 @@ public class ActorsActivity extends BaseActivity implements View.OnLongClickList
             return convertView;
         }
 
+    }
+
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            return PlaceholderFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "LIST";
+                case 1:
+                    return "MAP";
+
+            }
+            return null;
+        }
     }
 }

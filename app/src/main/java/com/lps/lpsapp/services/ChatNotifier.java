@@ -8,6 +8,8 @@ import com.lps.lpsapp.viewModel.chat.ChatMessage;
  */
 public interface ChatNotifier {
     void messageResived(ChatMessage chatMessage);
+
     void joinChat(Actor actor);
+
     void leaveChat(Actor actor);
 }

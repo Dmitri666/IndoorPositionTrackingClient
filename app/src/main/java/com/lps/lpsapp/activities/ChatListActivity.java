@@ -13,13 +13,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lps.lpsapp.LpsApplication;
-import com.lps.webapi.IWebApiResultListener;
-import com.lps.webapi.JsonSerializer;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.services.WebApiActions;
-import com.lps.webapi.services.WebApiService;
 import com.lps.lpsapp.viewModel.chat.Actor;
 import com.lps.lpsapp.viewModel.chat.ConversationsData;
+import com.lps.webapi.IWebApiResultListener;
+import com.lps.webapi.JsonSerializer;
+import com.lps.webapi.services.WebApiService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class ChatListActivity extends BaseActivity {
     private static String TAG = "ChatListActivity";
     private ListView listView;
     private MyArrayAdapter adapter;
-    private ArrayList<ConversationsData> listItems =new ArrayList<ConversationsData>();
+    private ArrayList<ConversationsData> listItems = new ArrayList<ConversationsData>();
     private UUID mRoomId;
 
 
@@ -37,13 +37,13 @@ public class ChatListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_list);
-        if(getIntent().getExtras().containsKey("roomId")) {
+        if (getIntent().getExtras().containsKey("roomId")) {
             this.mRoomId = (UUID) getIntent().getExtras().get("roomId");
         }
 
-        listView = (ListView)this.findViewById(R.id.listView);
+        listView = (ListView) this.findViewById(R.id.listView);
 
-        adapter=new MyArrayAdapter(this,
+        adapter = new MyArrayAdapter(this,
                 R.layout.list_item_chat,
                 listItems);
         listView.setAdapter(adapter);
@@ -73,26 +73,26 @@ public class ChatListActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         String path = WebApiActions.GetRoomConversations();
-        if(this.mRoomId != null) {
+        if (this.mRoomId != null) {
             path += "/" + this.mRoomId.toString();
         }
 
-        WebApiService service = new WebApiService(ConversationsData.class,true);
+        WebApiService service = new WebApiService(ConversationsData.class, true);
         service.performGetList(path, new IWebApiResultListener<List>() {
             @Override
             public void onResult(List objResult) {
                 setConversations(objResult);
             }
+
             @Override
             public void onError(Exception err) {
-                ((LpsApplication)getApplicationContext()).HandleError(err);
+                ((LpsApplication) getApplicationContext()).HandleError(err);
             }
         });
 
     }
 
-    private void setConversations(List<ConversationsData> data)
-    {
+    private void setConversations(List<ConversationsData> data) {
         adapter.clear();
         for (ConversationsData conversation : data) {
             adapter.add(conversation);
@@ -100,11 +100,11 @@ public class ChatListActivity extends BaseActivity {
         mProgressBar.setVisibility(View.GONE);
     }
 
-    private class MyArrayAdapter extends ArrayAdapter
-    {
+    private class MyArrayAdapter extends ArrayAdapter {
         private LayoutInflater inflater = null;
+
         public MyArrayAdapter(Context context, int resource, List<ConversationsData> objects) {
-            super(context, resource,objects);
+            super(context, resource, objects);
             inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -115,7 +115,7 @@ public class ChatListActivity extends BaseActivity {
                 convertView = inflater.inflate(R.layout.list_item_chat, null);
             TextView tvText = (TextView) convertView.findViewById(R.id.text);
             TextView tvTitle = (TextView) convertView.findViewById(R.id.title);
-            ConversationsData info =  (ConversationsData)this.getItem(position);
+            ConversationsData info = (ConversationsData) this.getItem(position);
             tvText.setText(info.userName);
             tvTitle.setText(info.userName);
             return convertView;

@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    tools:context="com.lps.lpsapp.activities.ActorsActivity$PlaceholderFragment">
+    android:fitsSystemWindows="false"
+    tools:context="com.lps.lpsapp.activities.ActorsActivity$PlaceholderFragment"
+    android:isScrollContainer="true">
 
     <com.lps.lpsapp.map.CustomerMapView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -23,7 +23,7 @@
         app:mapViewDimension="24sp"
         app:wandColor="#33b5e5"
         app:wandWidth="10"
-
+        android:layout_gravity="top"
         />
 
     <android.support.design.widget.FloatingActionButton
