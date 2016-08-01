@@ -249,6 +249,9 @@ public class CustomerMapView extends ScalableView {
     }
 
     public void addActor(Actor actor) {
+        if(this.actors.containsKey(actor.position.deviceId)) {
+            return;
+        }
         ActorsActivity host = (ActorsActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
         this.actors.put(actor.position.deviceId, actor);
         GuiDevice myButton;
@@ -276,13 +279,13 @@ public class CustomerMapView extends ScalableView {
         }
 
         for (Actor actor : this.actors.values()) {
-            float width = this.getDrawX((float) (actor.position.x + actor.guiElement.wight)) - this.getDrawX((float) actor.position.x);
-            float hight = this.getDrawY((float) (actor.position.y + actor.guiElement.height)) - this.getDrawY((float) actor.position.y);
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) width, (int) hight);
-            lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
+            int width = Math.round(this.getDrawX(actor.guiElement.wight));
+            int height = Math.round(this.getDrawY(actor.guiElement.height));
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
+            lp.width = width;
+            lp.height = height;
+            lp.leftMargin = Math.round(this.getDrawX((float) actor.position.x));
             lp.topMargin = Math.round(this.getDrawY((float) actor.position.y));
-            actor.guiElement.setLayoutParams(lp);
-            //Log.d(TAG, "Actor Layout width:" + lp.width + "height:" + lp.height + "leftMargin:" + lp.leftMargin + "topMargin" + lp.topMargin);
         }
     }
 
@@ -369,6 +372,8 @@ public class CustomerMapView extends ScalableView {
             final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
             device.animate().x(this.getDrawX((float) position.x)).y(this.getDrawY((float) position.y));
+            pos.position.x = position.x;
+            pos.position.y = position.y;
         } else {
             DevicePosition pos = new DevicePosition();
             pos.deviceId = position.deviceId;

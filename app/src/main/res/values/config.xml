@@ -1,5 +1,5 @@
 <resources>
-    <string name="serverUrl">@string/urlGloobar</string>
+    <string name="serverUrl">@string/urlLocal</string>
     <string name="getToken">/token</string>
     <string name="images">/FileUploads/</string>
     <string name="RegisterUserCurrentDevice">/api/Account/RegisterUserCurrentDevice</string>
