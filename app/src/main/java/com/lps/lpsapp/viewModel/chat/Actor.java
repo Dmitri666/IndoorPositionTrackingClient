@@ -15,9 +15,17 @@ public class Actor {
     public DevicePosition position;
 
     @JsonIgnore
+    public double wight;
+
+    @JsonIgnore
+    public double height;
+
+    @JsonIgnore
     public GuiDevice guiElement;
 
     public Actor() {
+        this.wight = 40f;
+        this.height = 40f;
     }
 
 

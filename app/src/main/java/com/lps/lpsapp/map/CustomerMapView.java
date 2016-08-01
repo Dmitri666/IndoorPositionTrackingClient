@@ -1,5 +1,7 @@
 package com.lps.lpsapp.map;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -226,9 +228,10 @@ public class CustomerMapView extends ScalableView {
                 view.setRotation(Math.round(table.angle));
 
             }
-
-            view.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams) view.getLayoutParams(), table));
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) table.wight, (int) table.height);
+            view.setLayoutParams(lp);
         }
+        this.invalidate();
     }
 
     public void clearActors() {
@@ -264,28 +267,35 @@ public class CustomerMapView extends ScalableView {
         actor.guiElement = myButton;
 
 
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.guiElement.wight, (int) actor.guiElement.height);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.wight, (int) actor.height);
         lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
-        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.guiElement.height);
+        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.height);
         myButton.setOnClickListener(host);
 
         this.addView(myButton);
+        this.invalidate();
     }
 
 
     private void setLayoutForMapObjects() {
         for (Table table : this.mRoomModel.tables) {
-            table.guiElement.setLayoutParams(this.applayTableLayoutParams((FrameLayout.LayoutParams) table.guiElement.getLayoutParams(), table));
+            FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)table.guiElement.getLayoutParams();
+            param.width = Math.round(this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x)));
+            param.height = Math.round(this.getDrawY(Math.round(table.y + table.height)) - this.getDrawY(Math.round(table.y)));
+            table.guiElement.setLayoutParams(param);
+            table.guiElement.setX(Math.round(this.getDrawX(Math.round(table.x))));
+            table.guiElement.setY(Math.round(this.getDrawY(Math.round(table.y))));
         }
 
         for (Actor actor : this.actors.values()) {
-            int width = Math.round(this.getDrawX(actor.guiElement.wight));
-            int height = Math.round(this.getDrawY(actor.guiElement.height));
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
-            lp.width = width;
-            lp.height = height;
-            lp.leftMargin = Math.round(this.getDrawX((float) actor.position.x));
-            lp.topMargin = Math.round(this.getDrawY((float) actor.position.y));
+            FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
+            param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(Math.round(actor.position.x)));
+            param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(Math.round(actor.position.y)));
+            actor.guiElement.setLayoutParams(param);
+            //if(actor.guiElement.getAnimation() == null) {
+                actor.guiElement.setX(Math.round(this.getDrawX(Math.round(actor.position.x))));
+                actor.guiElement.setY(Math.round(this.getDrawY(Math.round(actor.position.y))));
+            //}
         }
     }
 
@@ -295,13 +305,6 @@ public class CustomerMapView extends ScalableView {
         this.invalidate();
     }
 
-    private FrameLayout.LayoutParams applayTableLayoutParams(FrameLayout.LayoutParams param, Table table) {
-        param.width = Math.round(this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x)));
-        param.height = Math.round(this.getDrawY(Math.round(table.y + table.height)) - this.getDrawY(Math.round(table.y)));
-        param.leftMargin = Math.round(this.getDrawX(Math.round(table.x)));
-        param.topMargin = Math.round(this.getDrawY(Math.round(table.y)));
-        return param;
-    }
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
@@ -371,9 +374,17 @@ public class CustomerMapView extends ScalableView {
         if (this.actors.containsKey(position.deviceId)) {
             final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
-            device.animate().x(this.getDrawX((float) position.x)).y(this.getDrawY((float) position.y));
-            pos.position.x = position.x;
-            pos.position.y = position.y;
+            long duration = device.animate().x(this.getDrawX(position.x)).y(this.getDrawY(position.y)).getDuration();
+
+            ObjectAnimator animX = ObjectAnimator.ofFloat(pos.position, "x", (float) position.x);
+            ObjectAnimator animY = ObjectAnimator.ofFloat(pos.position, "y", (float) position.y);
+            AnimatorSet animSetXY = new AnimatorSet();
+            animSetXY.playTogether(animX, animY);
+            animSetXY.setDuration(duration);
+            animSetXY.start();
+
+
+
         } else {
             DevicePosition pos = new DevicePosition();
             pos.deviceId = position.deviceId;
@@ -384,7 +395,7 @@ public class CustomerMapView extends ScalableView {
             actor.position = position;
 
             this.addActor(actor);
-            this.invalidate();
+
         }
 
     }
