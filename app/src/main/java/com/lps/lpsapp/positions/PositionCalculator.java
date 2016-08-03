@@ -123,7 +123,7 @@ public class PositionCalculator {
                     }
                 } else {
                     if (this.positionCalculatorListener != null) {
-                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds);
+                        //this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds);
                     }
                     Log.d(TAG, "Iteration count:" + i);
 
