@@ -1,6 +1,5 @@
 package com.lps.lpsapp.map;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -79,7 +78,9 @@ public class CustomerMapView extends ScalableView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.d(TAG, "onSizeChanged");
+
+        Log.d(TAG, "onSizeChanged" + w + ":" + h + ":" + oldw + ":" + oldh);
+        Log.d(TAG, "mContentRect" + mContentRect.left + ":" + mContentRect.top + ":" + mContentRect.width() + ":" + mContentRect.height());
     }
 
     public void setmRoomModel(RoomModel roomModel) {
@@ -403,6 +404,10 @@ public class CustomerMapView extends ScalableView {
     }
 
     public void positionChanged(final DevicePosition position) {
+        if(!this.hasRoomModel()) {
+            return;
+        }
+
         if (this.actors.containsKey(position.deviceId)) {
             final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
