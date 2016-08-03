@@ -1,7 +1,9 @@
 package com.lps.lpsapp.map;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -20,6 +22,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 
 import com.lps.core.gui.ScalableView;
@@ -150,6 +153,21 @@ public class CustomerMapView extends ScalableView {
     }
 
     @Override
+    protected float getRealX(float x) {
+        float x1 =  super.getRealX(x);
+
+        float newWight = this.mRoomModel.wight;
+        float xOffset = 0;
+        if ((float) this.mContentRect.height() / (float) this.mContentRect.width() < this.mRoomModel.height / this.mRoomModel.wight) {
+            newWight = this.mRoomModel.height * this.mContentRect.width() / this.mContentRect.height();
+            xOffset = (newWight - this.mRoomModel.wight) / 2;
+        }
+        float result =  (x1 + 1 / 2f * newWight) - xOffset;
+
+        return result;
+    }
+
+    @Override
     protected float getDrawY(float y) {
 
         float newHight = this.mRoomModel.height;
@@ -162,6 +180,20 @@ public class CustomerMapView extends ScalableView {
         return super.getDrawY(y1);
     }
 
+    @Override
+    protected float getRealY(float y) {
+        float y1 =  super.getRealY(y);
+
+        float newHeigth = this.mRoomModel.height;
+        float yOffset = 0;
+        if ((float) this.mContentRect.width() / (float) this.mContentRect.height() < this.mRoomModel.wight / this.mRoomModel.height) {
+            newHeigth = this.mRoomModel.wight * this.mContentRect.height() / this.mContentRect.width();
+            yOffset = (newHeigth - this.mRoomModel.height) / 2;
+        }
+        float result =  (y1 + 1 / 2f * newHeigth) - yOffset;
+
+        return result;
+    }
 
     public void setBooking(List<TableState> model) {
         final BookingActivity activity = (BookingActivity) ((ContextThemeWrapper) this.getContext()).getBaseContext();
@@ -374,7 +406,16 @@ public class CustomerMapView extends ScalableView {
         if (this.actors.containsKey(position.deviceId)) {
             final Actor pos = this.actors.get(position.deviceId);
             View device = pos.guiElement;
-            long duration = device.animate().x(this.getDrawX(position.x)).y(this.getDrawY(position.y)).getDuration();
+            ViewPropertyAnimator animator = device.animate();
+            animator.setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    //pos.position.x =  (float)valueAnimator.getAnimatedValue("x");
+                    //pos.position.y =  (float)valueAnimator.getAnimatedValue("y");
+                }
+            });
+
+            long duration = animator.x(this.getDrawX(position.x)).y(this.getDrawY(position.y)).getDuration();
 
             ObjectAnimator animX = ObjectAnimator.ofFloat(pos.position, "x", (float) position.x);
             ObjectAnimator animY = ObjectAnimator.ofFloat(pos.position, "y", (float) position.y);

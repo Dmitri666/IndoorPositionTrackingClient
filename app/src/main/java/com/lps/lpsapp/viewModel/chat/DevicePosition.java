@@ -18,22 +18,22 @@ public class DevicePosition {
 
     }
 
-    @JsonIgnore
+
     public void setX(float x) {
         this.x = x;
     }
 
-    @JsonIgnore
+
     public void setY(float y) {
         this.y = y;
     }
 
-    @JsonIgnore
+
     public float getX() {
         return this.x;
     }
 
-    @JsonIgnore
+
     public float getY() {
         return this.y;
     }

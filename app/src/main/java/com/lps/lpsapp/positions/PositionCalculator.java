@@ -65,7 +65,7 @@ public class PositionCalculator {
 
         Point2D result = new Point2D(0, 0);
         if (results.size() == 0) {
-            return result;
+            return null;
         }
 
         for (Point2D point : results) {

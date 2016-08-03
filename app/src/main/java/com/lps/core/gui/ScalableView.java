@@ -370,6 +370,12 @@ public class ScalableView extends FrameLayout {
                 * (x - mCurrentViewport.left) / mCurrentViewport.width();
     }
 
+    protected float getRealX(float x) {
+        return mCurrentViewport.left
+                + mCurrentViewport.width()
+                * (x - mContentRect.left) / mContentRect.width();
+    }
+
     /**
      * Computes the pixel offset for the given Y chart value. This may be outside the view bounds.
      */
@@ -379,6 +385,11 @@ public class ScalableView extends FrameLayout {
                 * (y - mCurrentViewport.top) / mCurrentViewport.height();
     }
 
+    protected float getRealY(float y) {
+        return mCurrentViewport.bottom
+                - mCurrentViewport.height()
+                * (y - mContentRect.top) / mContentRect.height();
+    }
     public void DrawOnUnscaledCanvas(Canvas canvas) {
 
     }
