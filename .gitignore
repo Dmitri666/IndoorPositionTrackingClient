@@ -5,5 +5,7 @@
 .DS_Store
 /build
 /captures
-gradle.properties
 /gradle.properties
+app/src/main/res/drawable/bg.xml
+Would skip repository libs/android-beacon-library
+libs/libs.iml
