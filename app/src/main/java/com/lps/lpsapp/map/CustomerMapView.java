@@ -2,7 +2,6 @@ package com.lps.lpsapp.map;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -15,13 +14,13 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.ViewCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 
 import com.lps.core.gui.ScalableView;
@@ -90,7 +89,7 @@ public class CustomerMapView extends ScalableView {
         Bitmap bitmap = BitmapFactory.decodeStream(stream);
         mBackground = new BitmapDrawable(getResources(), bitmap);
         this.CreateMapObjects();
-        this.invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public boolean hasRoomModel() {
@@ -155,7 +154,7 @@ public class CustomerMapView extends ScalableView {
 
     @Override
     protected float getRealX(float x) {
-        float x1 =  super.getRealX(x);
+
 
         float newWight = this.mRoomModel.wight;
         float xOffset = 0;
@@ -163,9 +162,9 @@ public class CustomerMapView extends ScalableView {
             newWight = this.mRoomModel.height * this.mContentRect.width() / this.mContentRect.height();
             xOffset = (newWight - this.mRoomModel.wight) / 2;
         }
-        float result =  (x1 + 1 / 2f * newWight) - xOffset;
-
-        return result;
+        float result =  (x + 1 / 2f * newWight) - xOffset;
+        float x1 =  super.getRealX(result);
+        return x1;
     }
 
     @Override
@@ -264,7 +263,7 @@ public class CustomerMapView extends ScalableView {
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) table.wight, (int) table.height);
             view.setLayoutParams(lp);
         }
-        this.invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public void clearActors() {
@@ -272,7 +271,7 @@ public class CustomerMapView extends ScalableView {
             this.removeView(actor.guiElement);
         }
         this.actors.clear();
-        this.invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     public void removeActor(String deviceId) {
@@ -280,7 +279,7 @@ public class CustomerMapView extends ScalableView {
             Actor actor = this.actors.get(deviceId);
             this.removeView(actor.guiElement);
             this.actors.remove(deviceId);
-            this.invalidate();
+            ViewCompat.postInvalidateOnAnimation(this);
         }
     }
 
@@ -299,14 +298,16 @@ public class CustomerMapView extends ScalableView {
         myButton.setText(actor.userName);
         actor.guiElement = myButton;
 
-
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) actor.wight, (int) actor.height);
-        lp.leftMargin = (int) this.getDrawX((float) actor.position.x);
-        lp.topMargin = (int) (this.getDrawY((float) actor.position.y) - actor.height);
+        int wight = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(Math.round(actor.position.x)));
+        int height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(Math.round(actor.position.y)));
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(wight, height);
+        actor.guiElement.setLayoutParams(lp);
+        actor.guiElement.setX(Math.round(this.getDrawX(Math.round(actor.position.x))));
+        actor.guiElement.setY(Math.round(this.getDrawY(Math.round(actor.position.y))));
         myButton.setOnClickListener(host);
 
         this.addView(myButton);
-        this.invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
 
@@ -321,21 +322,21 @@ public class CustomerMapView extends ScalableView {
         }
 
         for (Actor actor : this.actors.values()) {
+
+
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
             param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(Math.round(actor.position.x)));
             param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(Math.round(actor.position.y)));
             actor.guiElement.setLayoutParams(param);
-            //if(actor.guiElement.getAnimation() == null) {
-                actor.guiElement.setX(Math.round(this.getDrawX(Math.round(actor.position.x))));
-                actor.guiElement.setY(Math.round(this.getDrawY(Math.round(actor.position.y))));
-            //}
+            actor.guiElement.setX(Math.round(this.getDrawX(Math.round(actor.position.x))));
+            actor.guiElement.setY(Math.round(this.getDrawY(Math.round(actor.position.y))));
         }
     }
 
     public void setCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
         this.beaconDatas = beaconDatas;
         this.calculationResult = bounds;
-        this.invalidate();
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
 
@@ -403,34 +404,20 @@ public class CustomerMapView extends ScalableView {
         return null;
     }
 
-    public void positionChanged(final DevicePosition position) {
+    public void positionChanged(final DevicePosition position,final long interval) {
         if(!this.hasRoomModel()) {
             return;
         }
 
         if (this.actors.containsKey(position.deviceId)) {
-            final Actor pos = this.actors.get(position.deviceId);
-            View device = pos.guiElement;
-            ViewPropertyAnimator animator = device.animate();
-            animator.setUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    //pos.position.x =  (float)valueAnimator.getAnimatedValue("x");
-                    //pos.position.y =  (float)valueAnimator.getAnimatedValue("y");
-                }
-            });
+            final Actor actor = this.actors.get(position.deviceId);
 
-            long duration = animator.x(this.getDrawX(position.x)).y(this.getDrawY(position.y)).getDuration();
-
-            ObjectAnimator animX = ObjectAnimator.ofFloat(pos.position, "x", (float) position.x);
-            ObjectAnimator animY = ObjectAnimator.ofFloat(pos.position, "y", (float) position.y);
+            ObjectAnimator animX = ObjectAnimator.ofFloat(actor, "x", (float) position.x);
+            ObjectAnimator animY = ObjectAnimator.ofFloat(actor, "y", (float) position.y);
             AnimatorSet animSetXY = new AnimatorSet();
             animSetXY.playTogether(animX, animY);
-            animSetXY.setDuration(duration);
+            animSetXY.setDuration(interval);
             animSetXY.start();
-
-
-
         } else {
             DevicePosition pos = new DevicePosition();
             pos.deviceId = position.deviceId;

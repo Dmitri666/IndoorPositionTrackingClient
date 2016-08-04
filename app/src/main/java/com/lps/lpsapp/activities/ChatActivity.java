@@ -177,6 +177,7 @@ public class ChatActivity extends BaseActivity {
                 chatMessage.message = messageText;
                 chatMessage.conversationId = conversationId;
                 chatMessage.time = new Date();
+                chatMessage.isMe = true;
 
 
                 messageET.setText("");

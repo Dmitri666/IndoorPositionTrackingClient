@@ -23,6 +23,28 @@ public class Actor {
     @JsonIgnore
     public GuiDevice guiElement;
 
+    @JsonIgnore
+    public void setX(float x) {
+        this.position.x = x;
+        this.guiElement.invalidate();
+    }
+
+    @JsonIgnore
+    public void setY(float y) {
+        this.position.y = y;
+        this.guiElement.invalidate();
+    }
+
+    @JsonIgnore
+    public float getX() {
+        return this.position.x;
+    }
+
+    @JsonIgnore
+    public float getY() {
+        return this.position.y;
+    }
+
     public Actor() {
         this.wight = 40f;
         this.height = 40f;

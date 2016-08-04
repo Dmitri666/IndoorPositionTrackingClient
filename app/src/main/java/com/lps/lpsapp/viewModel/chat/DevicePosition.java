@@ -1,7 +1,5 @@
 package com.lps.lpsapp.viewModel.chat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.UUID;
 
 /**
@@ -18,23 +16,4 @@ public class DevicePosition {
 
     }
 
-
-    public void setX(float x) {
-        this.x = x;
-    }
-
-
-    public void setY(float y) {
-        this.y = y;
-    }
-
-
-    public float getX() {
-        return this.x;
-    }
-
-
-    public float getY() {
-        return this.y;
-    }
 }

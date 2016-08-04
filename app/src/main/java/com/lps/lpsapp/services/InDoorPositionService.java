@@ -310,6 +310,10 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
         this.consumers.remove(consumer);
     }
 
+    public long getInterval() {
+        return BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD + BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD;
+    }
+
     private void setRegions(List<com.lps.lpsapp.viewModel.Region> regions) {
         for (com.lps.lpsapp.viewModel.Region r : regions) {
             Region roomRegion = new Region(r.roomId.toString(), Identifier.fromUuid(r.identifirer1), Identifier.fromInt(r.identifirer2), null);

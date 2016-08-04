@@ -208,7 +208,7 @@ public class SettingsActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
                     long period = Long.parseLong(s.toString());
-                    beaconManager.setForegroundBetweenScanPeriod(period);
+                    //beaconManager.setForegroundBetweenScanPeriod(period);
                 }
             }
         });

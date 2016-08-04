@@ -49,6 +49,8 @@ import com.lps.webapi.JsonSerializer;
 import com.lps.webapi.services.WebApiService;
 import com.squareup.picasso.Picasso;
 
+import org.altbeacon.beacon.BeaconManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -356,7 +358,11 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
                 if (view.hasRoomModel()) {
-                    view.positionChanged(position);
+                    if(mBeaconService != null) {
+                        view.positionChanged(position, mBeaconService.getInterval());
+                    } else {
+                        view.positionChanged(position, BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD + BeaconManager.DEFAULT_FOREGROUND_BETWEEN_SCAN_PERIOD);
+                    }
                 }
             }
         });
@@ -366,10 +372,10 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
     public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
         this.runOnUiThread(new Runnable() {
             public void run() {
-                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
-                if (view != null && view.hasRoomModel()) {
-                    view.setCalculationResult(beaconDatas, bounds);
-                }
+//                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
+//                if (view != null && view.hasRoomModel()) {
+//                    view.setCalculationResult(beaconDatas, bounds);
+//                }
             }
         });
 

@@ -394,7 +394,7 @@ public class ScalableView extends FrameLayout {
 
     }
 
-    public void DrawOnScaledCanvas(Canvas canvas) {
+    public void  DrawOnScaledCanvas(Canvas canvas) {
 
     }
 

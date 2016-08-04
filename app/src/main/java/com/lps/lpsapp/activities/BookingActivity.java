@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -344,7 +345,7 @@ public class BookingActivity extends BaseActivity implements DatePickerFragment.
         }
 
 
-        view.invalidate();
+        ViewCompat.postInvalidateOnAnimation(view);
 
         FloatingActionButton btn = (FloatingActionButton) this.findViewById(R.id.btnBooking);
         btn.setVisibility(View.INVISIBLE);
