@@ -1,5 +1,6 @@
 package com.lps.lpsapp.map;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -412,12 +413,40 @@ public class CustomerMapView extends ScalableView {
         if (this.actors.containsKey(position.deviceId)) {
             final Actor actor = this.actors.get(position.deviceId);
 
-            ObjectAnimator animX = ObjectAnimator.ofFloat(actor, "x", (float) position.x);
-            ObjectAnimator animY = ObjectAnimator.ofFloat(actor, "y", (float) position.y);
-            AnimatorSet animSetXY = new AnimatorSet();
-            animSetXY.playTogether(animX, animY);
-            animSetXY.setDuration(interval);
-            animSetXY.start();
+            if(actor.animSetXY != null) {
+                actor.animSetXY.removeAllListeners();
+                actor.animSetXY.end();
+                actor.animSetXY.cancel();
+
+                List<Animator> animators = actor.animSetXY.getChildAnimations();
+                for(int i = 0;i < animators.size();i++) {
+                    ObjectAnimator ax = (ObjectAnimator)animators.get(i);
+                    ax.removeAllListeners();
+                    ax.end();
+                    ax.cancel();
+                    if(ax.getPropertyName().equals("x")) {
+                        ax.setFloatValues((float) position.x);
+                    } else {
+                        ax.setFloatValues((float) position.y);
+                    }
+
+                }
+
+                actor.animSetXY.setDuration(interval);
+                actor.animSetXY.start();
+
+            } else {
+                ObjectAnimator animX = ObjectAnimator.ofFloat(actor, "x", (float) position.x);
+                ObjectAnimator animY = ObjectAnimator.ofFloat(actor, "y", (float) position.y);
+                AnimatorSet animSetXY = new AnimatorSet();
+                animSetXY.playTogether(animX, animY);
+                animSetXY.setDuration(interval);
+                actor.animSetXY = animSetXY;
+                animSetXY.start();
+            }
+
+
+
         } else {
             DevicePosition pos = new DevicePosition();
             pos.deviceId = position.deviceId;

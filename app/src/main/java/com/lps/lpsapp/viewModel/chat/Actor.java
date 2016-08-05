@@ -1,5 +1,7 @@
 package com.lps.lpsapp.viewModel.chat;
 
+import android.animation.AnimatorSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lps.lpsapp.map.GuiDevice;
 
@@ -44,6 +46,9 @@ public class Actor {
     public float getY() {
         return this.position.y;
     }
+
+    @JsonIgnore
+    public AnimatorSet animSetXY;
 
     public Actor() {
         this.wight = 40f;
