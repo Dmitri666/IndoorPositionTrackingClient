@@ -305,7 +305,7 @@ public class CustomerMapView extends ScalableView {
             param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(actor.position.x));
             param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(actor.position.y));
             //param.leftMargin = Math.round(this.getDrawX(actor.position.x));
-            //param.topMargin = Math.round(this.getDrawY(actor.position.y));
+            //param.topMargin = Math.round(this.getDrawY(actor.position.y) - param.height);
             actor.guiElement.setLayoutParams(param);
             actor.guiElement.setX(this.getDrawX(Math.round(actor.position.x)));
             actor.guiElement.setY(this.getDrawY(Math.round(actor.position.y)));
