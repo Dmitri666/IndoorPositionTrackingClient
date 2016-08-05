@@ -121,7 +121,18 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey, BeaconGroup> {
                     count = subSet.size();
                 }
             }
+
             subSet = subSet.subList(0, count);
+            if(subSet.size() == 1) {
+                BeaconGroup nextGroup = subSet.get(0);
+                if(this.mCurrentGroup != null) {
+                    if(!nextGroup.isEquals(this.mCurrentGroup)) {
+                        this.mCurrentGroup = nextGroup;
+                        return new BeaconCalculationModel();
+                    }
+                }
+                this.mCurrentGroup = nextGroup;
+            }
         }
 
         BeaconCalculationModel calculationModel = new BeaconCalculationModel();
@@ -140,6 +151,7 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey, BeaconGroup> {
         return calculationModel;
     }
 
+    private BeaconGroup mCurrentGroup;
     private List<BeaconGroup> getSubSet(Set<Integer> keys) {
         List<BeaconGroup> subSet = new ArrayList<>();
         for (BeaconGroupKey key : this.keySet()) {

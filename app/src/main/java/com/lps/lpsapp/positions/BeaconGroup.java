@@ -3,13 +3,26 @@ package com.lps.lpsapp.positions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by dle on 28.06.2016.
  */
 public class BeaconGroup extends HashMap<Integer, Point2D> {
 
+public boolean isEquals(BeaconGroup group) {
+    if(this.size() != group.size()) {
+        return false;
+    }
 
+    for(Integer nr:this.keySet()) {
+        if(!group.keySet().contains(nr)) {
+            return false;
+        }
+    }
+
+    return true;
+}
     public Boolean IsValide(float xDelta, float yDelta) {
         //return true;
 

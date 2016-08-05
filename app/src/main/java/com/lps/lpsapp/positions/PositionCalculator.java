@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,18 +44,18 @@ public class PositionCalculator {
 
 
     public Point2D calculatePosition(Collection<Beacon> beacons) {
-        List<Beacon> list = new ArrayList<>(beacons);
-        Collections.sort(list, comparator);
 
-        if (list.size() > 3) {
-            list = list.subList(0, 3);
-        }
-
-        for (int i = 0; i < list.size(); i++) {
-            Log.d(TAG, " min :" + list.get(i).getId3().toString());
-        }
 
         BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
+        Iterator<BeaconGroupKey> it =  calculationModel.keySet().iterator();
+        while (it.hasNext()) {
+            BeaconGroupKey key = it.next();
+            Iterator<Integer> keyIt = key.iterator();
+            while(keyIt.hasNext()) {
+                Integer in = keyIt.next();
+                Log.d(TAG, " min :" + in);
+            }
+        }
 
         List<Point2D> results = new ArrayList<>();
         for (List<BeaconData> data : calculationModel.values()) {
