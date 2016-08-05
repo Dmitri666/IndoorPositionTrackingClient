@@ -282,16 +282,16 @@ public class ScalableView extends FrameLayout {
         int clipRestoreCount = canvas.save();
         canvas.clipRect(mContentRect);
         drawEdgeEffectsUnclipped(canvas);
-
-
-        float translateX = -this.mCurrentViewport.centerX() * this.mContentRect.width() / 2f;
-        float translateY = this.mCurrentViewport.centerY() * this.mContentRect.height() / 2f;
-        canvas.translate(translateX, translateY);
-
-        canvas.scale((AXIS_X_MAX - AXIS_X_MIN) / this.mCurrentViewport.width(), (AXIS_Y_MAX - AXIS_Y_MIN) / this.mCurrentViewport.height(), this.mContentRect.centerX(), this.mContentRect.centerY());
-
-        this.DrawOnScaledCanvas(canvas);
-        // Removes clipping rectangle
+//
+//
+//        float translateX = -this.mCurrentViewport.centerX() * this.mContentRect.width() / 2f;
+//        float translateY = this.mCurrentViewport.centerY() * this.mContentRect.height() / 2f;
+//        canvas.translate(translateX, translateY);
+//
+//        canvas.scale((AXIS_X_MAX - AXIS_X_MIN) / this.mCurrentViewport.width(), (AXIS_Y_MAX - AXIS_Y_MIN) / this.mCurrentViewport.height(), this.mContentRect.centerX(), this.mContentRect.centerY());
+//
+//        this.DrawOnScaledCanvas(canvas);
+//        // Removes clipping rectangle
         canvas.restoreToCount(clipRestoreCount);
 
         this.DrawOnUnscaledCanvas(canvas);

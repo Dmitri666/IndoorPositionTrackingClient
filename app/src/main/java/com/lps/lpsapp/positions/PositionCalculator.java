@@ -5,6 +5,8 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.util.Log;
 
+import com.lps.lpsapp.activities.SettingsActivity;
+
 import org.altbeacon.beacon.Beacon;
 
 import java.util.ArrayList;
@@ -122,8 +124,8 @@ public class PositionCalculator {
                         beaconData.increaseDistanceFactor();
                     }
                 } else {
-                    if (this.positionCalculatorListener != null) {
-                        //this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds);
+                    if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
+                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds);
                     }
                     Log.d(TAG, "Iteration count:" + i);
 

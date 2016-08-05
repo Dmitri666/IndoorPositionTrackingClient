@@ -372,10 +372,10 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
     public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
         this.runOnUiThread(new Runnable() {
             public void run() {
-//                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
-//                if (view != null && view.hasRoomModel()) {
-//                    view.setCalculationResult(beaconDatas, bounds);
-//                }
+                CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
+                if (view != null && view.hasRoomModel()) {
+                    view.setCalculationResult(beaconDatas, bounds);
+                }
             }
         });
 
@@ -385,7 +385,7 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View view) {
         GuiDevice gDevice = (GuiDevice) view;
         if (gDevice.deviceId.equals(((LpsApplication) getApplication()).getAndroidId())) {
-            //return;
+            return;
         }
 
         if (mActionMode != null) {

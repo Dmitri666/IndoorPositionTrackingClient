@@ -1,7 +1,5 @@
 package com.lps.lpsapp.map;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -115,6 +113,7 @@ public class CustomerMapView extends ScalableView {
             return;
         }
 
+
         if (mBackground != null) {
             mBackground.setBounds((int) this.getDrawX(0), (int) this.getDrawY(0), (int) this.getDrawX(mRoomModel.wight), (int) this.getDrawY(mRoomModel.height));
             mBackground.draw(canvas);
@@ -136,8 +135,14 @@ public class CustomerMapView extends ScalableView {
             canvas.restore();
         }
 
-        this.setLayoutForMapObjects();
 
+
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        this.setLayoutForMapObjects();
+        super.onDraw(canvas);
     }
 
     @Override
@@ -145,54 +150,24 @@ public class CustomerMapView extends ScalableView {
         float newWight = this.mRoomModel.wight;
         float xOffset = 0;
         if ((float) this.mContentRect.height() / (float) this.mContentRect.width() < this.mRoomModel.height / this.mRoomModel.wight) {
-            newWight = this.mRoomModel.height * this.mContentRect.width() / this.mContentRect.height();
-            xOffset = (newWight - this.mRoomModel.wight) / 2;
+            newWight = this.mRoomModel.height * (float)this.mContentRect.width() / (float)this.mContentRect.height();
+            xOffset = (newWight - this.mRoomModel.wight) / 2f;
         }
-        float x1 = ((x + xOffset) / newWight) * 2f - 1;
+        float x1 = ((x + xOffset) / newWight) * 2f - 1f;
         return super.getDrawX(x1);
     }
 
-    @Override
-    protected float getRealX(float x) {
-
-
-        float newWight = this.mRoomModel.wight;
-        float xOffset = 0;
-        if ((float) this.mContentRect.height() / (float) this.mContentRect.width() < this.mRoomModel.height / this.mRoomModel.wight) {
-            newWight = this.mRoomModel.height * this.mContentRect.width() / this.mContentRect.height();
-            xOffset = (newWight - this.mRoomModel.wight) / 2;
-        }
-        float result =  (x + 1 / 2f * newWight) - xOffset;
-        float x1 =  super.getRealX(result);
-        return x1;
-    }
 
     @Override
     protected float getDrawY(float y) {
-
         float newHight = this.mRoomModel.height;
         float yOffset = 0;
         if ((float) this.mContentRect.height() / (float) this.mContentRect.width() > this.mRoomModel.height / this.mRoomModel.wight) {
-            newHight = this.mRoomModel.wight * this.mContentRect.height() / this.mContentRect.width();
-            yOffset = (newHight - this.mRoomModel.height) / 2;
+            newHight = this.mRoomModel.wight * (float)this.mContentRect.height() / (float)this.mContentRect.width();
+            yOffset = (newHight - this.mRoomModel.height) / 2f;
         }
-        float y1 = (newHight - y - yOffset) * 2f / newHight - 1;
+        float y1 = (newHight - y - yOffset) * 2f / newHight - 1f;
         return super.getDrawY(y1);
-    }
-
-    @Override
-    protected float getRealY(float y) {
-        float y1 =  super.getRealY(y);
-
-        float newHeigth = this.mRoomModel.height;
-        float yOffset = 0;
-        if ((float) this.mContentRect.width() / (float) this.mContentRect.height() < this.mRoomModel.wight / this.mRoomModel.height) {
-            newHeigth = this.mRoomModel.wight * this.mContentRect.height() / this.mContentRect.width();
-            yOffset = (newHeigth - this.mRoomModel.height) / 2;
-        }
-        float result =  (y1 + 1 / 2f * newHeigth) - yOffset;
-
-        return result;
     }
 
     public void setBooking(List<TableState> model) {
@@ -312,6 +287,10 @@ public class CustomerMapView extends ScalableView {
 
 
     private void setLayoutForMapObjects() {
+        if(!this.hasRoomModel()) {
+            return;
+        }
+
         for (Table table : this.mRoomModel.tables) {
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)table.guiElement.getLayoutParams();
             param.width = Math.round(this.getDrawX(Math.round(table.x + table.wight)) - this.getDrawX(Math.round(table.x)));
@@ -322,14 +301,18 @@ public class CustomerMapView extends ScalableView {
         }
 
         for (Actor actor : this.actors.values()) {
-
-
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
-            param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(Math.round(actor.position.x)));
-            param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(Math.round(actor.position.y)));
+            param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(actor.position.x));
+            param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(actor.position.y));
+            //param.leftMargin = Math.round(this.getDrawX(actor.position.x));
+            //param.topMargin = Math.round(this.getDrawY(actor.position.y));
             actor.guiElement.setLayoutParams(param);
-            actor.guiElement.setX(Math.round(this.getDrawX(Math.round(actor.position.x))));
-            actor.guiElement.setY(Math.round(this.getDrawY(Math.round(actor.position.y))));
+            actor.guiElement.setX(this.getDrawX(Math.round(actor.position.x)));
+            actor.guiElement.setY(this.getDrawY(Math.round(actor.position.y)));
+            if(actor.position.deviceId.equals(((LpsApplication)getContext().getApplicationContext()).getAndroidId())) {
+                Log.d(TAG,"actor:" + actor.userName + " x:" + actor.guiElement.getX() + " y:" + actor.guiElement.getY());
+            }
+
         }
     }
 
@@ -411,23 +394,17 @@ public class CustomerMapView extends ScalableView {
 
         if (this.actors.containsKey(position.deviceId)) {
             final Actor actor = this.actors.get(position.deviceId);
-
-            ObjectAnimator animX = ObjectAnimator.ofFloat(actor, "x", (float) position.x);
-            ObjectAnimator animY = ObjectAnimator.ofFloat(actor, "y", (float) position.y);
-            AnimatorSet animSetXY = new AnimatorSet();
-            animSetXY.playTogether(animX, animY);
-            animSetXY.setDuration(interval);
-            animSetXY.start();
+            actor.setPosition(position.x,position.y,interval);
         } else {
-            DevicePosition pos = new DevicePosition();
-            pos.deviceId = position.deviceId;
-            pos.x = position.x;
-            pos.y = position.y;
-
-            Actor actor = new Actor();
-            actor.position = position;
-
-            this.addActor(actor);
+//            DevicePosition pos = new DevicePosition();
+//            pos.deviceId = position.deviceId;
+//            pos.x = position.x;
+//            pos.y = position.y;
+//
+//            Actor actor = new Actor();
+//            actor.position = position;
+//
+//            this.addActor(actor);
 
         }
 
