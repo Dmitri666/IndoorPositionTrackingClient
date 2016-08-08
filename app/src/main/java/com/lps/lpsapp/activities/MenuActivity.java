@@ -22,6 +22,7 @@ public class MenuActivity extends BaseActivity {
         Log.d(TAG, "Created");
         setContentView(R.layout.activity_menu);
         this.mProgressBar.setVisibility(View.GONE);
+
     }
 
     @Override

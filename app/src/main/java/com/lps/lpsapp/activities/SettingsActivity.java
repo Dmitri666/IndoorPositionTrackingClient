@@ -31,7 +31,11 @@ public class SettingsActivity extends BaseActivity {
 
     private CompoundButton.OnCheckedChangeListener mUseBeaconSimulatorChangeListener;
     private CompoundButton.OnCheckedChangeListener mShowCirclesChangeListener;
-
+    private TextWatcher mWebApiUrlChangeListener;
+    private TextWatcher mTestXChangeListener;
+    private TextWatcher mTestYChangeListener;
+    private TextWatcher mBeaconGroupCountChangeListener;
+    private TextWatcher mScanPeriodChangeListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +103,7 @@ public class SettingsActivity extends BaseActivity {
 
         EditText url = (EditText) this.findViewById(R.id.tbWebapiurl);
         url.setText(WebApiUrl);
-        url.addTextChangedListener(new TextWatcher() {
+        mWebApiUrlChangeListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -114,7 +118,8 @@ public class SettingsActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 WebApiUrl = s.toString();
             }
-        });
+        };
+        url.addTextChangedListener(mWebApiUrlChangeListener);
 
 
         EditText testX = (EditText) this.findViewById(R.id.txtX);
@@ -125,7 +130,7 @@ public class SettingsActivity extends BaseActivity {
             testY.setText(Float.toString(TestPosition.y));
         }
 
-        testX.addTextChangedListener(new TextWatcher() {
+        mTestXChangeListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -140,10 +145,10 @@ public class SettingsActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 setTestPosition();
             }
-        });
+        };
+        testX.addTextChangedListener(mTestXChangeListener);
 
-
-        testY.addTextChangedListener(new TextWatcher() {
+        mTestYChangeListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -158,7 +163,8 @@ public class SettingsActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 setTestPosition();
             }
-        });
+        };
+        testY.addTextChangedListener(mTestYChangeListener);
 
 
         EditText bgc = (EditText) this.findViewById(R.id.txtBeaconGroupCount);
@@ -167,7 +173,7 @@ public class SettingsActivity extends BaseActivity {
 
         }
 
-        bgc.addTextChangedListener(new TextWatcher() {
+        mBeaconGroupCountChangeListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -186,14 +192,16 @@ public class SettingsActivity extends BaseActivity {
                     BeaconGroupCount = Integer.parseInt(s.toString());
                 }
             }
-        });
+        };
+        bgc.addTextChangedListener(mBeaconGroupCountChangeListener);
 
 
         EditText scanPeriod = (EditText) this.findViewById(R.id.txtScanPeriod);
         LpsApplication app = (LpsApplication) this.getApplicationContext();
         final BeaconManager beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(app);
         scanPeriod.setText(Long.toString(BeaconManager.DEFAULT_FOREGROUND_SCAN_PERIOD));
-        scanPeriod.addTextChangedListener(new TextWatcher() {
+
+        mScanPeriodChangeListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -211,7 +219,8 @@ public class SettingsActivity extends BaseActivity {
                     beaconManager.setForegroundScanPeriod(period);
                 }
             }
-        });
+        };
+        scanPeriod.addTextChangedListener(mScanPeriodChangeListener);
 
 
 
@@ -244,5 +253,19 @@ public class SettingsActivity extends BaseActivity {
         Switch swUseSimulator = (Switch) this.findViewById(R.id.switch_use_beacon_simulator);
         swUseSimulator.setOnCheckedChangeListener(null);
 
+        EditText url = (EditText) this.findViewById(R.id.tbWebapiurl);
+        url.removeTextChangedListener(this.mWebApiUrlChangeListener);
+
+        EditText testX = (EditText) this.findViewById(R.id.txtX);
+        testX.removeTextChangedListener(this.mTestXChangeListener);
+
+        EditText testY = (EditText) this.findViewById(R.id.txtY);
+        testY.removeTextChangedListener(this.mTestYChangeListener);
+
+        EditText bgc = (EditText) this.findViewById(R.id.txtBeaconGroupCount);
+        bgc.removeTextChangedListener(this.mBeaconGroupCountChangeListener);
+
+        EditText scanPeriod = (EditText) this.findViewById(R.id.txtScanPeriod);
+        scanPeriod.removeTextChangedListener(this.mScanPeriodChangeListener);
     }
 }
