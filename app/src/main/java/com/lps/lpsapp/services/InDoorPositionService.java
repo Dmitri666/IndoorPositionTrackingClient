@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
-import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.Point2D;
@@ -269,7 +268,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
     @Override
     public void onBeaconServiceConnect() {
         Log.d(TAG, "BeaconServiceConnect.");
-        Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
+        //Beacon.setDistanceCalculator(new DefaultDistanceCalculator());
 
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
