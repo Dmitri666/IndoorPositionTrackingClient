@@ -12,6 +12,7 @@ import org.altbeacon.beacon.Beacon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,11 +37,12 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
     public boolean USE_SIMULATED_BEACONS = true;
     DefaultDistanceCalculator calc = new DefaultDistanceCalculator();
     private List<Beacon> beacons;
-    private Point currentPoint;
+    public Point currentPoint;
     private double angle = 0;
     private int i = 0;
     private BeaconModel mBeaconmodel;
     private ScheduledExecutorService scheduleTaskExecutor;
+    private Random random = new Random();
 
     /**
      * Creates empty beacons ArrayList.
@@ -78,6 +80,9 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
         } else if (this.mBeaconmodel != null) {
             Point center = new Point(this.mBeaconmodel.wight / this.mBeaconmodel.realScaleFactor / 2f, this.mBeaconmodel.height / this.mBeaconmodel.realScaleFactor / 2f);
             float radius = center.x;
+            if(center.y < center.x) {
+                radius = center.y;
+            }
             i++;
             if (i % 5 == 0) {
                 angle += 20.0;
@@ -102,7 +107,9 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
                 if (beacon != null && currentPoint != null) {
                     double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
                     double rssi = calc.calculateRssi(-55, distance);
-                    //rssi = rssi * 0.9f;
+
+                    rssi = rssi * (0.6d + 0.3d * random.nextDouble());
+                    //rssi = rssi * 0.9d;
                     b.setRssi(Math.round(Math.round(rssi)));
                     //Log.d(TAG,"distance " + distance);
                 }

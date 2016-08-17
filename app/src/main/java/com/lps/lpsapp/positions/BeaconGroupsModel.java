@@ -30,24 +30,17 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey, BeaconGroup> {
         for (int i = 0; i < model.beacons.size(); i++) {
             for (int j = i + 1; j < model.beacons.size(); j++) {
                 for (int k = j + 1; k < model.beacons.size(); k++) {
-                    BeaconGroupKey key = new BeaconGroupKey();
-                    BeaconGroup group = new BeaconGroup();
+                                        BeaconGroup group = new BeaconGroup();
                     BeaconInRoom br1 = model.beacons.get(i);
                     BeaconInRoom br2 = model.beacons.get(j);
                     BeaconInRoom br3 = model.beacons.get(k);
-
-                    key.add(br1.id3);
                     group.put(br1.id3, new Point2D(br1.x, br1.y));
-
-                    key.add(br2.id3);
                     group.put(br2.id3, new Point2D(br2.x, br2.y));
-
-                    key.add(br3.id3);
                     group.put(br3.id3, new Point2D(br3.x, br3.y));
 
-                    if (!this.containsKey(key)) {
+                    if (!this.containsKey(group.getGroupKey())) {
                         if (group.IsValide(this.wight / 10, this.height / 10)) {
-                            this.put(key, group);
+                            this.put(group.getGroupKey(), group);
                         }
                     }
                 }
@@ -68,45 +61,6 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey, BeaconGroup> {
     }
 
     public BeaconCalculationModel getCalculationModel(Collection<Beacon> beacons) {
-        /*ArrayList<BeaconData> result = new ArrayList<>();
-        if(beacons.size() == 0) {
-            return result;
-        }
-
-        if(beacons.size() == 1) {
-            for(Beacon beacon:beacons) {
-                for(BeaconGroup points:this.values()) {
-                    if(points.containsKey(beacon.getId3().toInt())) {
-                        Point2D point = points.get(beacon.getId3().toInt());
-                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
-                        data.setDistance(beacon.getDistance() * this.realScaleFactor);
-                        result.add(data);
-                        return result;
-                    }
-                }
-            }
-            return result;
-        }
-
-        if(beacons.size() == 2) {
-            for(Beacon beacon:beacons) {
-                for(BeaconGroup points:this.values()) {
-                    if(points.containsKey(beacon.getId3().toInt())) {
-                        Point2D point = points.get(beacon.getId3().toInt());
-                        BeaconData data = new BeaconData(beacon.getId3().toInt(),point.x,point.y);
-                        data.setDistance(beacon.getDistance()* this.realScaleFactor);
-                        result.add(data);
-                        if(result.size() == 2) {
-                            return result;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-            return result;
-        }*/
-
         HashMap<Integer, Double> distances = new HashMap<>();
         for (Beacon beacon : beacons) {
             distances.put(beacon.getId3().toInt(), beacon.getDistance());
@@ -137,15 +91,13 @@ public class BeaconGroupsModel extends HashMap<BeaconGroupKey, BeaconGroup> {
 
         BeaconCalculationModel calculationModel = new BeaconCalculationModel();
         for (BeaconGroup group : subSet) {
-            BeaconGroupKey key = new BeaconGroupKey();
             List<BeaconData> datas = new ArrayList<>();
             for (int id3 : group.keySet()) {
                 BeaconData data = new BeaconData(id3, group.get(id3).x, group.get(id3).y);
                 data.setDistance(distances.get(id3) * this.realScaleFactor);
                 datas.add(data);
             }
-            key.addAll(group.keySet());
-            calculationModel.put(key, datas);
+            calculationModel.put(group.getGroupKey(), datas);
         }
 
         return calculationModel;

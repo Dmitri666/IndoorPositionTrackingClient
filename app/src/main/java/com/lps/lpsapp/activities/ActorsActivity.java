@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -105,8 +106,8 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
             if (mBeaconService.mPositionCalculator != null) {
                 mBeaconService.mPositionCalculator.positionCalculatorListener = new PositionCalculatorNotifier() {
                     @Override
-                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
-                        setCalculationResult(beaconDatas, bounds);
+                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds, Path path) {
+                        setCalculationResult(beaconDatas, bounds,path);
                     }
                 };
             }
@@ -369,12 +370,12 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
 
     }
 
-    public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds) {
+    public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds,final Path path) {
         this.runOnUiThread(new Runnable() {
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
                 if (view != null && view.hasRoomModel()) {
-                    view.setCalculationResult(beaconDatas, bounds);
+                    view.setCalculationResult(beaconDatas, bounds,path);
                 }
             }
         });

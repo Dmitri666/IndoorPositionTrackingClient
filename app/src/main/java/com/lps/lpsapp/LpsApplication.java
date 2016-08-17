@@ -11,6 +11,8 @@ import com.lps.lpsapp.management.AppManager;
 import com.lps.webapi.AccessToken;
 import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.JsonSerializer;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.http.InvalidHttpStatusCodeException;
@@ -32,15 +34,15 @@ public class LpsApplication extends MultiDexApplication {
         return mContext;
     }
 
-    //public static RefWatcher getRefWatcher(Context context) {
-    //    return refWatcher;
-    //}
+    public static RefWatcher getRefWatcher(Context context) {
+        return refWatcher;
+    }
 
-    //private static RefWatcher refWatcher;
+    private static RefWatcher refWatcher;
 
     public void onCreate() {
         super.onCreate();
-        //refWatcher = LeakCanary.install(this);
+        refWatcher = LeakCanary.install(this);
         mContext = this;
         Platform.loadPlatformComponent(new AndroidPlatformComponent());
 

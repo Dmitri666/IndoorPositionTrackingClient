@@ -16,7 +16,6 @@ import android.support.v4.view.ViewCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Base64;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -75,9 +74,6 @@ public class CustomerMapView extends ScalableView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
-        Log.d(TAG, "onSizeChanged" + w + ":" + h + ":" + oldw + ":" + oldh);
-        Log.d(TAG, "mContentRect" + mContentRect.left + ":" + mContentRect.top + ":" + mContentRect.width() + ":" + mContentRect.height());
     }
 
     public void setmRoomModel(RoomModel roomModel) {
@@ -121,16 +117,17 @@ public class CustomerMapView extends ScalableView {
 
         if (SettingsActivity.ShowCircles && this.beaconDatas != null && this.calculationResult != null) {
             canvas.save();
-            for (int i = 0; i < 3; i++) {
-                BeaconData beaconData = this.beaconDatas.get(i);
-                Path path = new Path();
-                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getFactoredDistance()) - this.getDrawX(0), Path.Direction.CW);
-                path.close();
-
-                canvas.clipPath(path, Region.Op.INTERSECT);
-
-
-            }
+            canvas.clipPath(path, Region.Op.INTERSECT);
+//            for (int i = 0; i < 3; i++) {
+//                BeaconData beaconData = this.beaconDatas.get(i);
+//                Path path = new Path();
+//                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getFactoredDistance()) - this.getDrawX(0), Path.Direction.CW);
+//                path.close();
+//
+//                canvas.clipPath(path, Region.Op.INTERSECT);
+//
+//
+//            }
             canvas.drawColor(Color.GREEN);
             canvas.restore();
         }
@@ -304,21 +301,19 @@ public class CustomerMapView extends ScalableView {
             FrameLayout.LayoutParams param = (FrameLayout.LayoutParams)actor.guiElement.getLayoutParams();
             param.width = Math.round(this.getDrawX(Math.round(actor.position.x + actor.wight)) - this.getDrawX(actor.position.x));
             param.height = Math.round(this.getDrawY(Math.round(actor.position.y + actor.height)) - this.getDrawY(actor.position.y));
-            //param.leftMargin = Math.round(this.getDrawX(actor.position.x));
-            //param.topMargin = Math.round(this.getDrawY(actor.position.y) - param.height);
             actor.guiElement.setLayoutParams(param);
             actor.guiElement.setX(this.getDrawX(Math.round(actor.position.x)));
             actor.guiElement.setY(this.getDrawY(Math.round(actor.position.y)));
-            if(actor.position.deviceId.equals(((LpsApplication)getContext().getApplicationContext()).getAndroidId())) {
-                Log.d(TAG,"actor:" + actor.userName + " x:" + actor.guiElement.getX() + " y:" + actor.guiElement.getY());
-            }
+
 
         }
     }
 
-    public void setCalculationResult(List<BeaconData> beaconDatas, Rect bounds) {
+    private Path path;
+    public void setCalculationResult(List<BeaconData> beaconDatas, Rect bounds,Path path) {
         this.beaconDatas = beaconDatas;
         this.calculationResult = bounds;
+        this.path = path;
         ViewCompat.postInvalidateOnAnimation(this);
     }
 
@@ -395,16 +390,16 @@ public class CustomerMapView extends ScalableView {
         if (this.actors.containsKey(position.deviceId)) {
             final Actor actor = this.actors.get(position.deviceId);
             actor.setPosition(position.x,position.y,interval);
-        } else {
-//            DevicePosition pos = new DevicePosition();
-//            pos.deviceId = position.deviceId;
-//            pos.x = position.x;
-//            pos.y = position.y;
-//
-//            Actor actor = new Actor();
-//            actor.position = position;
-//
-//            this.addActor(actor);
+        } else if (position.deviceId.equals("xxx")){
+            DevicePosition pos = new DevicePosition();
+            pos.deviceId = position.deviceId;
+            pos.x = position.x;
+            pos.y = position.y;
+
+            Actor actor = new Actor();
+            actor.position = position;
+
+            this.addActor(actor);
 
         }
 

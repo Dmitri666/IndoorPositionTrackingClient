@@ -15,8 +15,10 @@ import android.widget.Toast;
 import com.lps.lpsapp.BuildConfig;
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.ActorsActivity;
+import com.lps.lpsapp.altbeacon.TimedBeaconSimulator;
 import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
+import com.lps.lpsapp.positions.CalculationResultModel;
 import com.lps.lpsapp.positions.Point2D;
 import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.viewModel.BeaconData;
@@ -39,6 +41,7 @@ import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.logging.LogManager;
 import org.altbeacon.beacon.logging.Loggers;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
+import org.altbeacon.beacon.simulator.BeaconSimulator;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
@@ -280,6 +283,18 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
 
                     if (!region.getUniqueId().equals(InDoorPositionService.this.backgroundRegion.getUniqueId()) && mPositionCalculator != null) {
                         new PositionsThread(beacons, UUID.fromString(region.getUniqueId())).run();
+
+                        BeaconSimulator simulator = BeaconManager.getBeaconSimulator();
+
+                        if (simulator != null && devicePositionListener != null) {
+                            DevicePosition param = new DevicePosition();
+                            param.deviceId = "xxx";
+                            param.roomId = UUID.fromString(region.getUniqueId());
+
+                            param.x = ((TimedBeaconSimulator)simulator).currentPoint.x * beaconGroupsModel.getRealScaleFactor();
+                            param.y = ((TimedBeaconSimulator)simulator).currentPoint.y * beaconGroupsModel.getRealScaleFactor();
+                            devicePositionListener.positionChanged(param);
+                        }
                     }
 
                 }
@@ -415,7 +430,9 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
 
         @Override
         public void run() {
-            Point2D position = mPositionCalculator.calculatePosition(beacons);
+            CalculationResultModel resultModel = mPositionCalculator.calculatePosition(beacons);
+            Point2D position = resultModel.getPoint();
+
             if (position != null) {
 
                 LpsApplication app = (LpsApplication) getApplicationContext();
@@ -438,6 +455,21 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 log.x = position.x;
                 log.y = position.y;
 
+//                for (BeaconGroupKey key : result.groupKeys) {
+//                    int i = 0;
+//                    for(Integer id3:key) {
+//                        if(i == 0) {
+//                            log.key1 = id3;
+//                        } else if(i == 1) {
+//                            log.key2 = id3;
+//                        } else if(i == 2) {
+//                            log.key3 = id3;
+//                            break;
+//                        }
+//                        i++;
+//                    }
+//                    break;
+//                }
 
                 service = new WebApiService(PositionLogData.class, true);
                 service.performPost(path, log);

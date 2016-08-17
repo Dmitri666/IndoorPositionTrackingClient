@@ -27,6 +27,10 @@ public class BeaconData {
         this.distanceFactor = 1.0f;
     }
 
+    public float getDistanceFactor() {
+        return this.distanceFactor;
+    }
+
     public void increaseDistanceFactor() {
         this.distanceFactor += 0.1f;
     }

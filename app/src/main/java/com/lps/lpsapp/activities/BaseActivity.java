@@ -18,8 +18,10 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.R;
 import com.lps.lpsapp.management.AppManager;
+import com.squareup.leakcanary.RefWatcher;
 //import com.squareup.leakcanary.RefWatcher;
 
 /**
@@ -84,8 +86,8 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-        //RefWatcher refWatcher = LpsApplication.getRefWatcher(this);
-        //refWatcher.watch(this);
+        RefWatcher refWatcher = LpsApplication.getRefWatcher(this);
+        refWatcher.watch(this);
     }
 
     @Override
