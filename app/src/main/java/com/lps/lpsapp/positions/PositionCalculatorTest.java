@@ -18,8 +18,8 @@ import java.util.List;
 /**
  * Created by dle on 29.10.2015.
  */
-public class PositionCalculator {
-    private static String TAG = "PositionCalculator";
+public class PositionCalculatorTest {
+    private static String TAG = "PositionCalculatorTest";
     public PositionCalculatorNotifier positionCalculatorListener;
     private BeaconGroupsModel beaconModel;
 
@@ -36,23 +36,25 @@ public class PositionCalculator {
         }
     };
 
-    public PositionCalculator(BeaconGroupsModel model) {
+    public PositionCalculatorTest(BeaconGroupsModel model) {
         beaconModel = model;
     }
 
 
     public CalculationResultModel calculatePosition(Collection<Beacon> beacons) {
-        ArrayList<List<RangedBeacon>>  calculationModel = this.beaconModel.getCalculationModel(beacons);
+        BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
         CalculationResultModel resultModel = new CalculationResultModel();
+        resultModel.clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
 
         List<RangedBeacon> firstGroup = null;
-        for (List<RangedBeacon> measurement : calculationModel) {
+        for (BeaconGroupKey key : calculationModel.keySet()) {
+            List<RangedBeacon> data = calculationModel.get(key);
             if(firstGroup == null) {
-                firstGroup = measurement;
+                firstGroup = data;
             }
-            Rect region = calculateRegion(measurement,firstGroup);
+            Path region = calculateRegion(data,firstGroup);
             if (region != null) {
-                CalculationResult result = new CalculationResult(new Point2D(region.exactCenterX(), region.exactCenterY()),key,data.get(0).getDistanceFactor(),region);
+                CalculationResult result = new CalculationResult(region);
                 resultModel.add(result);
             }
         }
@@ -63,7 +65,7 @@ public class PositionCalculator {
     }
 
     private void calculateDistanceFactor(List<RangedBeacon> beaconDatas) {
-                List<Double> factors = new ArrayList<>();
+        List<Double> factors = new ArrayList<>();
         factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(1).getFactoredDistance()));
         factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
         factors.add(Math.sqrt(Math.pow(beaconDatas.get(1).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(1).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(1).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
@@ -77,14 +79,8 @@ public class PositionCalculator {
 
     }
 
-    private Rect calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
+    private Path calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
         try {
-            Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
-
-
-            List<Path> paths = new ArrayList<>();
-
-
             for (int i = 0; i < 1000; i++) {
                 Path path1 =new Path();
                 path1.moveTo(firstGroup.get(0).x, firstGroup.get(0).y);
@@ -104,21 +100,17 @@ public class PositionCalculator {
 
                 }
 
-                Rect bounds = new Rect();
-                Region firstRegion = new Region();
-                firstRegion.setPath(path1,clip);
-                firstRegion.getBounds(bounds);
-                if (bounds.isEmpty()) {
+                if (!found) {
                     for (RangedBeacon beaconData : beaconDatas) {
                         beaconData.increaseDistanceFactor();
                     }
                 } else {
                     if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
-                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
+                        //this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
                     }
                     Log.d(TAG, "Iteration count:" + i);
 
-                    return bounds;
+                    return path1;
                 }
             }
 

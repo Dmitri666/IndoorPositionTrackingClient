@@ -3,13 +3,15 @@ package com.lps.lpsapp.positions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by dle on 28.06.2016.
  */
-public class BeaconGroup extends HashMap<Integer, Point2D> {
+public class BeaconGroup extends TreeMap<Integer, Point2D> {
 
-    public boolean isEquals(BeaconGroup group) {
+
+    public boolean equals(BeaconGroup group) {
         if (this.size() != group.size()) {
             return false;
         }
@@ -23,19 +25,11 @@ public class BeaconGroup extends HashMap<Integer, Point2D> {
         return true;
     }
 
-    private BeaconGroupKey mKey;
-    public BeaconGroupKey getGroupKey() {
-        if(this.mKey == null)
-        {
-            this.mKey = new BeaconGroupKey();
-            this.mKey.addAll(this.keySet());
-        }
-        return this.mKey;
+    public int hashCode() {
+        return this.keySet().hashCode();
     }
 
     public Boolean IsValide(float xDelta, float yDelta) {
-        //return true;
-
         List<Float> x = new ArrayList<>();
         List<Float> y = new ArrayList<>();
 

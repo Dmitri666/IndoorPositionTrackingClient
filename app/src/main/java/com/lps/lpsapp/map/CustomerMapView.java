@@ -27,7 +27,7 @@ import com.lps.lpsapp.R;
 import com.lps.lpsapp.activities.ActorsActivity;
 import com.lps.lpsapp.activities.BookingActivity;
 import com.lps.lpsapp.activities.SettingsActivity;
-import com.lps.lpsapp.positions.BeaconData;
+import com.lps.lpsapp.positions.RangedBeacon;
 import com.lps.lpsapp.viewModel.booking.TableState;
 import com.lps.lpsapp.viewModel.booking.TableStateEnum;
 import com.lps.lpsapp.viewModel.chat.Actor;
@@ -57,7 +57,7 @@ public class CustomerMapView extends ScalableView {
     private HashMap<String, Actor> actors;
     private RoomModel mRoomModel;
 
-    private List<BeaconData> beaconDatas;
+    private List<RangedBeacon> beaconDatas;
     private Rect calculationResult;
 
     public CustomerMapView(Context context, AttributeSet attrs) {
@@ -119,7 +119,7 @@ public class CustomerMapView extends ScalableView {
             canvas.save();
             canvas.clipPath(path, Region.Op.INTERSECT);
 //            for (int i = 0; i < 3; i++) {
-//                BeaconData beaconData = this.beaconDatas.get(i);
+//                RangedBeacon beaconData = this.beaconDatas.get(i);
 //                Path path = new Path();
 //                path.addCircle(this.getDrawX(beaconData.x), this.getDrawY(beaconData.y), (float) this.getDrawX((float) beaconData.getFactoredDistance()) - this.getDrawX(0), Path.Direction.CW);
 //                path.close();
@@ -310,7 +310,7 @@ public class CustomerMapView extends ScalableView {
     }
 
     private Path path;
-    public void setCalculationResult(List<BeaconData> beaconDatas, Rect bounds,Path path) {
+    public void setCalculationResult(List<RangedBeacon> beaconDatas, Rect bounds, Path path) {
         this.beaconDatas = beaconDatas;
         this.calculationResult = bounds;
         this.path = path;

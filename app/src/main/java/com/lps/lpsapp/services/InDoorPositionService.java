@@ -20,7 +20,7 @@ import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.CalculationResultModel;
 import com.lps.lpsapp.positions.Point2D;
-import com.lps.lpsapp.positions.PositionCalculator;
+import com.lps.lpsapp.positions.PositionCalculatorTest;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.PositionLogData;
@@ -57,7 +57,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
     private static final String TAG = "InDoorPositionService";
     private final IBinder mBinder = new LocalBinder();
     public boolean bound;
-    public PositionCalculator mPositionCalculator;
+    public PositionCalculatorTest mPositionCalculator;
     public DevicePositionNotifier devicePositionListener;
     public Region backgroundRegion;
     List<IBeaconServiceListener> consumers;
@@ -174,7 +174,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 @Override
                 public void onResult(BeaconModel objResult) {
                     beaconGroupsModel = new BeaconGroupsModel(objResult);
-                    mPositionCalculator = new PositionCalculator(beaconGroupsModel);
+                    mPositionCalculator = new PositionCalculatorTest(beaconGroupsModel);
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {

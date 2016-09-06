@@ -34,7 +34,7 @@ import com.lps.lpsapp.R;
 import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.map.CustomerMapView;
 import com.lps.lpsapp.map.GuiDevice;
-import com.lps.lpsapp.positions.BeaconData;
+import com.lps.lpsapp.positions.RangedBeacon;
 import com.lps.lpsapp.positions.PositionCalculatorNotifier;
 import com.lps.lpsapp.services.ChatNotifier;
 import com.lps.lpsapp.services.DevicePositionNotifier;
@@ -106,7 +106,7 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
             if (mBeaconService.mPositionCalculator != null) {
                 mBeaconService.mPositionCalculator.positionCalculatorListener = new PositionCalculatorNotifier() {
                     @Override
-                    public void onCalculationResult(List<BeaconData> beaconDatas, Rect bounds, Path path) {
+                    public void onCalculationResult(List<RangedBeacon> beaconDatas, Rect bounds, Path path) {
                         setCalculationResult(beaconDatas, bounds,path);
                     }
                 };
@@ -370,7 +370,7 @@ public class ActorsActivity extends BaseActivity implements View.OnClickListener
 
     }
 
-    public void setCalculationResult(final List<BeaconData> beaconDatas, final Rect bounds,final Path path) {
+    public void setCalculationResult(final List<RangedBeacon> beaconDatas, final Rect bounds, final Path path) {
         this.runOnUiThread(new Runnable() {
             public void run() {
                 CustomerMapView view = (CustomerMapView) findViewById(R.id.CustomerMapView);
