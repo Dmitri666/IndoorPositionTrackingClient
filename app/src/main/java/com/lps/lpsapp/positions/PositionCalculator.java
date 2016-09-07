@@ -5,7 +5,7 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.simple.SimpleMatrix;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -104,15 +104,14 @@ public class PositionCalculator {
             double distance1 = (Beacon.getDistanceCalculator()).calculateDistance(rb1.getTxPower(), rb1.getAvrRssi()) * beaconGroupsModel.getRealScaleFactor();
             double distance2 = (Beacon.getDistanceCalculator()).calculateDistance(rb2.getTxPower(), rb2.getAvrRssi()) * beaconGroupsModel.getRealScaleFactor();
 
-            DenseMatrix64F v1 = new DenseMatrix64F();
-            v1.add(0,0,rb1.getX());
-            v1.add(0,1,rb1.getY());
+            SimpleMatrix v1 = new SimpleMatrix(1,2,true,new double[]{rb1.getX(),rb1.getY()});
+            SimpleMatrix v2 = new SimpleMatrix(1,2,true,new double[]{rb2.getX(),rb2.getY()});
 
-            DenseMatrix64F v2 = new DenseMatrix64F();
-            v1.add(0,0,rb2.getX());
-            v1.add(0,1,rb2.getY());
+            SimpleMatrix vd = v1.minus(v2);
+            double d =  vd.s.determinant();
+            double d1 =  vd.determinant();
 
-            v1.plus()
+
 
             return null;
         }
