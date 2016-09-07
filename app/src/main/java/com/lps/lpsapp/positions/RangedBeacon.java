@@ -8,11 +8,14 @@ import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 public class RangedBeacon {
     private BeaconInRoom beaconInRoom;
     private double avrRssi;
+    private int txPower;
+    private double errorFactor;
 
-
-    public RangedBeacon(BeaconInRoom b,double avrRssi) {
+    public RangedBeacon(BeaconInRoom b,int txPower,double avrRssi) {
         this.beaconInRoom = b;
         this.avrRssi = avrRssi;
+        this.txPower = txPower;
+        this.errorFactor = 1.0;
     }
 
     public float getX() {
@@ -28,7 +31,15 @@ public class RangedBeacon {
     }
 
     public double getAvrRssi(){
-        return this.avrRssi;
+        return this.avrRssi * this.errorFactor;
+    }
+
+    public int getTxPower() {
+        return this.txPower;
+    }
+
+    public void incriseErrorFactor() {
+        this.errorFactor += 0.05;
     }
 
 

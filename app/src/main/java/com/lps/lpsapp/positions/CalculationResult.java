@@ -8,15 +8,15 @@ import android.graphics.Rect;
  */
 public class CalculationResult {
     public Point2D point;
-    public BeaconGroupKey groupKey;
+
     public float distanceFactor;
     public Rect region;
 
-    public CalculationResult(Point2D point,BeaconGroupKey groupKey,float distanceFactor,Rect region) {
+    public CalculationResult(Point2D point) {
         this.point = point;
-        this.groupKey = groupKey;
-        this.distanceFactor = distanceFactor;
-        this.region = region;
+        //this.groupKey = groupKey;
+        //this.distanceFactor = distanceFactor;
+        //this.region = region;
     }
 
     public Path path;

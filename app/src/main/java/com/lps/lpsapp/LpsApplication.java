@@ -7,12 +7,15 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.management.AppManager;
 import com.lps.webapi.AccessToken;
 import com.lps.webapi.AuthenticationException;
 import com.lps.webapi.JsonSerializer;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+
+import org.altbeacon.beacon.Beacon;
 
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.http.InvalidHttpStatusCodeException;
@@ -63,6 +66,8 @@ public class LpsApplication extends MultiDexApplication {
         mAndroidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         AccessToken.CurrentToken = this.getAuthenticationData();
+
+
 
 
     }

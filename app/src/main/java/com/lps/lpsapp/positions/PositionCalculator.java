@@ -1,17 +1,13 @@
 package com.lps.lpsapp.positions;
 
 import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.Region;
+import android.graphics.RectF;
 import android.util.Log;
 
-import com.lps.lpsapp.activities.SettingsActivity;
-
 import org.altbeacon.beacon.Beacon;
+import org.ejml.data.DenseMatrix64F;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,7 +17,7 @@ import java.util.List;
 public class PositionCalculator {
     private static String TAG = "PositionCalculator";
     public PositionCalculatorNotifier positionCalculatorListener;
-    private BeaconGroupsModel beaconModel;
+    private BeaconGroupsModel beaconGroupsModel;
 
 
     private Comparator<Beacon> comparator = new Comparator<Beacon>() {
@@ -37,149 +33,182 @@ public class PositionCalculator {
     };
 
     public PositionCalculator(BeaconGroupsModel model) {
-        beaconModel = model;
+        this.beaconGroupsModel = model;
     }
 
 
     public CalculationResultModel calculatePosition(Collection<Beacon> beacons) {
-        ArrayList<List<RangedBeacon>>  calculationModel = this.beaconModel.getCalculationModel(beacons);
+        BeaconCalculationModel calculationModel = this.beaconGroupsModel.getCalculationModel(beacons);
         CalculationResultModel resultModel = new CalculationResultModel();
+        TrelatationCalculator trelatationCalculator = new TrelatationCalculator(calculationModel);
+        Path area = null;
+        for(TrippleGroup group :calculationModel.trippleGroups) {
+            area = calculationModel.getPath(group);
+            Path path = trelatationCalculator.calculate(group);
+            if(path != null) {
+                RectF bounds = new RectF();
+                path.computeBounds(bounds,true);
+                String g = "";
+                CalculationResult cr = new CalculationResult(new Point2D(bounds.centerX(),bounds.centerY()));
+                resultModel.add(cr);
+                break;
+            }
 
-        List<RangedBeacon> firstGroup = null;
-        for (List<RangedBeacon> measurement : calculationModel) {
-            if(firstGroup == null) {
-                firstGroup = measurement;
-            }
-            Rect region = calculateRegion(measurement,firstGroup);
-            if (region != null) {
-                CalculationResult result = new CalculationResult(new Point2D(region.exactCenterX(), region.exactCenterY()),key,data.get(0).getDistanceFactor(),region);
-                resultModel.add(result);
-            }
         }
+
+        TrigometricCalculator trigometricCalculator = new TrigometricCalculator(calculationModel,area);
+        for(DubbleGroup group :calculationModel.dubbleGroups) {
+
+            Point2D point = trigometricCalculator.calculate(group);
+            if(point != null) {
+                CalculationResult cr = new CalculationResult(point);
+                resultModel.add(cr);
+            }
+
+        }
+//        resultModel.clip = new Region(0, 0, Math.round(beaconGroupsModel.getWight()), Math.round(beaconGroupsModel.getHeight()));
+//
+//        List<RangedBeacon> firstGroup = null;
+//        for (BeaconGroupKey key : calculationModel.keySet()) {
+//            List<RangedBeacon> data = calculationModel.get(key);
+//            if(firstGroup == null) {
+//                firstGroup = data;
+//            }
+//            Path region = calculateRegion(data,firstGroup);
+//            if (region != null) {
+//                CalculationResult result = new CalculationResult(region);
+//                resultModel.add(result);
+//            }
+//        }
 
 
 
         return resultModel;
     }
 
-    private void calculateDistanceFactor(List<RangedBeacon> beaconDatas) {
-                List<Double> factors = new ArrayList<>();
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(1).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(1).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(1).getFactoredDistance()));
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(0).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(0).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(0).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
-        factors.add(Math.sqrt(Math.pow(beaconDatas.get(1).x - beaconDatas.get(2).x, 2.0) + Math.pow(beaconDatas.get(1).y - beaconDatas.get(2).y, 2.0)) / (beaconDatas.get(1).getFactoredDistance() + beaconDatas.get(2).getFactoredDistance()));
+    private class TrigometricCalculator {
+        private BeaconCalculationModel calculationModel;
+        private Path area;
 
-        double factor = Collections.max(factors);
-        Log.d(TAG, " factor=" + factor);
-
-        for (RangedBeacon beaconData : beaconDatas) {
-            beaconData.setDistanceFactor((float) factor);
+        public TrigometricCalculator(BeaconCalculationModel calculationModel,Path area) {
+            this.calculationModel = calculationModel;
+            this.area = area;
         }
 
-    }
+        public Point2D calculate(DubbleGroup group) {
+            Integer id1 = group.getGroupIds().first();
+            Integer id2 = group.getGroupIds().last();
+            RangedBeacon rb1 = this.calculationModel.beacons.get(id1);
+            RangedBeacon rb2 = this.calculationModel.beacons.get(id2);
 
-    private Rect calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
-        try {
-            Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
+            double distance1 = (Beacon.getDistanceCalculator()).calculateDistance(rb1.getTxPower(), rb1.getAvrRssi()) * beaconGroupsModel.getRealScaleFactor();
+            double distance2 = (Beacon.getDistanceCalculator()).calculateDistance(rb2.getTxPower(), rb2.getAvrRssi()) * beaconGroupsModel.getRealScaleFactor();
 
+            DenseMatrix64F v1 = new DenseMatrix64F();
+            v1.add(0,0,rb1.getX());
+            v1.add(0,1,rb1.getY());
 
-            List<Path> paths = new ArrayList<>();
+            DenseMatrix64F v2 = new DenseMatrix64F();
+            v1.add(0,0,rb2.getX());
+            v1.add(0,1,rb2.getY());
 
+            v1.plus()
 
-            for (int i = 0; i < 1000; i++) {
-                Path path1 =new Path();
-                path1.moveTo(firstGroup.get(0).x, firstGroup.get(0).y);
-                path1.lineTo(firstGroup.get(1).x, firstGroup.get(1).y);
-                path1.lineTo(firstGroup.get(2).x, firstGroup.get(2).y);
-                path1.lineTo(firstGroup.get(0).x, firstGroup.get(0).y);
-                path1.close();
-
-                boolean found = false;
-                for (RangedBeacon beaconData : beaconDatas) {
-                    Path path = new Path();
-                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getFactoredDistance(), Path.Direction.CW);
-                    path.close();
-
-
-                    found = path1.op(path, Path.Op.INTERSECT);
-
-                }
-
-                Rect bounds = new Rect();
-                Region firstRegion = new Region();
-                firstRegion.setPath(path1,clip);
-                firstRegion.getBounds(bounds);
-                if (bounds.isEmpty()) {
-                    for (RangedBeacon beaconData : beaconDatas) {
-                        beaconData.increaseDistanceFactor();
-                    }
-                } else {
-                    if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
-                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
-                    }
-                    Log.d(TAG, "Iteration count:" + i);
-
-                    return bounds;
-                }
-            }
-
-        } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage(), ex);
+            return null;
         }
-        Log.d(TAG, "Position not found beacon count:" + beaconDatas.size());
-        return null;
     }
 
-    private Rect calculateRegion1(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
-        try {
-            Region clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
+    private class TrelatationCalculator {
+        private BeaconCalculationModel calculationModel;
 
-            Path path1 =new Path();
-            path1.moveTo(firstGroup.get(0).x, firstGroup.get(0).y);
-            path1.lineTo(firstGroup.get(1).x, firstGroup.get(1).y);
-            path1.lineTo(firstGroup.get(2).x, firstGroup.get(2).y);
-            path1.lineTo(firstGroup.get(0).x, firstGroup.get(0).y);
-            path1.close();
+        public TrelatationCalculator(BeaconCalculationModel calculationModel) {
+            this.calculationModel = calculationModel;
+        }
+
+        public Path calculate(TrippleGroup group) {
+            try {
+                for (int i = 0; i < 1000; i++) {
+                    Path path1 = this.calculationModel.getPath(group);
+
+                    boolean found = false;
+                    for (Integer id3 : group.getGroupIds()) {
+                        Path path = new Path();
+                        RangedBeacon rb = this.calculationModel.beacons.get(id3);
+                        double distance = (Beacon.getDistanceCalculator()).calculateDistance(rb.getTxPower(), rb.getAvrRssi());
+                        float radius = (float) (distance * beaconGroupsModel.getRealScaleFactor());
+                        path.addCircle(rb.getX(), rb.getY(), radius, Path.Direction.CW);
+                        path.close();
 
 
+                        found = path1.op(path, Path.Op.INTERSECT);
 
-            for (int i = 0; i < 1000; i++) {
-                Region firstRegion = new Region();
-                firstRegion.setPath(path1,clip);
+                    }
 
-                for (RangedBeacon beaconData : beaconDatas) {
-                    Path path = new Path();
-                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getFactoredDistance(), Path.Direction.CW);
-                    path.close();
-                    Region region = new Region();
-                    region.setPath(path, clip);
+                    if (path1.isEmpty()) {
+                        for (Integer id3 : group.getGroupIds()) {
+                            RangedBeacon rb = this.calculationModel.beacons.get(id3);
+                            rb.incriseErrorFactor();
+                        }
 
-                    if (firstRegion == null) {
-                        firstRegion = region;
                     } else {
-                        firstRegion.op(region, Region.Op.INTERSECT);
+                        //if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
+                        //this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
+                        //}
+                        Log.d(TAG, "Iteration count:" + i);
+
+                        return path1;
                     }
                 }
 
-                Rect bounds = new Rect();
-                firstRegion.getBounds(bounds);
-                if (bounds.isEmpty()) {
-                    for (RangedBeacon beaconData : beaconDatas) {
-                        beaconData.increaseDistanceFactor();
-                    }
-                } else {
-                    if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
-                        this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
-                    }
-                    Log.d(TAG, "Iteration count:" + i);
-
-                    return bounds;
-                }
+            } catch (Exception ex) {
+                Log.e(TAG, ex.getMessage(), ex);
             }
-
-        } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage(), ex);
+            Log.d(TAG, "Position not found beacon count: TrelatationCalculator");
+            return null;
         }
-        Log.d(TAG, "Position not found beacon count:" + beaconDatas.size());
+    }
+
+    private Path calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
+//        try {
+//            for (int i = 0; i < 1000; i++) {
+//                Path path1 =new Path();
+//                path1.moveTo(firstGroup.get(0).x, firstGroup.get(0).y);
+//                path1.lineTo(firstGroup.get(1).x, firstGroup.get(1).y);
+//                path1.lineTo(firstGroup.get(2).x, firstGroup.get(2).y);
+//                path1.lineTo(firstGroup.get(0).x, firstGroup.get(0).y);
+//                path1.close();
+//
+//                boolean found = false;
+//                for (RangedBeacon beaconData : beaconDatas) {
+//                    Path path = new Path();
+//                    path.addCircle(beaconData.x, beaconData.y, (float) beaconData.getFactoredDistance(), Path.Direction.CW);
+//                    path.close();
+//
+//
+//                    found = path1.op(path, Path.Op.INTERSECT);
+//
+//                }
+//
+//                if (!found) {
+//                    for (RangedBeacon beaconData : beaconDatas) {
+//                        beaconData.increaseDistanceFactor();
+//                    }
+//                } else {
+//                    if (SettingsActivity.ShowCircles && this.positionCalculatorListener != null) {
+//                        //this.positionCalculatorListener.onCalculationResult(beaconDatas, bounds,path1);
+//                    }
+//                    Log.d(TAG, "Iteration count:" + i);
+//
+//                    return path1;
+//                }
+//            }
+//
+//        } catch (Exception ex) {
+//            Log.e(TAG, ex.getMessage(), ex);
+//        }
+//        Log.d(TAG, "Position not found beacon count:" + beaconDatas.size());
         return null;
     }
+
+
 }

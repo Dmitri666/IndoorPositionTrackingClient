@@ -20,7 +20,7 @@ import com.lps.lpsapp.management.AppManager;
 import com.lps.lpsapp.positions.BeaconGroupsModel;
 import com.lps.lpsapp.positions.CalculationResultModel;
 import com.lps.lpsapp.positions.Point2D;
-import com.lps.lpsapp.positions.PositionCalculatorTest;
+import com.lps.lpsapp.positions.PositionCalculator;
 import com.lps.lpsapp.viewModel.BeaconData;
 import com.lps.lpsapp.viewModel.Measurement;
 import com.lps.lpsapp.viewModel.PositionLogData;
@@ -57,7 +57,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
     private static final String TAG = "InDoorPositionService";
     private final IBinder mBinder = new LocalBinder();
     public boolean bound;
-    public PositionCalculatorTest mPositionCalculator;
+    public PositionCalculator mPositionCalculator;
     public DevicePositionNotifier devicePositionListener;
     public Region backgroundRegion;
     List<IBeaconServiceListener> consumers;
@@ -111,6 +111,8 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
             beaconManager.getBeaconParsers().add(new BeaconParser().
                     setBeaconLayout("m:0-3=a7ae2eb7,i:4-19,i:20-21,i:22-23,p:24-24"));  // easiBeacons
         }
+
+
 
         //beaconManager.setForegroundScanPeriod(5000);
         //beaconManager.setForegroundBetweenScanPeriod(5000);
@@ -174,7 +176,7 @@ public class InDoorPositionService extends Service implements BootstrapNotifier,
                 @Override
                 public void onResult(BeaconModel objResult) {
                     beaconGroupsModel = new BeaconGroupsModel(objResult);
-                    mPositionCalculator = new PositionCalculatorTest(beaconGroupsModel);
+                    mPositionCalculator = new PositionCalculator(beaconGroupsModel);
                     try {
                         beaconManager.startRangingBeaconsInRegion(region);
                     } catch (RemoteException ex) {

@@ -1,16 +1,13 @@
 package com.lps.lpsapp.positions;
 
-import com.lps.lpsapp.activities.SettingsActivity;
 import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.distance.DistanceCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +21,7 @@ public class BeaconGroupsModel {
     private float realScaleFactor;
     private float wight;
     private float height;
-    private HashMap<Integer,BeaconInRoom> beacons;
+    private HashMap<Integer,BeaconInRoom> beaconsInRoom;
     private HashSet<TrippleGroup> trippleGroups;
     private HashSet<DubbleGroup> dubbleGroups;
 
@@ -32,11 +29,11 @@ public class BeaconGroupsModel {
         this.height = model.height;
         this.wight = model.wight;
         this.realScaleFactor = model.realScaleFactor;
-        this.beacons = new HashMap<>();
+        this.beaconsInRoom = new HashMap<>();
         this.trippleGroups = new HashSet<>();
         this.dubbleGroups = new HashSet<>();
         for (BeaconInRoom b : model.beacons) {
-            this.beacons.put(b.id3, b);
+            this.beaconsInRoom.put(b.id3, b);
         }
 
         for (int i = 0; i < model.beacons.size(); i++) {
@@ -79,7 +76,7 @@ public class BeaconGroupsModel {
 
 
         for (Integer id3: group.getGroupIds()) {
-            BeaconInRoom rb = this.beacons.get(id3);
+            BeaconInRoom rb = this.beaconsInRoom.get(id3);
             x.add(rb.x);
             y.add(rb.y);
         }
@@ -144,94 +141,18 @@ public class BeaconGroupsModel {
             distances.put(id3, beacon.getDistance());
             DefaultDistanceCalculator dc = (DefaultDistanceCalculator)Beacon.getDistanceCalculator();
             double rssi = dc.calculateRssi(beacon.getTxPower(),beacon.getDistance());
-            BeaconInRoom bir = this.beacons.get(id3);
-            RangedBeacon rb = new RangedBeacon(bir,rssi);
-            rangedBeacons.put(id3,rb);
+            BeaconInRoom bir = this.beaconsInRoom.get(id3);
+            if(bir != null) {
+                RangedBeacon rb = new RangedBeacon(bir,beacon.getTxPower(), rssi);
+                rangedBeacons.put(id3, rb);
+            }
 
         }
-
         HashSet<TrippleGroup> tripples = this.getMatchedTrippleGroups(distances.keySet());
         HashSet<DubbleGroup> dobleGroups = this.getMatchedDobleGroups(distances.keySet());
 
-
-
-
         BeaconCalculationModel calculationModel = new BeaconCalculationModel(tripples,dobleGroups,rangedBeacons);
 
-        Collections.sort(subSet, new BeaconGroupComporator(distances));
-        if (subSet.size() > 0) {
-            int count = 1;
-            if (SettingsActivity.BeaconGroupCount != null) {
-                count = SettingsActivity.BeaconGroupCount;
-                if (count > subSet.size()) {
-                    count = subSet.size();
-                }
-            }
-
-            subSet = subSet.subList(0, count);
-            if(subSet.size() == 1) {
-                BeaconGroup nextGroup = subSet.get(0);
-                if(this.mCurrentGroup != null) {
-                    if(!nextGroup.equals(this.mCurrentGroup)) {
-                        this.mCurrentGroup = nextGroup;
-                        return calculationModel;
-                    }
-                }
-                this.mCurrentGroup = nextGroup;
-            }
-        }
-
-
-        for (BeaconGroup group : subSet) {
-            List<RangedBeacon> datas = new ArrayList<>();
-            for (int id3 : group.keySet()) {
-                RangedBeacon data = new RangedBeacon(id3,distances.get(id3) * this.realScaleFactor);
-                datas.add(data);
-            }
-            calculationModel.add(datas);
-        }
-
-        return calculationModel;
-    }
-    public ArrayList<List<RangedBeacon>> getCalculationModel1(Collection<Beacon> beacons) {
-        ArrayList<List<RangedBeacon>> calculationModel = new ArrayList<>();
-        HashMap<Integer, Double> distances = new HashMap<>();
-        for (Beacon beacon : beacons) {
-            distances.put(beacon.getId3().toInt(), beacon.getDistance());
-        }
-        List<BeaconGroup> subSet = getSubSet(distances.keySet());
-        Collections.sort(subSet, new BeaconGroupComporator(distances));
-        if (subSet.size() > 0) {
-            int count = 1;
-            if (SettingsActivity.BeaconGroupCount != null) {
-                count = SettingsActivity.BeaconGroupCount;
-                if (count > subSet.size()) {
-                    count = subSet.size();
-                }
-            }
-
-            subSet = subSet.subList(0, count);
-            if(subSet.size() == 1) {
-                BeaconGroup nextGroup = subSet.get(0);
-                if(this.mCurrentGroup != null) {
-                    if(!nextGroup.equals(this.mCurrentGroup)) {
-                        this.mCurrentGroup = nextGroup;
-                        return calculationModel;
-                    }
-                }
-                this.mCurrentGroup = nextGroup;
-            }
-        }
-
-
-        for (BeaconGroup group : subSet) {
-            List<RangedBeacon> datas = new ArrayList<>();
-            for (int id3 : group.keySet()) {
-                RangedBeacon data = new RangedBeacon(id3,distances.get(id3) * this.realScaleFactor);
-                datas.add(data);
-            }
-            calculationModel.add(datas);
-        }
 
         return calculationModel;
     }
@@ -256,17 +177,6 @@ public class BeaconGroupsModel {
         return subSet;
     }
 
-    private BeaconGroup mCurrentGroup;
-    private List<BeaconGroup> getSubSet(Set<Integer> keys) {
-        List<BeaconGroup> subSet = new ArrayList<>();
-        for (BeaconGroup key : this) {
-            if (keys.containsAll(key.keySet())) {
-                subSet.add(key);
-            }
-
-        }
-        return subSet;
-    }
 
     private class BeaconGroupComporator implements Comparator<BeaconGroup> {
         HashMap<Integer, Double> distances;

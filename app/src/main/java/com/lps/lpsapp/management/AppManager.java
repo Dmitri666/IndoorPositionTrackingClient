@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.lps.lpsapp.LpsApplication;
 import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.services.InDoorPositionService;
 import com.lps.lpsapp.services.PushService;
 import com.lps.lpsapp.services.WebApiActions;
@@ -21,6 +22,7 @@ import com.lps.webapi.AccessToken;
 import com.lps.webapi.IWebApiResultListener;
 import com.lps.webapi.services.WebApiService;
 
+import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BleNotAvailableException;
 
 /**
@@ -60,6 +62,7 @@ public class AppManager {
             InDoorPositionService.LocalBinder binder = (InDoorPositionService.LocalBinder) service;
             mPositionService = binder.getService();
             mPositionServiceBound = true;
+            Beacon.setDistanceCalculator(new DefaultDistanceCalculator(0.42093,6.9476,0.54992));
 
 
         }

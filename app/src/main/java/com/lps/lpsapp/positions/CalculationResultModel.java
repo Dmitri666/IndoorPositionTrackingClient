@@ -1,7 +1,5 @@
 package com.lps.lpsapp.positions;
 
-import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.Region;
 
 import java.util.ArrayList;
@@ -34,9 +32,9 @@ public class CalculationResultModel extends ArrayList<CalculationResult> {
     private void analyse() {
         List<CalculationResult> list = new ArrayList<>();
         for(CalculationResult cr:this) {
-            if(cr.groupKey.contains(1)) {
-                list.add(cr);
-            }
+            //if(cr.groupKey.contains(1)) {
+            //    list.add(cr);
+            //}
         }
 
         String s = "";
@@ -47,34 +45,37 @@ public class CalculationResultModel extends ArrayList<CalculationResult> {
         if (this.size() == 0) {
             return null;
         }
-        boolean res = false;
-        Path first = null;
-        for (CalculationResult point : this) {
-            if(first == null) {
-                first = point.path;
-            }
-            else {
-                res = first.op(point.path, Path.Op.INTERSECT);
-            }
-
+        else {
+            return this.get(0).point;
         }
-
-        if(res)
-        {
-            Region reg = new Region();
-            reg.setPath(first,clip);
-            Rect b = new Rect();
-            reg.getBounds(b);
-
-            if(reg.isEmpty()) {
-                Path p = first;
-            }
-            else {
-                Path p = first;
-            }
-
-        }
-
-        return result;
+//        boolean res = false;
+//        Path first = null;
+//        for (CalculationResult point : this) {
+//            if(first == null) {
+//                first = point.path;
+//            }
+//            else {
+//                res = first.op(point.path, Path.Op.INTERSECT);
+//            }
+//
+//        }
+//
+//        if(res)
+//        {
+//            Region reg = new Region();
+//            reg.setPath(first,clip);
+//            Rect b = new Rect();
+//            reg.getBounds(b);
+//
+//            if(reg.isEmpty()) {
+//                Path p = first;
+//            }
+//            else {
+//                Path p = first;
+//            }
+//
+//        }
+//
+//        return result;
     }
 }
