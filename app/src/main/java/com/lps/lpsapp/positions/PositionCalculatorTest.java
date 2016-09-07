@@ -44,6 +44,7 @@ public class PositionCalculatorTest {
     public CalculationResultModel calculatePosition(Collection<Beacon> beacons) {
         BeaconCalculationModel calculationModel = this.beaconModel.getCalculationModel(beacons);
         CalculationResultModel resultModel = new CalculationResultModel();
+        for(TrippleGroup group :calculationModel.)
         resultModel.clip = new Region(0, 0, Math.round(beaconModel.getWight()), Math.round(beaconModel.getHeight()));
 
         List<RangedBeacon> firstGroup = null;

@@ -6,18 +6,31 @@ import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
  * Created by dle on 29.10.2015.
  */
 public class RangedBeacon {
-    public int id3;
-    public float x;
-    public float y;
-    private double rssi;
+    private BeaconInRoom beaconInRoom;
+    private double avrRssi;
 
 
-    public RangedBeacon(BeaconInRoom b) {
-        this.id3 = b.id3;
-        this.x = b.x;
-        this.y = b.y;
-
+    public RangedBeacon(BeaconInRoom b,double avrRssi) {
+        this.beaconInRoom = b;
+        this.avrRssi = avrRssi;
     }
+
+    public float getX() {
+        return this.beaconInRoom.x;
+    }
+
+    public float getY() {
+        return this.beaconInRoom.y;
+    }
+
+    public int getId3() {
+        return this.beaconInRoom.id3;
+    }
+
+    public double getAvrRssi(){
+        return this.avrRssi;
+    }
+
 
 
 }

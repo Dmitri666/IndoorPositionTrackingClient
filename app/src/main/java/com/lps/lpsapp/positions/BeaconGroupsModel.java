@@ -1,10 +1,12 @@
 package com.lps.lpsapp.positions;
 
 import com.lps.lpsapp.activities.SettingsActivity;
+import com.lps.lpsapp.altbeacon.DefaultDistanceCalculator;
 import com.lps.lpsapp.viewModel.chat.BeaconInRoom;
 import com.lps.lpsapp.viewModel.chat.BeaconModel;
 
 import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.distance.DistanceCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +24,7 @@ public class BeaconGroupsModel {
     private float realScaleFactor;
     private float wight;
     private float height;
-    private HashMap<Integer,RangedBeacon> beacons;
+    private HashMap<Integer,BeaconInRoom> beacons;
     private HashSet<TrippleGroup> trippleGroups;
     private HashSet<DubbleGroup> dubbleGroups;
 
@@ -34,8 +36,7 @@ public class BeaconGroupsModel {
         this.trippleGroups = new HashSet<>();
         this.dubbleGroups = new HashSet<>();
         for (BeaconInRoom b : model.beacons) {
-            RangedBeacon rb = new RangedBeacon(b);
-            this.beacons.put(rb.id3, rb);
+            this.beacons.put(b.id3, b);
         }
 
         for (int i = 0; i < model.beacons.size(); i++) {
@@ -78,7 +79,7 @@ public class BeaconGroupsModel {
 
 
         for (Integer id3: group.getGroupIds()) {
-            RangedBeacon rb = this.beacons.get(id3);
+            BeaconInRoom rb = this.beacons.get(id3);
             x.add(rb.x);
             y.add(rb.y);
         }
@@ -135,13 +136,28 @@ public class BeaconGroupsModel {
 
 
     public BeaconCalculationModel getCalculationModel(Collection<Beacon> beacons) {
-        BeaconCalculationModel calculationModel = new BeaconCalculationModel();
+
         HashMap<Integer, Double> distances = new HashMap<>();
+        HashMap<Integer,RangedBeacon> rangedBeacons = new HashMap<>();
         for (Beacon beacon : beacons) {
-            distances.put(beacon.getId3().toInt(), beacon.getDistance());
+            Integer id3 = beacon.getId3().toInt();
+            distances.put(id3, beacon.getDistance());
+            DefaultDistanceCalculator dc = (DefaultDistanceCalculator)Beacon.getDistanceCalculator();
+            double rssi = dc.calculateRssi(beacon.getTxPower(),beacon.getDistance());
+            BeaconInRoom bir = this.beacons.get(id3);
+            RangedBeacon rb = new RangedBeacon(bir,rssi);
+            rangedBeacons.put(id3,rb);
+
         }
 
-        List<BeaconGroup> subSet = getSubSet(distances.keySet());
+        HashSet<TrippleGroup> tripples = this.getMatchedTrippleGroups(distances.keySet());
+        HashSet<DubbleGroup> dobleGroups = this.getMatchedDobleGroups(distances.keySet());
+
+
+
+
+        BeaconCalculationModel calculationModel = new BeaconCalculationModel(tripples,dobleGroups,rangedBeacons);
+
         Collections.sort(subSet, new BeaconGroupComporator(distances));
         if (subSet.size() > 0) {
             int count = 1;
