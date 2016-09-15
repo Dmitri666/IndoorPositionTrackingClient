@@ -5,11 +5,18 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
+import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
+import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+
+import trilateration.NonLinearLeastSquaresSolver;
+import trilateration.TrilaterationFunction;
 
 /**
  * Created by dle on 29.10.2015.
@@ -108,12 +115,20 @@ public class PositionCalculator {
             SimpleMatrix v2 = new SimpleMatrix(1,2,true,new double[]{rb2.getX(),rb2.getY()});
 
             SimpleMatrix vd = v1.minus(v2);
-            double d =  vd.s.determinant();
-            double d1 =  vd.determinant();
+            double d =  this.getLength(vd);
+            double s = ( Math.pow(d,2) + Math.pow(distance2,2) - Math.pow(distance1,2)) / 2.0 / d;
+            double h = Math.sqrt(Math.pow(distance2,2) - Math.pow(s,2));
 
+            SimpleMatrix vs = vd.scale(s / d);
+            SimpleMatrix test1 = vs.svd().getU();
+            SimpleMatrix test2 = vs.svd().getV();
 
 
             return null;
+        }
+
+        private double getLength(SimpleMatrix vector) {
+            return Math.sqrt( Math.pow(vector.get(0,0),2) + Math.pow(vector.get(0,0),2));
         }
     }
 
@@ -167,6 +182,22 @@ public class PositionCalculator {
         }
     }
 
+    public void Test()
+    {
+        double[][] positions = new double[][] { { 5.0, -6.0 }, { 13.0, -15.0 }, { 21.0, -3.0 }, { 12.4, -21.2 } };
+        double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };
+
+        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
+        LeastSquaresOptimizer.Optimum optimum = solver.solve();
+
+// the answer
+        double[] centroid = optimum.getPoint().toArray();
+
+// error and geometry information; may throw SingularMatrixException depending the threshold argument provided
+        RealVector standardDeviation = optimum.getSigma(0);
+        RealMatrix covarianceMatrix = optimum.getCovariances(0);
+    }
+    
     private Path calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
 //        try {
 //            for (int i = 0; i < 1000; i++) {
