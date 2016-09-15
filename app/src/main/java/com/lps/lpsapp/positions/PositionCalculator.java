@@ -166,17 +166,23 @@ public class PositionCalculator {
             }
 
             NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
-            LeastSquaresOptimizer.Optimum optimum = solver.solve();
+            try{
+                LeastSquaresOptimizer.Optimum optimum = solver.solve();
 
-            // the answer
-            double[] centroid = optimum.getPoint().toArray();
+                // the answer
+                double[] centroid = optimum.getPoint().toArray();
 
-            // error and geometry information; may throw SingularMatrixException depending the threshold argument provided
-            RealVector standardDeviation = optimum.getSigma(0);
-            RealMatrix covarianceMatrix = optimum.getCovariances(0);
+                // error and geometry information; may throw SingularMatrixException depending the threshold argument provided
+                RealVector standardDeviation = optimum.getSigma(0);
+                RealMatrix covarianceMatrix = optimum.getCovariances(0);
 
 
-            return null;
+                return new Point2D((float) centroid[0],(float) centroid[1]);
+            } catch (Exception ex) {
+                Log.e(TAG,ex.getMessage(),ex);
+                return null;
+            }
+
         }
 
 

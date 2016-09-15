@@ -108,7 +108,7 @@ public class TimedBeaconSimulator implements org.altbeacon.beacon.simulator.Beac
                     double distance = Math.sqrt(Math.pow(currentPoint.x - (beacon.x / this.mBeaconmodel.realScaleFactor), 2.0) + Math.pow(currentPoint.y - beacon.y / this.mBeaconmodel.realScaleFactor, 2.0));
                     double rssi = calc.calculateRssi(-55, distance);
 
-                    rssi = rssi * (0.9d + 0.1d * random.nextDouble());
+                    //rssi = rssi * (0.9d + 0.1d * random.nextDouble());
                     //rssi = rssi * 0.9d;
                     b.setRssi(Math.round(Math.round(rssi)));
                     //Log.d(TAG,"distance " + distance);
