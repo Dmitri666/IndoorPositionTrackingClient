@@ -13,7 +13,9 @@ import org.ejml.simple.SimpleMatrix;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import trilateration.NonLinearLeastSquaresSolver;
 import trilateration.TrilaterationFunction;
@@ -63,6 +65,9 @@ public class PositionCalculator {
 
         }
 
+        MultilaterationCalculator multilaterationCalculator = new MultilaterationCalculator(calculationModel);
+        multilaterationCalculator.calculate();
+
         TrigometricCalculator trigometricCalculator = new TrigometricCalculator(calculationModel,area);
         for(DubbleGroup group :calculationModel.dubbleGroups) {
 
@@ -92,6 +97,8 @@ public class PositionCalculator {
 
         return resultModel;
     }
+
+
 
     private class TrigometricCalculator {
         private BeaconCalculationModel calculationModel;
@@ -130,6 +137,49 @@ public class PositionCalculator {
         private double getLength(SimpleMatrix vector) {
             return Math.sqrt( Math.pow(vector.get(0,0),2) + Math.pow(vector.get(0,0),2));
         }
+    }
+
+    private class MultilaterationCalculator {
+        private BeaconCalculationModel calculationModel;
+
+
+        public MultilaterationCalculator(BeaconCalculationModel calculationModel) {
+            this.calculationModel = calculationModel;
+
+        }
+
+        public Point2D calculate() {
+            //double[][] positions = new double[][] { { 5.0, -6.0 }, { 13.0, -15.0 }, { 21.0, -3.0 }, { 12.4, -21.2 } };
+            //double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };
+            double[][] positions = new double[this.calculationModel.beacons.size()][2];
+            double[] distances = new double[this.calculationModel.beacons.size()];
+
+            int index = 0;
+            Iterator it =  this.calculationModel.beacons.entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry<Integer,RangedBeacon> o = (Map.Entry<Integer,RangedBeacon>)it.next();
+                RangedBeacon rb = o.getValue();
+                positions[index][0] = rb.getX();
+                positions[index][1] = rb.getY();
+                distances[index] = rb.getAvrDistance();
+                index++;
+            }
+
+            NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
+            LeastSquaresOptimizer.Optimum optimum = solver.solve();
+
+            // the answer
+            double[] centroid = optimum.getPoint().toArray();
+
+            // error and geometry information; may throw SingularMatrixException depending the threshold argument provided
+            RealVector standardDeviation = optimum.getSigma(0);
+            RealMatrix covarianceMatrix = optimum.getCovariances(0);
+
+
+            return null;
+        }
+
+
     }
 
     private class TrelatationCalculator {
@@ -182,22 +232,8 @@ public class PositionCalculator {
         }
     }
 
-    public void Test()
-    {
-        double[][] positions = new double[][] { { 5.0, -6.0 }, { 13.0, -15.0 }, { 21.0, -3.0 }, { 12.4, -21.2 } };
-        double[] distances = new double[] { 8.06, 13.97, 23.32, 15.31 };
 
-        NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
-        LeastSquaresOptimizer.Optimum optimum = solver.solve();
 
-// the answer
-        double[] centroid = optimum.getPoint().toArray();
-
-// error and geometry information; may throw SingularMatrixException depending the threshold argument provided
-        RealVector standardDeviation = optimum.getSigma(0);
-        RealMatrix covarianceMatrix = optimum.getCovariances(0);
-    }
-    
     private Path calculateRegion(List<RangedBeacon> beaconDatas, List<RangedBeacon> firstGroup ) {
 //        try {
 //            for (int i = 0; i < 1000; i++) {

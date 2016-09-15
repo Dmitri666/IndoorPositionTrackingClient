@@ -143,7 +143,7 @@ public class BeaconGroupsModel {
             double rssi = dc.calculateRssi(beacon.getTxPower(),beacon.getDistance());
             BeaconInRoom bir = this.beaconsInRoom.get(id3);
             if(bir != null) {
-                RangedBeacon rb = new RangedBeacon(bir,beacon.getTxPower(), rssi);
+                RangedBeacon rb = new RangedBeacon(bir,beacon.getTxPower(), rssi,beacon.getDistance());
                 rangedBeacons.put(id3, rb);
             }
 
